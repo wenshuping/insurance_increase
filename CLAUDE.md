@@ -93,15 +93,6 @@ skills:
 "以测试工程师角色，为投保流程写 Playwright 测试"
 ```
 
-也可以用斜杠命令直接调用：
-
-```
-/frontend-design
-/webapp-testing
-/c4-architecture
-/prioritizing-roadmap
-```
-
 ---
 
 ## 技术栈
