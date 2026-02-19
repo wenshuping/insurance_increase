@@ -67,6 +67,7 @@ skills:
   - vercel-react-best-practices  # React/Next.js 最佳实践
   - tailwind-design-system     # 组件实现
   - accessibility-compliance   # 无障碍交互
+  - ralph-wiggum               # 规范驱动自主编码
 ```
 
 ### ⚙️ 后端开发
@@ -75,6 +76,7 @@ skills:
 skills:
   - architecture-patterns      # 分层架构、领域模型
   - microservices-patterns     # 服务间通信
+  - ralph-wiggum               # 规范驱动自主编码
 ```
 
 ### 🧪 测试工程师
