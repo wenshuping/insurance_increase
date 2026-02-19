@@ -213,6 +213,10 @@
   /* === F-001 QUIZ OVERLAY === */
   #quiz-overlay { position:absolute;inset:0;background:#F6F8FB;z-index:200;flex-direction:column;display:none;overflow:hidden; }
   #quiz-overlay.q-active { display:flex; }
+
+  /* === F-011 CLAIMS OVERLAY === */
+  #claims-overlay.cl-active { display:flex !important; }
+  #claims-material-sheet.open { display:flex !important; }
   .qs { display:none;flex-direction:column;flex:1;overflow:hidden; }
   .qs.q-cur { display:flex; }
   .qs-scroll { flex:1;overflow-y:auto; }
@@ -620,6 +624,50 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             </div>
             <div style="font-size:12px;color:#6B7280;text-align:center;">添加保单</div>
+          </div>
+        </div>
+      </div>
+      <!-- F-011: 理赔进度追踪入口卡 -->
+      <div style="margin:0 16px 16px;background:linear-gradient(135deg,#F0FDF4,#ECFDF5);border-radius:16px;border:1.5px solid #A7F3D0;padding:16px;cursor:pointer;" onclick="openClaims()">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#10B981,#059669);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#065F46;">理赔进度追踪</div>
+              <div style="font-size:12px;color:#10B981;margin-top:2px;">核赔审查中 · 预计2-3个工作日</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <div style="background:#10B981;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;">进行中</div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:0;">
+          <div style="text-align:center;flex:1;">
+            <div style="width:24px;height:24px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style="font-size:9px;color:#10B981;font-weight:600;">报案受理</div>
+          </div>
+          <div style="height:2px;flex:1;background:#10B981;margin-bottom:14px;"></div>
+          <div style="text-align:center;flex:1;">
+            <div style="width:24px;height:24px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div style="font-size:9px;color:#10B981;font-weight:600;">材料审核</div>
+          </div>
+          <div style="height:2px;flex:1;background:#10B981;margin-bottom:14px;"></div>
+          <div style="text-align:center;flex:1;">
+            <div style="width:24px;height:24px;border-radius:50%;background:#F5A623;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;animation:pulse-ring 1.5s infinite;"><div style="width:8px;height:8px;border-radius:50%;background:#fff;"></div></div>
+            <div style="font-size:9px;color:#F5A623;font-weight:700;">核赔审查</div>
+          </div>
+          <div style="height:2px;flex:1;background:#E5E7EB;margin-bottom:14px;"></div>
+          <div style="text-align:center;flex:1;">
+            <div style="width:24px;height:24px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;"></div>
+            <div style="font-size:9px;color:#9CA3AF;">赔付打款</div>
+          </div>
+          <div style="height:2px;flex:1;background:#E5E7EB;margin-bottom:14px;"></div>
+          <div style="text-align:center;flex:1;">
+            <div style="width:24px;height:24px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;"></div>
+            <div style="font-size:9px;color:#9CA3AF;">理赔完成</div>
           </div>
         </div>
       </div>
@@ -2188,6 +2236,209 @@ function switchHistoryTab(el) {
 function openRulesSheet() { document.getElementById('rules-sheet-bg').classList.add('open'); }
 function closeRulesSheet() { document.getElementById('rules-sheet-bg').classList.remove('open'); }
 
+/* ===== F-011: 理赔进度追踪 ===== */
+function openClaims() {
+  document.getElementById('claims-overlay').classList.add('cl-active');
+}
+function closeClaims() {
+  document.getElementById('claims-overlay').classList.remove('cl-active');
+}
+function openClaimsMaterial() {
+  document.getElementById('claims-material-sheet').classList.add('open');
+}
+function closeClaimsMaterial() {
+  document.getElementById('claims-material-sheet').classList.remove('open');
+}
+function shareClaimsProgress() {
+  alert('理赔进度已分享到微信好友。（原型演示）');
+}
+
 </script>
+
+<!-- ===== F-011: 理赔进度追踪 Overlay ===== -->
+<div id="claims-overlay" style="position:absolute;inset:0;background:#F6F8FB;z-index:200;flex-direction:column;display:none;overflow-y:auto;">
+  <!-- id冲突修正：删除内部重复div -->
+
+  <!-- Header -->
+  <div style="background:linear-gradient(160deg,#065F46,#059669);padding:54px 20px 28px;position:relative;overflow:hidden;flex-shrink:0;">
+    <div style="position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);pointer-events:none;"></div>
+    <div style="position:absolute;left:-20px;bottom:-40px;width:90px;height:90px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none;"></div>
+    <button onclick="closeClaims()" style="position:absolute;top:54px;left:16px;background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div style="text-align:center;">
+      <div style="font-size:12px;color:rgba(255,255,255,0.7);letter-spacing:1px;margin-bottom:8px;">CLAIM TRACKING</div>
+      <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;">理赔进度追踪</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.75);">案件编号 CL-2026-0219-003</div>
+      <div style="margin-top:16px;background:rgba(255,255,255,0.15);border-radius:12px;padding:12px 20px;display:inline-flex;align-items:center;gap:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#F5A623;animation:pulse-ring 1.5s infinite;"></div>
+        <span style="font-size:14px;font-weight:700;color:#fff;">核赔审查中</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.75);">预计 2-3 个工作日</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Claim Info Card -->
+  <div style="margin:16px 16px 0;background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:14px;font-weight:700;color:#0F1E37;">理赔案件信息</div>
+      <div style="font-size:11px;color:#6B7A8D;">2026-02-15 提交</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="background:#F6F8FB;border-radius:10px;padding:10px;">
+        <div style="font-size:11px;color:#6B7A8D;margin-bottom:3px;">险种</div>
+        <div style="font-size:13px;font-weight:600;color:#0F1E37;">重疾险</div>
+      </div>
+      <div style="background:#F6F8FB;border-radius:10px;padding:10px;">
+        <div style="font-size:11px;color:#6B7A8D;margin-bottom:3px;">保险公司</div>
+        <div style="font-size:13px;font-weight:600;color:#0F1E37;">平安人寿</div>
+      </div>
+      <div style="background:#F6F8FB;border-radius:10px;padding:10px;">
+        <div style="font-size:11px;color:#6B7A8D;margin-bottom:3px;">申请金额</div>
+        <div style="font-size:14px;font-weight:800;color:#059669;">¥200,000</div>
+      </div>
+      <div style="background:#F6F8FB;border-radius:10px;padding:10px;">
+        <div style="font-size:11px;color:#6B7A8D;margin-bottom:3px;">保障顾问</div>
+        <div style="font-size:13px;font-weight:600;color:#0F1E37;">张婷婷 <span style="color:#2B7FBF;">联系</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Timeline -->
+  <div style="margin:16px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <div style="font-size:14px;font-weight:700;color:#0F1E37;margin-bottom:20px;">办理进度</div>
+
+    <!-- Step 1: Done -->
+    <div style="display:flex;gap:14px;margin-bottom:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="width:2px;flex:1;background:#10B981;min-height:44px;margin:4px 0;"></div>
+      </div>
+      <div style="flex:1;padding-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:14px;font-weight:700;color:#10B981;">报案受理</div>
+          <div style="font-size:11px;color:#6B7A8D;">2026-02-15</div>
+        </div>
+        <div style="font-size:12px;color:#6B7A8D;line-height:1.5;">您的理赔申请已提交，已分配专属理赔专员。案件受理完成。</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Done -->
+    <div style="display:flex;gap:14px;margin-bottom:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="width:2px;flex:1;background:#F5A623;min-height:44px;margin:4px 0;"></div>
+      </div>
+      <div style="flex:1;padding-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:14px;font-weight:700;color:#10B981;">材料审核</div>
+          <div style="font-size:11px;color:#6B7A8D;">2026-02-17</div>
+        </div>
+        <div style="font-size:12px;color:#6B7A8D;line-height:1.5;">全部6项材料已审核通过，符合理赔条件，已转交核赔部门。</div>
+      </div>
+    </div>
+
+    <!-- Step 3: Active -->
+    <div style="display:flex;gap:14px;margin-bottom:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#F5A623;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(245,166,35,0.2);">
+          <div style="width:10px;height:10px;border-radius:50%;background:#fff;"></div>
+        </div>
+        <div style="width:2px;flex:1;background:#E5E7EB;min-height:44px;margin:4px 0;"></div>
+      </div>
+      <div style="flex:1;padding-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <div style="font-size:14px;font-weight:700;color:#D97706;">核赔审查</div>
+          <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:2px 8px;">
+            <span style="font-size:11px;color:#D97706;font-weight:700;">进行中</span>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#6B7A8D;line-height:1.5;margin-bottom:10px;">核赔专员正在审查病历及医疗证明材料，预计 <strong style="color:#D97706;">2-3个工作日</strong> 完成。</div>
+        <div onclick="openClaimsMaterial()" style="background:#FFF7ED;border:1px solid #FDE68A;border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:12px;font-weight:600;color:#D97706;">查看所需材料清单（4/6已提交）</div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Pending -->
+    <div style="display:flex;gap:14px;margin-bottom:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;">
+          <div style="width:10px;height:10px;border-radius:50%;background:#D1D5DB;"></div>
+        </div>
+        <div style="width:2px;flex:1;background:#E5E7EB;min-height:44px;margin:4px 0;"></div>
+      </div>
+      <div style="flex:1;padding-bottom:24px;">
+        <div style="font-size:14px;font-weight:600;color:#9CA3AF;margin-bottom:4px;">赔付打款</div>
+        <div style="font-size:12px;color:#C4CBD4;">审核通过后，赔款将直接打入您的银行账户。</div>
+      </div>
+    </div>
+
+    <!-- Step 5: Pending -->
+    <div style="display:flex;gap:14px;">
+      <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:600;color:#9CA3AF;margin-bottom:4px;">理赔完成</div>
+        <div style="font-size:12px;color:#C4CBD4;">这份承诺，今天兑现了。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom action -->
+  <div style="padding:16px;flex-shrink:0;margin-top:auto;">
+    <button onclick="shareClaimsProgress()" style="width:100%;height:50px;border-radius:14px;border:1.5px solid #10B981;background:#fff;color:#10B981;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans SC';display:flex;align-items:center;justify-content:center;gap:8px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      分享理赔进度给家人
+    </button>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:#6B7A8D;">如有疑问，请联系您的保障顾问 <strong style="color:#2B7FBF;">张婷婷</strong></div>
+  </div>
+</div>
+
+<!-- Claims Material Sheet -->
+<div id="claims-material-sheet" style="position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:300;display:none;align-items:flex-end;" onclick="if(event.target===this)closeClaimsMaterial()">
+  <div style="background:#fff;border-radius:24px 24px 0 0;width:100%;padding:24px 20px 36px;max-height:70%;">
+    <div style="width:36px;height:4px;background:#E5E7EB;border-radius:2px;margin:0 auto 20px;"></div>
+    <div style="font-size:16px;font-weight:800;color:#0F1E37;margin-bottom:6px;">材料清单</div>
+    <div style="font-size:12px;color:#6B7A8D;margin-bottom:20px;">共6项，已提交4项</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#F0FDF4;border-radius:12px;">
+        <div style="width:22px;height:22px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><div style="font-size:13px;font-weight:600;color:#065F46;">理赔申请书</div><div style="font-size:11px;color:#10B981;">已提交 · 2026-02-15</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#F0FDF4;border-radius:12px;">
+        <div style="width:22px;height:22px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><div style="font-size:13px;font-weight:600;color:#065F46;">诊断证明书（原件）</div><div style="font-size:11px;color:#10B981;">已提交 · 2026-02-15</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#F0FDF4;border-radius:12px;">
+        <div style="width:22px;height:22px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><div style="font-size:13px;font-weight:600;color:#065F46;">住院病历复印件</div><div style="font-size:11px;color:#10B981;">已提交 · 2026-02-16</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#F0FDF4;border-radius:12px;">
+        <div style="width:22px;height:22px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><div style="font-size:13px;font-weight:600;color:#065F46;">身份证复印件</div><div style="font-size:11px;color:#10B981;">已提交 · 2026-02-15</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#FFF7ED;border-radius:12px;border:1px solid #FDE68A;">
+        <div style="width:22px;height:22px;border-radius:50%;background:#FDE68A;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:12px;">!</span></div>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#92400E;">银行卡复印件</div><div style="font-size:11px;color:#D97706;">待提交 · 请上传</div></div>
+        <div style="background:#F5A623;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;">上传</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:#FFF7ED;border-radius:12px;border:1px solid #FDE68A;">
+        <div style="width:22px;height:22px;border-radius:50%;background:#FDE68A;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="font-size:12px;">!</span></div>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#92400E;">病理检查报告</div><div style="font-size:11px;color:#D97706;">待提交 · 如有请上传</div></div>
+        <div style="background:#F5A623;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;">上传</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
