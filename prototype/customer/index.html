@@ -608,6 +608,212 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ============================
+   ADVISOR CARD (homepage strip)
+============================ */
+.advisor-strip {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border-radius: var(--radius-card);
+  padding: 12px 14px; margin: 12px 16px 0;
+  box-shadow: var(--shadow-card); cursor: pointer;
+}
+.advisor-strip:active { transform: scale(0.99); }
+.advisor-avatar-wrap { position: relative; flex-shrink: 0; }
+.advisor-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: linear-gradient(135deg, #2B7FBF 0%, #3DAA85 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #fff;
+  border: 2px solid #fff; box-shadow: 0 2px 8px rgba(43,127,191,0.25);
+}
+.advisor-cert-dot {
+  position: absolute; bottom: 0; right: 0;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--warm); border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.advisor-cert-dot svg { width: 8px; height: 8px; color: #fff; }
+.advisor-info { flex: 1; min-width: 0; }
+.advisor-role-label { font-size: 11px; color: var(--text-caption); margin-bottom: 2px; }
+.advisor-name { font-size: 15px; font-weight: 700; color: var(--text-h1); }
+.advisor-meta { font-size: 12px; color: var(--text-caption); margin-top: 2px; }
+.advisor-cta-arrow svg { width: 20px; height: 20px; color: var(--primary); }
+
+/* ============================
+   OVERLAY: ADVISOR DETAIL
+============================ */
+#overlay-advisor {
+  position: absolute; inset: 0; z-index: 500;
+  background: var(--bg); display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+#overlay-advisor.open { transform: translateX(0); }
+
+.adv-topbar {
+  height: 52px; background: var(--card);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.adv-back { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.adv-back svg { width: 20px; height: 20px; color: var(--text-h1); }
+.adv-back-label { font-size: 16px; font-weight: 600; color: var(--text-h1); }
+.adv-share { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--primary); cursor: pointer; }
+.adv-share svg { width: 16px; height: 16px; }
+
+/* Hero banner */
+.adv-hero {
+  background: linear-gradient(160deg, #EBF4FF 0%, #E8F8F2 100%);
+  padding: 24px 20px 20px; text-align: center; flex-shrink: 0;
+}
+.adv-hero-avatar-wrap { position: relative; display: inline-block; margin-bottom: 10px; }
+.adv-hero-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, #2B7FBF 0%, #3DAA85 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 800; color: #fff;
+  border: 4px solid #fff; box-shadow: 0 4px 16px rgba(43,127,191,0.3);
+  margin: 0 auto;
+}
+.adv-hero-badge {
+  position: absolute; bottom: 0; right: -4px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--warm); border: 2px solid #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.adv-hero-badge svg { width: 12px; height: 12px; color: #fff; }
+.adv-hero-name { font-size: 22px; font-weight: 700; color: var(--text-h1); }
+.adv-hero-role { font-size: 13px; color: var(--text-caption); margin-top: 3px; }
+.adv-stats-row { display: flex; justify-content: center; gap: 0; margin-top: 16px; }
+.adv-stat {
+  flex: 1; text-align: center;
+  border-right: 1px solid var(--border);
+}
+.adv-stat:last-child { border-right: none; }
+.adv-stat-num { font-family: "DIN Alternate", monospace; font-size: 24px; font-weight: 700; }
+.adv-stat-num.blue { color: var(--primary); }
+.adv-stat-num.green { color: var(--secondary); }
+.adv-stat-num.warm { color: var(--warm); }
+.adv-stat-label { font-size: 11px; color: var(--text-caption); margin-top: 2px; }
+
+/* Advisor body scroll */
+.adv-body { flex: 1; overflow-y: auto; }
+.adv-body::-webkit-scrollbar { display: none; }
+.adv-section { padding: 16px 16px 0; }
+.adv-section-title {
+  font-size: 13px; font-weight: 600; color: var(--text-caption);
+  letter-spacing: 0.5px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+}
+.adv-section-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* Specialty tags */
+.adv-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.adv-tag {
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 12px; font-weight: 500;
+  background: #EBF4FF; color: var(--primary);
+  border: 1px solid rgba(43,127,191,0.2);
+}
+
+/* Quote */
+.adv-quote {
+  border-left: 3px solid var(--primary);
+  padding: 10px 14px; background: #EBF4FF;
+  border-radius: 0 8px 8px 0; margin-bottom: 10px;
+}
+.adv-quote-text { font-size: 14px; font-style: italic; color: var(--text-h2); line-height: 1.6; }
+.adv-bio { font-size: 14px; color: var(--text-body); line-height: 1.7; }
+.adv-bio-expand {
+  font-size: 13px; color: var(--primary); cursor: pointer;
+  margin-top: 6px; display: flex; align-items: center; gap: 4px;
+}
+
+/* Credentials */
+.adv-cred-list { display: flex; flex-direction: column; gap: 8px; }
+.adv-cred-item {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--card); border-radius: var(--radius-sm);
+  padding: 12px 14px; border: 1px solid var(--border);
+}
+.adv-cred-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.adv-cred-icon.blue { background: #EBF4FF; }
+.adv-cred-icon.blue svg { color: var(--primary); }
+.adv-cred-icon.warm { background: #FFF4E0; }
+.adv-cred-icon.warm svg { color: var(--warm); }
+.adv-cred-icon svg { width: 18px; height: 18px; }
+.adv-cred-name { font-size: 14px; font-weight: 600; color: var(--text-h1); }
+.adv-cred-sub { font-size: 12px; color: var(--text-caption); margin-top: 2px; }
+
+/* Review cards */
+.adv-review-wrap { overflow: hidden; position: relative; }
+.adv-review-scroll { display: flex; gap: 10px; transition: transform 0.3s ease; }
+.adv-review-card {
+  min-width: 100%; background: var(--card);
+  border-radius: var(--radius-card); padding: 16px;
+  border: 1px solid var(--border);
+}
+.adv-stars { color: var(--warm); font-size: 14px; margin-bottom: 8px; letter-spacing: 2px; }
+.adv-review-text { font-size: 14px; color: var(--text-body); line-height: 1.7; font-style: italic; }
+.adv-review-author { font-size: 12px; color: var(--text-caption); margin-top: 10px; }
+.adv-review-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+.adv-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); cursor: pointer; }
+.adv-dot.active { background: var(--primary); width: 16px; border-radius: 3px; }
+
+/* Timeline */
+.adv-timeline { display: flex; flex-direction: column; gap: 0; }
+.adv-tl-item { display: flex; gap: 14px; position: relative; padding-bottom: 16px; }
+.adv-tl-item::before {
+  content: ''; position: absolute; left: 13px; top: 26px;
+  width: 2px; height: calc(100% - 10px);
+  background: linear-gradient(180deg, var(--primary) 0%, var(--border) 100%);
+}
+.adv-tl-item:last-child::before { display: none; }
+.adv-tl-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #EBF4FF; border: 2px solid var(--primary);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.adv-tl-dot svg { width: 12px; height: 12px; color: var(--primary); }
+.adv-tl-year { font-size: 12px; font-weight: 700; color: var(--primary); }
+.adv-tl-text { font-size: 13px; color: var(--text-body); margin-top: 2px; line-height: 1.5; }
+
+/* Self-disclosure */
+.adv-self-items { display: flex; flex-direction: column; gap: 8px; }
+.adv-self-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card); padding: 10px 14px;
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+}
+.adv-self-item svg { width: 16px; height: 16px; color: var(--secondary); flex-shrink: 0; }
+.adv-self-name { font-size: 13px; font-weight: 600; color: var(--text-h1); flex: 1; }
+.adv-self-amount { font-size: 12px; color: var(--text-caption); }
+
+/* Bottom CTA */
+.adv-footer {
+  display: flex; gap: 10px; padding: 12px 16px 16px;
+  background: var(--card); border-top: 1px solid var(--border); flex-shrink: 0;
+}
+.adv-btn-msg {
+  flex: 1; height: 48px; border-radius: var(--radius-btn);
+  background: #EBF4FF; color: var(--primary);
+  font-size: 14px; font-weight: 600; cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.adv-btn-msg svg { width: 16px; height: 16px; }
+.adv-btn-book {
+  flex: 2; height: 48px; border-radius: var(--radius-btn);
+  background: var(--gradient-cta); color: #fff;
+  font-size: 14px; font-weight: 600; cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.adv-btn-book svg { width: 16px; height: 16px; }
+
+/* ============================
    OVERLAY: DAILY CHECK-IN
 ============================ */
 #overlay-daily {
@@ -941,6 +1147,25 @@ a { text-decoration: none; color: inherit; }
 
       <!-- 主内容 -->
       <div class="home-body">
+
+        <!-- 专属守护顾问 mini 名片 -->
+        <div class="advisor-strip" onclick="openAdvisor()">
+          <div class="advisor-avatar-wrap">
+            <div class="advisor-avatar">陈</div>
+            <div class="advisor-cert-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+          </div>
+          <div class="advisor-info">
+            <div class="advisor-role-label">你的专属守护顾问</div>
+            <div class="advisor-name">陈晓霞</div>
+            <div class="advisor-meta">7年从业 · 服务843位家庭</div>
+          </div>
+          <div class="advisor-cta-arrow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+          </div>
+        </div>
+
         <!-- 保障指数卡 -->
         <div class="card index-card">
           <div class="ring-wrap">
@@ -1551,6 +1776,16 @@ a { text-decoration: none; color: inherit; }
               <div class="menu-item-text">
                 <div class="menu-item-title">守护健康报告</div>
                 <div class="menu-item-sub">最近测评：2026-02-01</div>
+              </div>
+              <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+            </div>
+            <div class="menu-item" onclick="openAdvisor()">
+              <div class="menu-item-icon" style="background:#EBF4FF;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/><path d="M18 14l2 2 4-4" style="stroke:var(--warm);"/></svg>
+              </div>
+              <div class="menu-item-text">
+                <div class="menu-item-title">我的顾问</div>
+                <div class="menu-item-sub">陈晓霞 · 专属守护顾问</div>
               </div>
               <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
             </div>
@@ -2526,6 +2761,237 @@ a { text-decoration: none; color: inherit; }
     </div>
   </div><!-- /sheet-earn-rules -->
 
+  <!-- ============================================
+       OVERLAY: 守护顾问详情（SP-4）
+  ============================================ -->
+  <div id="overlay-advisor">
+
+    <!-- 顶部导航 -->
+    <div class="adv-topbar">
+      <div class="adv-back" onclick="closeAdvisor()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        <span class="adv-back-label">你的守护顾问</span>
+      </div>
+      <div class="adv-share">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        分享名片
+      </div>
+    </div>
+
+    <!-- Hero 区 -->
+    <div class="adv-hero">
+      <div class="adv-hero-avatar-wrap">
+        <div class="adv-hero-avatar">陈</div>
+        <div class="adv-hero-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+      </div>
+      <div class="adv-hero-name">陈晓霞</div>
+      <div class="adv-hero-role">专属守护顾问 · 守护+ 深圳分公司</div>
+      <div class="adv-stats-row" style="margin-top:16px;">
+        <div class="adv-stat">
+          <div class="adv-stat-num blue">7年</div>
+          <div class="adv-stat-label">从业经验</div>
+        </div>
+        <div class="adv-stat">
+          <div class="adv-stat-num green">843位</div>
+          <div class="adv-stat-label">守护家庭</div>
+        </div>
+        <div class="adv-stat">
+          <div class="adv-stat-num warm">98%</div>
+          <div class="adv-stat-label">好评率</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 正文滚动区 -->
+    <div class="adv-body">
+
+      <!-- 专长领域 -->
+      <div class="adv-section">
+        <div class="adv-section-title">专长领域</div>
+        <div class="adv-tags">
+          <span class="adv-tag">家庭保障规划</span>
+          <span class="adv-tag">重疾险配置</span>
+          <span class="adv-tag">养老规划</span>
+          <span class="adv-tag">子女教育金</span>
+          <span class="adv-tag">高净值客户</span>
+        </div>
+      </div>
+
+      <!-- 守护理念 -->
+      <div class="adv-section" style="margin-top:16px;">
+        <div class="adv-section-title">守护理念</div>
+        <div class="adv-quote">
+          <div class="adv-quote-text">「每个家庭都值得被认真对待。保险不是数字，是你对家人那句没说出口的话。」</div>
+        </div>
+        <div class="adv-bio" id="adv-bio-text">
+          我做保险顾问7年，最难忘的不是签下多少保单，而是陪6个家庭走过理赔那一关——见过眼泪，才真正懂得「保障」两个字的重量。我不会推产品，我帮你想清楚「你真正需要什么」。
+        </div>
+        <div class="adv-bio-expand">
+          了解更多
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <!-- 资质证书 -->
+      <div class="adv-section" style="margin-top:16px;">
+        <div class="adv-section-title">资质证书</div>
+        <div class="adv-cred-list">
+          <div class="adv-cred-item">
+            <div class="adv-cred-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div>
+              <div class="adv-cred-name">保险代理人资格证</div>
+              <div class="adv-cred-sub">中国银行保险监督管理委员会</div>
+            </div>
+          </div>
+          <div class="adv-cred-item">
+            <div class="adv-cred-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div>
+              <div class="adv-cred-name">AFP 金融理财师</div>
+              <div class="adv-cred-sub">中国金融理财标准委员会认证</div>
+            </div>
+          </div>
+          <div class="adv-cred-item">
+            <div class="adv-cred-icon warm">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div>
+              <div class="adv-cred-name">连续5年优秀顾问 · 守护卫士</div>
+              <div class="adv-cred-sub">2020 — 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 客户评价 -->
+      <div class="adv-section" style="margin-top:16px;">
+        <div class="adv-section-title">客户说</div>
+        <div class="adv-review-wrap">
+          <div class="adv-review-scroll" id="adv-review-scroll">
+            <div class="adv-review-card">
+              <div class="adv-stars">★★★★★</div>
+              <div class="adv-review-text">「晓霞帮我梳理了之前买的4份保单，发现有重复投保，帮我省了不少钱，还重新帮我做了家庭规划。现在心里踏实多了。」</div>
+              <div class="adv-review-author">— 王先生 · 深圳 · 38岁 · 企业主</div>
+            </div>
+            <div class="adv-review-card">
+              <div class="adv-stars">★★★★★</div>
+              <div class="adv-review-text">「理赔那段时间很难熬，晓霞全程帮我对接保险公司，跑材料，最终顺利赔付。不是亲人，但比亲人还贴心。」</div>
+              <div class="adv-review-author">— 林女士 · 广州 · 45岁 · 教师</div>
+            </div>
+            <div class="adv-review-card">
+              <div class="adv-stars">★★★★★</div>
+              <div class="adv-review-text">「第一次买保险什么都不懂，晓霞一步一步讲给我听，从不催促，让我自己想清楚再决定。这才是真正负责的顾问。」</div>
+              <div class="adv-review-author">— 小李 · 深圳 · 27岁 · 应届生</div>
+            </div>
+          </div>
+        </div>
+        <div class="adv-review-dots" id="adv-dots">
+          <div class="adv-dot active" onclick="switchReview(0)"></div>
+          <div class="adv-dot" onclick="switchReview(1)"></div>
+          <div class="adv-dot" onclick="switchReview(2)"></div>
+        </div>
+      </div>
+
+      <!-- 服务历程 -->
+      <div class="adv-section" style="margin-top:16px;">
+        <div class="adv-section-title">服务历程</div>
+        <div class="adv-timeline">
+          <div class="adv-tl-item">
+            <div class="adv-tl-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <div>
+              <div class="adv-tl-year">2025</div>
+              <div class="adv-tl-text">通过平台认证，成为「守护顾问」</div>
+            </div>
+          </div>
+          <div class="adv-tl-item">
+            <div class="adv-tl-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div class="adv-tl-year">2022</div>
+              <div class="adv-tl-text">协助 27 个家庭顺利完成理赔</div>
+            </div>
+          </div>
+          <div class="adv-tl-item">
+            <div class="adv-tl-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div>
+              <div class="adv-tl-year">2020</div>
+              <div class="adv-tl-text">连续3年荣获「优秀顾问·守护卫士」称号</div>
+            </div>
+          </div>
+          <div class="adv-tl-item">
+            <div class="adv-tl-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path fill="none" d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <div>
+              <div class="adv-tl-year">2019</div>
+              <div class="adv-tl-text">服务家庭突破 500 户</div>
+            </div>
+          </div>
+          <div class="adv-tl-item">
+            <div class="adv-tl-dot">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <div>
+              <div class="adv-tl-year">2018</div>
+              <div class="adv-tl-text">取得 AFP 金融理财师认证</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 我也在守护 -->
+      <div class="adv-section" style="margin-top:16px; padding-bottom:16px;">
+        <div class="adv-section-title">我也在守护</div>
+        <div style="font-size:13px;color:var(--text-caption);margin-bottom:10px;">「我给自己和家人买了这些保险」</div>
+        <div class="adv-self-items">
+          <div class="adv-self-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path fill="currentColor" fill-opacity="0.15" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div class="adv-self-name">重疾险</div>
+            <div class="adv-self-amount">保额 50 万</div>
+          </div>
+          <div class="adv-self-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path fill="currentColor" fill-opacity="0.15" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div class="adv-self-name">百万医疗险</div>
+            <div class="adv-self-amount">全家配置</div>
+          </div>
+          <div class="adv-self-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path fill="currentColor" fill-opacity="0.15" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div class="adv-self-name">定期寿险</div>
+            <div class="adv-self-amount">保额 100 万</div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-caption);margin-top:10px;line-height:1.6;padding:10px;background:var(--card);border-radius:8px;border:1px solid var(--border);">
+          「我选这个配置，是因为家里有老人和孩子，重疾和寿险优先。百万医疗我给全家都买了，毕竟自己懂，所以买得更彻底。」
+        </div>
+      </div>
+
+      <div class="scroll-pad"></div>
+    </div><!-- /adv-body -->
+
+    <!-- 底部 CTA -->
+    <div class="adv-footer">
+      <button class="adv-btn-msg">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        发消息
+      </button>
+      <button class="adv-btn-book">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        预约一对一咨询
+      </button>
+    </div>
+
+  </div><!-- /overlay-advisor -->
+
 </div><!-- /phone-wrap -->
 
 <script>
@@ -2680,6 +3146,27 @@ function selectChip(el, group) {
   el.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
   setTimeout(nextStep, 300);
+}
+
+// ============================
+// ADVISOR DETAIL (SP-4)
+// ============================
+function openAdvisor() {
+  document.getElementById('overlay-advisor').classList.add('open');
+}
+function closeAdvisor() {
+  document.getElementById('overlay-advisor').classList.remove('open');
+}
+
+// Review card carousel
+let currentReview = 0;
+function switchReview(idx) {
+  currentReview = idx;
+  const scroll = document.getElementById('adv-review-scroll');
+  if (scroll) scroll.style.transform = `translateX(${-idx * 100}%)`;
+  document.querySelectorAll('.adv-dot').forEach((d, i) => {
+    d.classList.toggle('active', i === idx);
+  });
 }
 </script>
 
