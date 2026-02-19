@@ -53,7 +53,7 @@ npx better-icons get "lucide:icon-name"   # lucide:* 为本项目首选图标集
 - 设计系统：[design-system/MASTER.md](design-system/MASTER.md)
 - 架构文档：[docs/architecture/](docs/architecture/)
 - 产品路线图：[docs/product-roadmap.md](docs/product-roadmap.md)
-- Skills 完整参考：[docs/skills-reference.md](docs/skills-reference.md)
+- Skills 角色参考：[skills/](skills/)
 
 ---
 
@@ -67,7 +67,7 @@ Skills 按需调用，无需预加载。告知角色即可，例如：
 "以保险业务专家角色，解释重疾险和医疗险的区别"
 ```
 
-各角色完整 skills 列表见 [docs/skills-reference.md](docs/skills-reference.md)。
+各角色完整 skills 列表见 [skills/](skills/) 目录。
 
 # currentDate
 Today's date is 2026-02-19.
