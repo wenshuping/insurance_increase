@@ -28,6 +28,10 @@ skills:
   - product-marketing-context   # 产品定位文档
   - postmortem-writing          # 复盘报告
   - find-skills                 # 发现新 skills
+  - skill-creator               # 创建自定义 skills
+  - product-manager-toolkit     # PM 综合工具包
+  - prd-generator               # PRD 需求文档生成
+  - user-story-mapping          # 用户故事地图
 ```
 
 ### 📁 项目经理
@@ -38,6 +42,7 @@ skills:
   - architecture-decision-records  # 决策日志跟踪
   - postmortem-writing          # 项目复盘
   - c4-architecture             # 辅助跨团队沟通
+  - planning-with-files         # 文件驱动项目规划
 ```
 
 ### 🎨 UI 设计师
@@ -50,6 +55,7 @@ skills:
   - tailwind-design-system     # Tailwind v4 设计系统
   - web-design-guidelines      # UI 规范审查
   - accessibility-compliance   # WCAG 2.2 无障碍
+  - better-icons               # 图标库设计
 ```
 
 ### 💻 前端开发
@@ -78,6 +84,50 @@ skills:
   - accessibility-compliance   # 无障碍合规测试
   - postmortem-writing         # Bug 复盘报告
 ```
+
+### 📣 市场营销 (Marketing)
+
+```
+skills:
+  - copywriting                # 营销文案写作
+  - marketing-psychology       # 营销心理学
+  - content-strategy           # 内容策略规划
+  - seo-audit                  # SEO 审查优化
+  - programmatic-seo           # 程序化 SEO
+  - product-marketing-context  # 产品营销定位
+```
+
+### 👥 客户角色 (Customer Persona)
+
+> 模拟真实用户体验产品，用于测试、用研、体验验证
+
+```
+skills:
+  - customer-persona           # 客户角色模拟（多年龄/性别/身份）
+```
+
+**内置角色：**
+- 青年群体：小王（互联网男）、小李（应届女生）、阿杰（自由职业）、小美（已婚白领）
+- 中年群体：张总（企业主）、王姐（全职主妇）、老陈（国企中层）、林姐（教师）
+- 老年群体：王阿姨（退休工人）、李大爷（退休干部）
+- 特殊群体：外卖小哥阿明、海归Lucy、宝妈小雪
+
+### 🏢 保险从业人员角色 (Insurance Staff Persona)
+
+> 模拟业务员、团队长、公司高管视角，用于 B 端产品测试和需求验证
+
+```
+skills:
+  - insurance-staff-persona    # 从业人员角色模拟（不同层级/阅历）
+```
+
+**内置角色：**
+- 新人业务员：小陈（应届转行）、小敏（宝妈兼职）
+- 成长型业务员：阿强（主力销售）、晓琳（女性客群）、老黄（二线城市）
+- 资深业务员：刘哥（行业老炮）、美姐（转型培训）
+- 团队长：王姐（初级）、陈总监（资深30人团队）
+- 保险公司高管：林副总（渠道总监）、李总（VP）、郑总（CTO）
+- 经纪公司高管：钱总（小型创始人）、吴CEO（B轮）、许CTO（技术）
 
 ---
 
