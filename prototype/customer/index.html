@@ -1519,8 +1519,76 @@ a { text-decoration: none; color: inherit; }
        OVERLAY: 守护完整度检测（5步测评）
   ============================================ -->
   <div class="overlay" id="overlay-assess">
-    <!-- 进度头部 -->
-    <div class="assess-header">
+
+    <!-- ── Step 0: 引导落地页 F-001-0 ── -->
+    <div class="assess-step active" id="step-0" style="flex:1;overflow-y:auto;background:var(--bg);">
+      <!-- 关闭按钮 -->
+      <div style="display:flex;justify-content:flex-end;padding:10px 16px 0;">
+        <div style="font-size:13px;color:var(--text-caption);cursor:pointer;" onclick="closeAssess()">✕ 关闭</div>
+      </div>
+
+      <!-- 业务员名片条 -->
+      <div class="agent-strip" style="margin:4px 16px 12px;">
+        <div class="agent-strip-avatar">张</div>
+        <div class="agent-strip-text"><strong>张明</strong> 为你发来一份礼物</div>
+      </div>
+
+      <!-- 主视觉区 -->
+      <div style="margin:0 16px;background:var(--gradient-bg);border-radius:var(--radius-lg);padding:28px 20px 24px;text-align:center;">
+        <!-- 家庭守护插画（SVG 简洁版） -->
+        <svg width="120" height="100" viewBox="0 0 120 100" fill="none" style="margin-bottom:16px;">
+          <!-- 光环 -->
+          <ellipse cx="60" cy="75" rx="50" ry="10" fill="rgba(43,127,191,0.08)"/>
+          <!-- 大人1 -->
+          <circle cx="40" cy="40" r="12" fill="#2B7FBF" opacity="0.85"/>
+          <rect x="30" y="52" width="20" height="26" rx="8" fill="#2B7FBF" opacity="0.85"/>
+          <!-- 大人2 -->
+          <circle cx="80" cy="40" r="12" fill="#3DAA85" opacity="0.85"/>
+          <rect x="70" y="52" width="20" height="26" rx="8" fill="#3DAA85" opacity="0.85"/>
+          <!-- 孩子 -->
+          <circle cx="60" cy="50" r="9" fill="#F5A623" opacity="0.9"/>
+          <rect x="53" y="59" width="14" height="18" rx="6" fill="#F5A623" opacity="0.9"/>
+          <!-- 守护光环 -->
+          <path d="M20 38 Q60 8 100 38 Q100 80 60 96 Q20 80 20 38Z" stroke="#2B7FBF" stroke-width="2" fill="none" opacity="0.25" stroke-dasharray="4 3"/>
+        </svg>
+        <div style="font-size:22px;font-weight:700;color:var(--text-h1);line-height:1.4;margin-bottom:10px;">
+          30秒，看看你的家庭守护<br>有多完整
+        </div>
+        <div style="font-size:13px;color:var(--text-caption);">已有 <strong style="color:var(--primary);">128,432</strong> 个家庭完成了守护检测</div>
+      </div>
+
+      <!-- 价值点 -->
+      <div style="margin:16px 16px 0;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div style="font-size:14px;color:var(--text-body);">生成专属五维守护报告</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div style="font-size:14px;color:var(--text-body);">发现你的家庭守护盲区</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--warm);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div style="font-size:14px;color:var(--text-body);">生成可分享的守护健康证书</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div style="padding:20px 16px 8px;">
+        <button class="btn-primary" onclick="showStep(1)">开始我的守护检测</button>
+        <div style="text-align:center;margin-top:10px;font-size:13px;color:var(--text-caption);">无需注册，30秒完成 · 完全免费</div>
+      </div>
+      <div style="text-align:center;padding:0 24px 20px;font-size:11px;color:var(--text-placeholder);">保障信息仅用于生成报告，不会被分享给第三方</div>
+    </div>
+
+    <!-- ── 进度头部（Step 1-5 时显示）── -->
+    <div id="assess-header-bar" class="assess-header" style="display:none;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
         <div class="btn-back" style="width:auto;padding:0;" onclick="prevStep()">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 19-7-7 7-7m7 7H5"/></svg>
@@ -1844,22 +1912,28 @@ function closeClaims() {
 }
 function openAssess() {
   document.getElementById('overlay-assess').classList.add('open');
-  showStep(1);
+  showStep(0);
 }
 function closeAssess() {
   document.getElementById('overlay-assess').classList.remove('open');
 }
 
 // Assessment step navigation
-let currentStep = 1;
+let currentStep = 0;
 const stepPcts = {1:20, 2:40, 3:60, 4:80, 5:100};
 function showStep(n) {
   currentStep = n;
   document.querySelectorAll('.assess-step').forEach(s => s.classList.remove('active'));
   const s = document.getElementById('step-' + n);
   if (s) s.classList.add('active');
-  document.getElementById('assess-prog-fill').style.width = stepPcts[n] + '%';
-  document.getElementById('assess-step-text').textContent = '第 ' + n + ' 步，共 5 步';
+  const headerBar = document.getElementById('assess-header-bar');
+  if (n === 0) {
+    if (headerBar) headerBar.style.display = 'none';
+  } else {
+    if (headerBar) headerBar.style.display = '';
+    document.getElementById('assess-prog-fill').style.width = stepPcts[n] + '%';
+    document.getElementById('assess-step-text').textContent = '第 ' + n + ' 步，共 5 步';
+  }
 }
 function nextStep() {
   if (currentStep < 5) showStep(currentStep + 1);
@@ -1867,6 +1941,7 @@ function nextStep() {
 }
 function prevStep() {
   if (currentStep > 1) showStep(currentStep - 1);
+  else if (currentStep === 1) showStep(0);
   else closeAssess();
 }
 function showReport() {
