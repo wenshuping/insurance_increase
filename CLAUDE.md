@@ -40,6 +40,7 @@ skills:
   - skill-creator               # 创建自定义 skills
   - product-manager-toolkit     # PM 综合工具包
   - prd-generator               # PRD 需求文档生成
+  - wireframe-prototyping       # 线框图与原型设计
   - user-story-mapping          # 用户故事地图
   - competitive-analysis        # 竞品分析（Lenny）
   - ai-product-strategy         # AI 产品策略（Lenny）
