@@ -573,6 +573,174 @@ a { text-decoration: none; color: inherit; }
 .shop-body { padding: 10px; }
 .shop-name { font-size: 13px; font-weight: 500; color: var(--text-h1); }
 .shop-pts { font-size: 12px; color: var(--warm); font-weight: 600; margin-top: 4px; }
+.shop-value { font-size: 11px; color: var(--text-caption); margin-top: 2px; }
+.shop-value span { color: #E05C5C; }
+
+/* Family pool card (enhanced) */
+.family-pool-card {
+  background: var(--card); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card); padding: 16px;
+}
+
+/* Activity cards */
+.activity-card {
+  background: var(--card); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card); overflow: hidden;
+  margin-bottom: 12px; cursor: pointer;
+}
+.activity-card-img {
+  height: 110px;
+  background: linear-gradient(135deg, #1A3A5C 0%, #2B7FBF 50%, #3DAA85 100%);
+  display: flex; align-items: flex-end; gap: 8px; padding: 12px;
+}
+.activity-tag {
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 4px; padding: 3px 8px; font-size: 11px; color: #fff;
+  font-weight: 500; display: flex; align-items: center; gap: 3px; align-self: flex-start;
+}
+.activity-card-body { padding: 14px; }
+.activity-meta { font-size: 12px; color: var(--text-caption); margin-bottom: 10px; }
+.activity-pts { font-size: 14px; color: var(--warm); font-weight: 600; margin-bottom: 2px; }
+.activity-count { font-size: 12px; color: var(--text-caption); }
+.activity-cta {
+  background: var(--gradient-cta); color: #fff; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; border: none;
+}
+
+/* ============================
+   OVERLAY: DAILY CHECK-IN
+============================ */
+#overlay-daily {
+  position: absolute; inset: 0; z-index: 500;
+  background: var(--bg); display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+#overlay-daily.open { transform: translateX(0); }
+.daily-screen { display: none; flex: 1; flex-direction: column; overflow-y: auto; padding: 16px; gap: 12px; }
+.daily-screen.active { display: flex; }
+.cal-week-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.cal-day-item { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 38px; }
+.cal-day-label { font-size: 11px; color: var(--text-caption); }
+.cal-day-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.cal-day-dot.done { background: var(--secondary); color: #fff; }
+.cal-day-dot.today { background: var(--warm); color: #fff; }
+.cal-day-dot.empty { background: #F0F3F7; }
+.quiz-question-card {
+  background: var(--card); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card); padding: 24px 20px;
+  font-size: 16px; font-weight: 500; color: var(--text-h1); line-height: 1.7;
+}
+.daily-option {
+  background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--radius-card); padding: 14px 16px;
+  font-size: 14px; color: var(--text-body); cursor: pointer; transition: all 0.15s;
+}
+.daily-option.selected { border-color: var(--primary); background: rgba(43,127,191,0.06); color: var(--primary); font-weight: 500; }
+.daily-option.correct { border-color: var(--secondary); background: #E8F8F2; color: var(--secondary); font-weight: 600; }
+
+/* ============================
+   OVERLAY: SHOP
+============================ */
+#overlay-shop {
+  position: absolute; inset: 0; z-index: 500;
+  background: var(--bg); display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+#overlay-shop.open { transform: translateX(0); }
+.shop-cat-row {
+  display: flex; overflow-x: auto; background: #fff;
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.shop-cat-row::-webkit-scrollbar { display: none; }
+.shop-cat-btn {
+  flex-shrink: 0; padding: 12px 12px; font-size: 13px; font-weight: 500;
+  color: var(--text-caption); cursor: pointer;
+  border-bottom: 2px solid transparent; white-space: nowrap;
+}
+.shop-cat-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.shop-items-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.shop-item-card {
+  background: var(--card); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card); overflow: hidden; cursor: pointer; position: relative;
+}
+.shop-item-thumb {
+  height: 90px; display: flex; align-items: center; justify-content: center;
+}
+.health-bg { background: linear-gradient(135deg,#E8F8F2,#B2EDD8); }
+.life-bg { background: linear-gradient(135deg,#FFF3E0,#FFD9A3); }
+.premium-bg { background: linear-gradient(135deg,#F0ECFF,#D9D0FF); }
+.shop-item-info { padding: 10px; }
+.shop-item-name { font-size: 13px; font-weight: 500; color: var(--text-h1); }
+.shop-item-pts { font-size: 13px; font-weight: 700; color: var(--warm); margin-top: 3px; }
+.shop-item-val { font-size: 11px; color: var(--text-caption); margin-top: 2px; }
+.shop-lock-badge {
+  position: absolute; inset: 0; background: rgba(240,243,247,0.88);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px; font-size: 11px; font-weight: 600; color: var(--text-caption);
+}
+.shop-stock-tag {
+  position: absolute; top: 6px; right: 6px; background: #E05C5C; color: #fff;
+  border-radius: 4px; padding: 2px 6px; font-size: 10px; font-weight: 600;
+}
+/* Exchange confirmation sheet */
+#sheet-exchange {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--card); border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.15); padding: 16px 20px 32px;
+  z-index: 600; transform: translateY(100%); transition: transform 0.3s ease;
+}
+#sheet-exchange.open { transform: translateY(0); }
+
+/* ============================
+   OVERLAY: FAMILY POOL
+============================ */
+#overlay-family-pool {
+  position: absolute; inset: 0; z-index: 500;
+  background: var(--bg); display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+#overlay-family-pool.open { transform: translateX(0); }
+
+/* ============================
+   OVERLAY: POINTS RECORDS
+============================ */
+#overlay-points-records {
+  position: absolute; inset: 0; z-index: 500;
+  background: var(--bg); display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+#overlay-points-records.open { transform: translateX(0); }
+.rec-filter-btn {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+  font-size: 13px; font-weight: 500; color: var(--text-caption);
+  background: #F0F3F7; cursor: pointer;
+}
+.rec-filter-btn.active { background: var(--primary); color: #fff; }
+.record-item {
+  background: var(--card); border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card); padding: 14px 16px; margin-bottom: 10px;
+}
+.record-row { display: flex; align-items: center; justify-content: space-between; }
+.record-desc { font-size: 14px; font-weight: 500; color: var(--text-h1); }
+.record-pts-gain { font-size: 16px; font-weight: 700; color: var(--secondary); }
+.record-pts-spend { font-size: 16px; font-weight: 700; color: #E05C5C; }
+.record-meta { font-size: 12px; color: var(--text-caption); margin-top: 4px; }
+/* Earn rules sheet */
+#sheet-earn-rules {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  background: var(--card); border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.15); padding: 16px 20px 32px;
+  z-index: 600; transform: translateY(100%); transition: transform 0.3s ease;
+  max-height: 80vh; overflow-y: auto;
+}
+#sheet-earn-rules.open { transform: translateY(0); }
 
 /* ============================
    SCREEN: CONTENT
@@ -1008,21 +1176,29 @@ a { text-decoration: none; color: inherit; }
          SCREEN: POINTS (积分)
     ============================================ -->
     <div class="screen" id="screen-points">
+      <!-- Header bar -->
+      <div style="background:var(--primary);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;">
+        <div style="font-size:17px;font-weight:600;color:#fff;">积分中心</div>
+        <div onclick="openPointsRecords()" style="cursor:pointer;color:rgba(255,255,255,0.85);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+      </div>
       <!-- Hero -->
       <div class="points-hero">
         <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-bottom:4px;">我的守护积分</div>
         <div class="points-big num">2,840</div>
         <div class="points-level">
           <span class="badge badge-warm">金卡守护者</span>
-          <span>距钻石差 160 分</span>
+          <span>再积 <strong>160</strong> 分，解锁钻石专属权益</span>
         </div>
         <div class="points-prog-wrap">
           <div class="points-prog-label">
-            <span>金卡 3000</span>
-            <span>钻石 8000</span>
+            <span>金卡 3,000</span>
+            <span>88%</span>
+            <span>钻石 8,000</span>
           </div>
           <div class="points-prog-track">
-            <div class="points-prog-fill" style="width:35%"></div>
+            <div class="points-prog-fill" style="width:88%"></div>
           </div>
         </div>
       </div>
@@ -1031,12 +1207,16 @@ a { text-decoration: none; color: inherit; }
       <div style="background:var(--card);padding:4px 0;border-bottom:1px solid var(--border);">
         <div class="level-nodes">
           <div class="level-node">
-            <div class="level-dot done">✓</div>
+            <div class="level-dot done">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
             <div class="level-name">普通</div>
           </div>
           <div class="level-connector done"></div>
           <div class="level-node">
-            <div class="level-dot done">✓</div>
+            <div class="level-dot done">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
             <div class="level-name">银卡</div>
           </div>
           <div class="level-connector done"></div>
@@ -1051,96 +1231,162 @@ a { text-decoration: none; color: inherit; }
           </div>
           <div class="level-connector"></div>
           <div class="level-node">
-            <div class="level-dot locked">⬡</div>
-            <div class="level-name">守护家</div>
+            <div class="level-dot locked" style="background:#E8F0FF;border-color:#2B7FBF;">⬡</div>
+            <div class="level-name" style="color:var(--primary);font-weight:600;">守护家</div>
           </div>
         </div>
       </div>
 
       <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px;">
-        <!-- 家庭积分池 -->
-        <div class="family-pool">
-          <div>
-            <div class="pool-label">家庭积分池</div>
-            <div style="font-size:12px;color:var(--text-caption);margin-top:2px;">共 3 位家庭成员</div>
+        <!-- 家庭积分池 (enhanced) -->
+        <div class="family-pool-card" onclick="openFamilyPool()" style="cursor:pointer;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div>
+              <div style="font-size:14px;font-weight:600;color:var(--text-h1);display:flex;align-items:center;gap:4px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--primary);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                家庭积分池
+              </div>
+              <div style="font-size:12px;color:var(--text-caption);margin-top:2px;">3 位家庭成员 · 点击查看详情</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="num" style="font-size:20px;font-weight:700;color:var(--primary);">8,500</div>
+              <div onclick="event.stopPropagation();" style="font-size:12px;color:var(--primary);font-weight:500;cursor:pointer;">邀请家人 +</div>
+            </div>
           </div>
-          <div class="pool-num num">8,500</div>
-          <div class="pool-invite">邀请家人 +</div>
+          <div style="font-size:12px;color:var(--text-caption);margin-bottom:6px;">共同目标：家庭体检套餐（10,000分）</div>
+          <div style="height:6px;background:#EEF2F8;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:85%;background:var(--gradient-cta);border-radius:3px;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-caption);margin-top:4px;">
+            <span>已积 8,500分</span><span style="color:var(--primary);font-weight:600;">85%</span><span>还差 1,500分</span>
+          </div>
         </div>
 
-        <!-- 赚取积分 -->
+        <!-- 赚取更多积分 -->
         <div>
           <div class="section-title">赚取更多积分</div>
           <div class="earn-grid">
-            <div class="earn-card">
+            <div class="earn-card" onclick="openDaily()">
               <div>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2B7FBF" stroke-width="2" stroke-linecap="round"><circle fill="currentColor" cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2B7FBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
               </div>
               <div class="earn-title">每日打卡</div>
-              <div class="earn-pts">+20 积分/天</div>
+              <div class="earn-pts">+20 分/天</div>
               <div style="margin-top:6px;background:var(--primary);color:#fff;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">今日打卡</div>
             </div>
             <div class="earn-card">
               <div>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3DAA85" stroke-width="2" stroke-linecap="round"><path fill="currentColor" d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3DAA85" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
               </div>
-              <div class="earn-title">分享报告</div>
-              <div class="earn-pts">+50 积分/次</div>
+              <div class="earn-title">分享测评</div>
+              <div class="earn-pts">+50 分/次</div>
               <div style="margin-top:6px;background:#E8F8F2;color:var(--secondary);height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">去分享</div>
             </div>
-            <div class="earn-card">
+            <div class="earn-card" onclick="openAssess()">
               <div>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18" stroke-width="3"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
               </div>
-              <div class="earn-title">上传保单</div>
-              <div class="earn-pts">+200 积分/张</div>
-              <div style="margin-top:6px;background:#FFF3E0;color:var(--warm);height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">去上传</div>
+              <div class="earn-title">完成测评</div>
+              <div class="earn-pts">+500 分</div>
+              <div style="margin-top:6px;background:#FFF3E0;color:var(--warm);height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">去测评</div>
             </div>
             <div class="earn-card">
               <div>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" stroke-width="2" stroke-linecap="round"><path fill="currentColor" d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="m22 2-7 20-4-9-9-4Z"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
               </div>
-              <div class="earn-title">填写节点</div>
-              <div class="earn-pts">+100 积分</div>
-              <div style="margin-top:6px;background:#F0ECFF;color:#7C5CBF;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">去填写</div>
+              <div class="earn-title">转介绍</div>
+              <div class="earn-pts">+800 分</div>
+              <div style="margin-top:6px;background:#F0ECFF;color:#7C5CBF;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;">去邀请</div>
             </div>
           </div>
+          <div onclick="openEarnRules()" style="text-align:center;margin-top:12px;font-size:13px;color:var(--primary);font-weight:500;cursor:pointer;">查看全部获取方式 →</div>
         </div>
 
         <!-- 积分兑换商城 -->
         <div>
           <div class="section-title">积分兑换商城</div>
           <div class="shop-scroll">
-            <div class="shop-card">
-              <div class="shop-img">☕</div>
+            <div class="shop-card" onclick="openExchangeSheet()">
+              <div class="shop-img" style="background:linear-gradient(135deg,#E8F8F2,#B2EDD8);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3DAA85" stroke-width="1.5" stroke-linecap="round"><path fill="#3DAA85" fill-opacity="0.2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
               <div class="shop-body">
-                <div class="shop-name">星巴克券</div>
-                <div class="shop-pts">500 积分</div>
+                <div class="shop-name">家庭体检套餐</div>
+                <div class="shop-pts">1,200 积分</div>
+                <div class="shop-value">价值 <span>¥298</span></div>
+              </div>
+            </div>
+            <div class="shop-card" onclick="openExchangeSheet()">
+              <div class="shop-img" style="background:linear-gradient(135deg,#FFF3E0,#FFD9A3);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+              </div>
+              <div class="shop-body">
+                <div class="shop-name">瑞幸咖啡券</div>
+                <div class="shop-pts">150 积分</div>
+                <div class="shop-value">价值 <span>¥22</span></div>
               </div>
             </div>
             <div class="shop-card">
-              <div class="shop-img">🎁</div>
+              <div class="shop-img" style="background:linear-gradient(135deg,#F0ECFF,#D9D0FF);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
               <div class="shop-body">
-                <div class="shop-name">体检优惠券</div>
+                <div class="shop-name">法律咨询1小时</div>
                 <div class="shop-pts">800 积分</div>
+                <div class="shop-value">价值 <span>¥200</span></div>
               </div>
             </div>
             <div class="shop-card">
-              <div class="shop-img">📱</div>
+              <div class="shop-img" style="background:linear-gradient(135deg,#EBF4FF,#BDD9F5);">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2B7FBF" stroke-width="1.5" stroke-linecap="round"><path fill="#2B7FBF" fill-opacity="0.15" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+              </div>
               <div class="shop-body">
-                <div class="shop-name">话费充值10元</div>
-                <div class="shop-pts">1000 积分</div>
+                <div class="shop-name">意外险1年</div>
+                <div class="shop-pts">1,200 积分</div>
+                <div class="shop-value" style="color:var(--primary);">守护增值</div>
               </div>
             </div>
-            <div class="shop-card">
-              <div class="shop-img">🌿</div>
-              <div class="shop-body">
-                <div class="shop-name">意外险7天</div>
-                <div class="shop-pts">300 积分</div>
+          </div>
+          <div onclick="openShop()" style="margin:12px 16px 0;padding:12px;background:var(--gradient-cta);border-radius:var(--radius-btn);color:#fff;font-size:15px;font-weight:600;cursor:pointer;text-align:center;">进入积分商城 →</div>
+        </div>
+
+        <!-- 精选活动 -->
+        <div>
+          <div class="section-title">精选活动</div>
+          <div class="activity-card">
+            <div class="activity-card-img">
+              <span class="activity-tag">线上测评</span>
+              <div style="margin-left:auto;font-size:17px;font-weight:700;color:#fff;text-align:right;">保险知识闯关大赛</div>
+            </div>
+            <div class="activity-card-body">
+              <div class="activity-meta">线上测评 · 约30分钟 · 截止 2026-02-25</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div class="activity-pts">参与得 +200 积分</div>
+                  <div class="activity-count">已有 1,234 人参加</div>
+                </div>
+                <button class="activity-cta">立即参加</button>
+              </div>
+            </div>
+          </div>
+          <div class="activity-card">
+            <div class="activity-card-img" style="background:linear-gradient(135deg,#1C3D2A 0%,#2A6040 50%,#3DAA85 100%);">
+              <span class="activity-tag">线下讲座</span>
+              <div style="margin-left:auto;font-size:17px;font-weight:700;color:#fff;text-align:right;">家庭健康与保障讲座</div>
+            </div>
+            <div class="activity-card-body">
+              <div class="activity-meta">上海·静安区 · 2026-02-22 14:00 · 剩余 12 名额</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <div class="activity-pts">签到得 +300 积分</div>
+                  <div class="activity-count">专业医生主讲</div>
+                </div>
+                <button class="activity-cta" style="background:#3DAA85;">报名参加</button>
               </div>
             </div>
           </div>
         </div>
+
         <div class="scroll-pad"></div>
       </div>
     </div><!-- /screen-points -->
@@ -1878,6 +2124,408 @@ a { text-decoration: none; color: inherit; }
     </div>
   </div><!-- /overlay-report -->
 
+  <!-- ============================================
+       OVERLAY: DAILY CHECK-IN (每日打卡)
+  ============================================ -->
+  <div id="overlay-daily">
+    <div style="height:52px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div onclick="closeDaily()" style="cursor:pointer;color:var(--text-caption);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 19-7-7 7-7m7 7H5"/></svg>
+      </div>
+      <div style="font-size:17px;font-weight:600;color:var(--text-h1);">每日保险打卡</div>
+      <div style="width:24px;"></div>
+    </div>
+    <!-- State A: Start -->
+    <div class="daily-screen active" id="daily-state-a">
+      <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;">
+        <div class="cal-week-row">
+          <div class="cal-day-item"><div class="cal-day-label">一</div><div class="cal-day-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+          <div class="cal-day-item"><div class="cal-day-label">二</div><div class="cal-day-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+          <div class="cal-day-item"><div class="cal-day-label">三</div><div class="cal-day-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+          <div class="cal-day-item"><div class="cal-day-label">四</div><div class="cal-day-dot done"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+          <div class="cal-day-item"><div class="cal-day-label">五</div><div class="cal-day-dot today" style="font-size:11px;font-weight:700;">今</div></div>
+          <div class="cal-day-item"><div class="cal-day-label">六</div><div class="cal-day-dot empty"></div></div>
+          <div class="cal-day-item"><div class="cal-day-label">日</div><div class="cal-day-dot empty"></div></div>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:var(--text-h1);margin-top:4px;">连续打卡 5 天！</div>
+        <div style="font-size:13px;color:var(--warm);margin-top:4px;">再坚持 2 天即可获得双倍积分奖励 🎯</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:20px;text-align:center;">
+        <div style="font-size:14px;color:var(--text-body);line-height:1.9;margin-bottom:16px;">
+          今日题目：<strong>3 题</strong><br>
+          答对 1 题 = <span style="color:var(--warm);font-weight:600;">+20 积分</span><br>
+          全部答对 = <span style="color:var(--warm);font-weight:600;">+60 积分</span><br>
+          连续7天全对获双倍加成
+        </div>
+        <button onclick="showDailyState('b')" style="width:100%;height:52px;background:var(--gradient-cta);color:#fff;border-radius:var(--radius-btn);font-size:16px;font-weight:600;cursor:pointer;border:none;">开始今日打卡</button>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;">
+        <div style="font-size:12px;color:var(--text-caption);margin-bottom:8px;">昨日热题</div>
+        <div style="font-size:14px;color:var(--text-body);line-height:1.6;">住院医疗险和百万医疗险有什么区别？</div>
+        <div style="font-size:12px;color:var(--text-caption);margin-top:8px;">百万医疗险保额更高，适合大额医疗费用... <span style="color:var(--primary);cursor:pointer;">查看完整解析</span></div>
+      </div>
+    </div>
+    <!-- State B: Question -->
+    <div class="daily-screen" id="daily-state-b">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0 8px;">
+        <div style="font-size:14px;color:var(--text-caption);">第 1 题 / 3 题</div>
+        <div style="display:flex;gap:6px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--primary);"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--border);"></div>
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--border);"></div>
+        </div>
+      </div>
+      <div class="quiz-question-card">王女士住院了，结果发现买的产品实际赔付 0 元。最可能的原因是？</div>
+      <div style="font-size:12px;color:var(--text-caption);text-align:center;">请仔细阅读题目再作答</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="daily-option" onclick="selectDailyOpt(this,'b');setTimeout(()=>showDailyState('c'),500);">A &nbsp; 她买的是意外险，不含住院赔付</div>
+        <div class="daily-option" onclick="selectDailyOpt(this,'b');setTimeout(()=>showDailyState('c'),500);">B &nbsp; 等待期内住院，不在理赔范围</div>
+        <div class="daily-option" onclick="selectDailyOpt(this,'b');setTimeout(()=>showDailyState('c'),500);">C &nbsp; 保额不足，只赔了一部分</div>
+        <div class="daily-option" onclick="selectDailyOpt(this,'b');setTimeout(()=>showDailyState('c'),500);">D &nbsp; 医院不在社保定点范围内</div>
+      </div>
+    </div>
+    <!-- State C: Correct feedback -->
+    <div class="daily-screen" id="daily-state-c">
+      <div style="background:#E8F8F2;border-radius:var(--radius-card);padding:24px 20px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;">
+        <div style="font-size:40px;">✅</div>
+        <div style="font-size:20px;font-weight:700;color:var(--secondary);">答对了！</div>
+        <div style="font-size:24px;font-weight:700;color:var(--warm);">+20 积分 已到账</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;font-size:14px;color:var(--text-body);line-height:1.7;">
+        <div style="font-weight:600;color:var(--text-h1);margin-bottom:8px;">解析</div>
+        等待期是健康险的重要概念。一般医疗险等待期 30 天，重疾险等待期 90~180 天。等待期内发生的疾病通常不在理赔范围内。
+        <div style="margin-top:12px;padding:10px;background:rgba(43,127,191,0.06);border-radius:8px;font-size:13px;color:var(--primary);">
+          💡 你家是否也有这个盲区？→ <span onclick="closeDaily();openAssess();" style="font-weight:600;cursor:pointer;">测测你的守护完整度</span>
+        </div>
+      </div>
+      <button onclick="showDailyState('e')" style="width:100%;height:52px;background:var(--gradient-cta);color:#fff;border-radius:var(--radius-btn);font-size:16px;font-weight:600;cursor:pointer;border:none;margin-top:auto;">下一题</button>
+    </div>
+    <!-- State E: Complete -->
+    <div class="daily-screen" id="daily-state-e">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:20px;gap:12px;text-align:center;">
+        <div style="font-size:56px;">🎉</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text-h1);">今日打卡完成！</div>
+        <div style="font-size:15px;color:var(--text-body);">答对 3 / 3 题</div>
+        <div style="font-size:28px;font-weight:700;color:var(--warm);">获得 +60 积分</div>
+        <div style="font-size:13px;color:var(--text-caption);">（含连续7天 ×2 加成）</div>
+        <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;width:100%;margin-top:8px;">
+          <div style="font-size:14px;font-weight:600;color:var(--text-h1);margin-bottom:6px;">你已连续打卡 5 天</div>
+          <div style="font-size:13px;color:var(--text-caption);margin-bottom:10px;">超越了圈子内 78% 的朋友</div>
+          <div style="height:6px;background:#EEF2F8;border-radius:3px;overflow:hidden;"><div style="height:100%;width:78%;background:var(--gradient-cta);border-radius:3px;"></div></div>
+        </div>
+        <div style="display:flex;gap:10px;width:100%;margin-top:auto;">
+          <button style="flex:1;height:48px;border:1.5px solid var(--primary);border-radius:var(--radius-btn);color:var(--primary);font-size:14px;font-weight:600;background:transparent;cursor:pointer;border:none;" onclick="closeDaily()">看圈子排行榜</button>
+          <button style="flex:1;height:48px;background:var(--gradient-cta);border-radius:var(--radius-btn);color:#fff;font-size:14px;font-weight:600;cursor:pointer;border:none;" onclick="closeDaily()">明天继续打卡</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /overlay-daily -->
+
+  <!-- ============================================
+       OVERLAY: SHOP (积分商城)
+  ============================================ -->
+  <div id="overlay-shop">
+    <div style="height:52px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div onclick="closeShop()" style="cursor:pointer;color:var(--text-caption);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 19-7-7 7-7m7 7H5"/></svg>
+      </div>
+      <div style="font-size:17px;font-weight:600;color:var(--text-h1);">积分兑换商城</div>
+      <div style="color:var(--text-caption);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+    </div>
+    <div style="background:rgba(43,127,191,0.06);padding:10px 16px;font-size:13px;color:var(--text-body);flex-shrink:0;border-bottom:1px solid var(--border);">
+      当前积分：<span style="color:var(--primary);font-weight:700;font-size:16px;">2,840</span> 分
+    </div>
+    <div class="shop-cat-row">
+      <div class="shop-cat-btn active" onclick="switchShopCat(this)">全部</div>
+      <div class="shop-cat-btn" onclick="switchShopCat(this)">生活优惠</div>
+      <div class="shop-cat-btn" onclick="switchShopCat(this)">健康服务</div>
+      <div class="shop-cat-btn" onclick="switchShopCat(this)">专业咨询</div>
+      <div class="shop-cat-btn" onclick="switchShopCat(this)">保险权益</div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text-caption);margin-bottom:12px;">推荐兑换</div>
+      <div class="shop-items-grid">
+        <div class="shop-item-card" onclick="openExchangeSheet()">
+          <div class="shop-item-thumb health-bg">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3DAA85" stroke-width="1.5" stroke-linecap="round"><path fill="#3DAA85" fill-opacity="0.2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <div class="shop-item-info">
+            <div class="shop-item-name">家庭体检套餐</div>
+            <div class="shop-item-pts">1,200 积分</div>
+            <div class="shop-item-val">价值 ¥298 · 爱康国宾</div>
+          </div>
+        </div>
+        <div class="shop-item-card" onclick="openExchangeSheet()">
+          <div class="shop-item-thumb life-bg" style="position:relative;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+            <div class="shop-stock-tag">仅剩 8 件</div>
+          </div>
+          <div class="shop-item-info">
+            <div class="shop-item-name">瑞幸咖啡券×5</div>
+            <div class="shop-item-pts">300 积分</div>
+            <div class="shop-item-val">价值 ¥110</div>
+          </div>
+        </div>
+        <div class="shop-item-card" onclick="openExchangeSheet()">
+          <div class="shop-item-thumb" style="background:linear-gradient(135deg,#EBF4FF,#BDD9F5);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#2B7FBF" stroke-width="1.5" stroke-linecap="round"><path fill="#2B7FBF" fill-opacity="0.15" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+          </div>
+          <div class="shop-item-info">
+            <div class="shop-item-name">意外险1年</div>
+            <div class="shop-item-pts">1,200 积分</div>
+            <div class="shop-item-val" style="color:var(--primary);">守护增值</div>
+          </div>
+        </div>
+        <div class="shop-item-card" onclick="openExchangeSheet()">
+          <div class="shop-item-thumb" style="background:linear-gradient(135deg,#F0ECFF,#D9D0FF);">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="shop-item-info">
+            <div class="shop-item-name">法律咨询1小时</div>
+            <div class="shop-item-pts">800 积分</div>
+            <div class="shop-item-val">价值 ¥200</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-caption);margin-bottom:12px;">仅限守护家（积分 ≥ 20,000）</div>
+      <div class="shop-items-grid">
+        <div class="shop-item-card">
+          <div class="shop-item-thumb premium-bg" style="position:relative;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            <div class="shop-lock-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              守护家等级解锁
+            </div>
+          </div>
+          <div class="shop-item-info">
+            <div class="shop-item-name">私享财富沙龙</div>
+            <div class="shop-item-pts">2,500 积分</div>
+            <div class="shop-item-val" style="color:#7C5CBF;">守护家专享</div>
+          </div>
+        </div>
+        <div class="shop-item-card">
+          <div class="shop-item-thumb" style="background:linear-gradient(135deg,#FFF3E0,#FFD9A3);position:relative;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#F5A623" stroke-width="1.5" stroke-linecap="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/></svg>
+            <div class="shop-lock-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              守护家等级解锁
+            </div>
+          </div>
+          <div class="shop-item-info">
+            <div class="shop-item-name">高端健康管理年卡</div>
+            <div class="shop-item-pts">3,000 积分</div>
+            <div class="shop-item-val" style="color:#7C5CBF;">守护家专享</div>
+          </div>
+        </div>
+      </div>
+      <div class="scroll-pad"></div>
+    </div>
+  </div><!-- /overlay-shop -->
+
+  <!-- ============================================
+       OVERLAY: FAMILY POOL (家庭守护圈)
+  ============================================ -->
+  <div id="overlay-family-pool">
+    <div style="background:var(--gradient-hero);flex-shrink:0;">
+      <div style="height:52px;display:flex;align-items:center;padding:0 16px;gap:12px;">
+        <div onclick="closeFamilyPool()" style="cursor:pointer;color:rgba(255,255,255,0.85);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 19-7-7 7-7m7 7H5"/></svg>
+        </div>
+        <div style="font-size:17px;font-weight:600;color:#fff;">家庭守护圈</div>
+      </div>
+      <div style="padding:12px 16px 24px;">
+        <div style="font-size:13px;color:rgba(255,255,255,0.75);margin-bottom:4px;">家庭积分池</div>
+        <div class="num" style="font-size:42px;font-weight:700;color:#fff;line-height:1;">8,500</div>
+        <div style="display:inline-block;margin-top:8px;background:rgba(255,255,255,0.2);border-radius:6px;padding:3px 10px;font-size:13px;color:#fff;">金卡守护家庭</div>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;">
+      <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;">
+        <div style="font-size:14px;font-weight:600;color:var(--text-h1);margin-bottom:12px;">家庭成员</div>
+        <div style="display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);gap:12px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--gradient-cta);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👨</div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:var(--text-h1);">王建国（我）</div>
+            <div style="font-size:12px;color:var(--text-caption);">金卡守护者 · 户主</div>
+          </div>
+          <div class="num" style="font-size:16px;font-weight:700;color:var(--primary);">4,200</div>
+        </div>
+        <div style="display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);gap:12px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#F5A623,#3DAA85);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👩</div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:var(--text-h1);">林晓月（妻子）</div>
+            <div style="font-size:12px;color:var(--text-caption);">银卡守护者</div>
+          </div>
+          <div class="num" style="font-size:16px;font-weight:700;color:var(--primary);">2,800</div>
+        </div>
+        <div style="display:flex;align-items:center;padding:12px 0;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#E8F8F2,#3DAA85);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">👦</div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:600;color:var(--text-h1);">王小宝（孩子）</div>
+            <div style="font-size:12px;color:var(--text-caption);">普通守护者</div>
+          </div>
+          <div class="num" style="font-size:16px;font-weight:700;color:var(--primary);">1,500</div>
+        </div>
+        <button style="width:100%;margin-top:8px;height:36px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text-caption);background:transparent;cursor:pointer;">管理家庭成员</button>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;">
+        <div style="font-size:14px;font-weight:600;color:var(--text-h1);margin-bottom:12px;">共同目标进度</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          <div style="font-size:14px;font-weight:500;color:var(--text-h1);">家庭体检套餐</div>
+        </div>
+        <div style="height:8px;background:#EEF2F8;border-radius:4px;overflow:hidden;margin-bottom:6px;">
+          <div style="height:100%;width:85%;background:var(--gradient-cta);border-radius:4px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-caption);">
+          <span>已积 8,500分</span><span>需要 10,000分</span>
+        </div>
+        <div style="margin-top:10px;font-size:13px;color:var(--primary);font-weight:500;">还差 1,500分 · 预计 18 天完成</div>
+      </div>
+      <div style="background:var(--card);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:16px;">
+        <div style="font-size:14px;font-weight:600;color:var(--text-h1);margin-bottom:12px;">最近积分动态</div>
+        <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:18px;">👩</div>
+          <div style="flex:1;font-size:13px;color:var(--text-body);">林晓月 完成今日打卡</div>
+          <div style="font-size:14px;font-weight:600;color:var(--secondary);">+20</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:18px;">👦</div>
+          <div style="flex:1;font-size:13px;color:var(--text-body);">王小宝 上传保单</div>
+          <div style="font-size:14px;font-weight:600;color:var(--secondary);">+200</div>
+        </div>
+        <div style="display:flex;gap:10px;padding:8px 0;">
+          <div style="font-size:18px;">👨</div>
+          <div style="flex:1;font-size:13px;color:var(--text-body);">王建国 参加活动签到</div>
+          <div style="font-size:14px;font-weight:600;color:var(--secondary);">+300</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button style="flex:1;height:48px;background:var(--gradient-cta);border-radius:var(--radius-btn);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;">邀请家人加入</button>
+        <button style="flex:1;height:48px;border:1.5px solid var(--primary);border-radius:var(--radius-btn);color:var(--primary);font-size:14px;font-weight:600;background:transparent;cursor:pointer;">转出积分</button>
+      </div>
+      <div class="scroll-pad"></div>
+    </div>
+  </div><!-- /overlay-family-pool -->
+
+  <!-- ============================================
+       OVERLAY: POINTS RECORDS (积分记录)
+  ============================================ -->
+  <div id="overlay-points-records">
+    <div style="background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div style="height:52px;display:flex;align-items:center;padding:0 16px;gap:12px;">
+        <div onclick="closePointsRecords()" style="cursor:pointer;color:var(--text-caption);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 19-7-7 7-7m7 7H5"/></svg>
+        </div>
+        <div style="font-size:17px;font-weight:600;color:var(--text-h1);">积分记录</div>
+      </div>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px;">
+        <div class="rec-filter-btn active" onclick="switchRecFilter(this)">全部</div>
+        <div class="rec-filter-btn" onclick="switchRecFilter(this)">获得</div>
+        <div class="rec-filter-btn" onclick="switchRecFilter(this)">消耗</div>
+        <div class="rec-filter-btn" onclick="switchRecFilter(this)">过期</div>
+      </div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px;">
+      <div style="font-size:13px;font-weight:600;color:var(--text-caption);margin-bottom:12px;">2026年2月</div>
+      <div class="record-item">
+        <div class="record-row">
+          <div class="record-desc">完成家庭保障测评</div>
+          <div class="record-pts-gain">+500</div>
+        </div>
+        <div class="record-meta">2026-02-19 10:24 · 余额 2,840分</div>
+      </div>
+      <div class="record-item">
+        <div class="record-row">
+          <div class="record-desc">每日打卡（连续7天奖励）</div>
+          <div class="record-pts-gain">+40</div>
+        </div>
+        <div class="record-meta">2026-02-18 09:15 · 余额 2,340分</div>
+      </div>
+      <div class="record-item">
+        <div class="record-row">
+          <div class="record-desc">兑换：家庭体检套餐</div>
+          <div class="record-pts-spend">-1,200</div>
+        </div>
+        <div class="record-meta">2026-02-15 14:32</div>
+      </div>
+      <div class="record-item">
+        <div class="record-row">
+          <div class="record-desc">转介绍成功（李明注册）</div>
+          <div class="record-pts-gain">+800</div>
+        </div>
+        <div class="record-meta">2026-02-10 16:00 · 余额 3,500分</div>
+      </div>
+      <div class="record-item">
+        <div class="record-row">
+          <div class="record-desc">参与线下讲座签到</div>
+          <div class="record-pts-gain">+300</div>
+        </div>
+        <div class="record-meta">2026-02-08 14:30 · 余额 2,700分</div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--text-caption);margin:16px 0 12px;">2026年1月</div>
+      <div class="record-item">
+        <div class="record-row">
+          <div class="record-desc">上传保单 OCR</div>
+          <div class="record-pts-gain">+200</div>
+        </div>
+        <div class="record-meta">2026-01-28 11:20 · 余额 2,400分</div>
+      </div>
+      <div class="scroll-pad"></div>
+    </div>
+  </div><!-- /overlay-points-records -->
+
+  <!-- Exchange confirmation sheet (phone-wrap level, overlays everything) -->
+  <div id="sheet-exchange" onclick="closeExchangeSheet()">
+    <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;" onclick="event.stopPropagation();"></div>
+    <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px;" onclick="event.stopPropagation();">
+      <div style="width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,#E8F8F2,#B2EDD8);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#3DAA85" stroke-width="1.5" stroke-linecap="round"><path fill="#3DAA85" fill-opacity="0.2" d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+      </div>
+      <div>
+        <div style="font-size:16px;font-weight:600;color:var(--text-h1);">家庭体检套餐（爱康国宾）</div>
+        <div style="font-size:13px;color:var(--text-caption);margin-top:4px;">价值 ¥298</div>
+      </div>
+    </div>
+    <div onclick="event.stopPropagation();">
+      <div style="font-size:14px;color:var(--text-body);margin-bottom:4px;">消耗积分：<strong style="font-size:18px;color:var(--warm);">1,200 分</strong></div>
+      <div style="font-size:14px;color:var(--text-body);">兑换后余额：<strong>1,640 分</strong></div>
+      <div style="font-size:12px;color:var(--text-caption);line-height:1.6;padding:12px;background:#F6F8FB;border-radius:8px;margin:12px 0;">兑换后24小时内将兑换码发送至绑定手机号，有效期90天，不可退换。</div>
+      <div style="display:flex;gap:10px;margin-top:16px;">
+        <button onclick="closeExchangeSheet()" style="flex:1;height:48px;background:#F0F3F7;border-radius:var(--radius-btn);font-size:14px;font-weight:600;color:var(--text-body);cursor:pointer;border:none;">取消</button>
+        <button onclick="closeExchangeSheet()" style="flex:2;height:48px;background:var(--gradient-cta);border-radius:var(--radius-btn);font-size:14px;font-weight:600;color:#fff;cursor:pointer;border:none;">确认兑换</button>
+      </div>
+    </div>
+  </div><!-- /sheet-exchange -->
+
+  <!-- Earn rules bottom sheet -->
+  <div id="sheet-earn-rules" onclick="closeEarnRules()">
+    <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;" onclick="event.stopPropagation();"></div>
+    <div onclick="event.stopPropagation();">
+      <div style="font-size:17px;font-weight:600;color:var(--text-h1);margin-bottom:16px;">如何获取积分</div>
+      <div style="font-size:13px;font-weight:600;color:var(--warm);margin-bottom:8px;">⭐ 高额积分</div>
+      <div style="background:#FFF8EE;border-radius:12px;padding:12px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-body);padding:6px 0;border-bottom:1px solid #FFE8BA;"><span>完成家庭保障测评</span><span style="color:var(--warm);font-weight:600;">+500分</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-body);padding:6px 0;border-bottom:1px solid #FFE8BA;"><span>帮朋友注册（转介绍）</span><span style="color:var(--warm);font-weight:600;">+800分</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-body);padding:6px 0;"><span>朋友成功购买保险</span><span style="color:var(--warm);font-weight:600;">+500分</span></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--primary);margin-bottom:8px;">📅 每日可得</div>
+      <div style="background:rgba(43,127,191,0.06);border-radius:12px;padding:12px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-body);padding:6px 0;border-bottom:1px solid rgba(43,127,191,0.1);"><span>保险知识打卡（答对）</span><span style="color:var(--primary);font-weight:600;">+20分/题</span></div>
+        <div style="font-size:12px;color:var(--text-caption);padding:4px 0 6px;">连续7天答对 × 2倍加成</div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-body);padding:6px 0;"><span>上传一份保单</span><span style="color:var(--primary);font-weight:600;">+200分</span></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;color:var(--secondary);margin-bottom:8px;">📣 分享传播</div>
+      <div style="background:rgba(61,170,133,0.06);border-radius:12px;padding:12px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--text-body);padding:6px 0;"><span>分享测评结果到朋友圈</span><span style="color:var(--secondary);font-weight:600;">+50分</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--text-caption);margin-bottom:16px;line-height:1.6;">积分兑换实物商品单次上限200元；积分不可兑换现金或购物卡；保费抵扣需合作险企单独授权。</div>
+      <button onclick="closeEarnRules()" style="width:100%;height:48px;background:var(--gradient-cta);border-radius:var(--radius-btn);color:#fff;font-size:15px;font-weight:600;cursor:pointer;border:none;">我知道了</button>
+    </div>
+  </div><!-- /sheet-earn-rules -->
+
 </div><!-- /phone-wrap -->
 
 <script>
@@ -1901,6 +2549,72 @@ function switchView(name, el) {
 function switchCat(el) {
   el.closest('.cat-tabs').querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+}
+
+// Daily check-in overlay
+function openDaily() {
+  document.getElementById('overlay-daily').classList.add('open');
+  showDailyState('a');
+}
+function closeDaily() {
+  document.getElementById('overlay-daily').classList.remove('open');
+}
+function showDailyState(state) {
+  document.querySelectorAll('.daily-screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('daily-state-' + state);
+  if (el) el.classList.add('active');
+}
+function selectDailyOpt(el, state) {
+  document.querySelectorAll('#daily-state-' + state + ' .daily-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// Shop overlay
+function openShop() {
+  document.getElementById('overlay-shop').classList.add('open');
+}
+function closeShop() {
+  document.getElementById('overlay-shop').classList.remove('open');
+}
+function switchShopCat(el) {
+  el.closest('.shop-cat-row').querySelectorAll('.shop-cat-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Exchange sheet
+function openExchangeSheet() {
+  document.getElementById('sheet-exchange').classList.add('open');
+}
+function closeExchangeSheet() {
+  document.getElementById('sheet-exchange').classList.remove('open');
+}
+
+// Family pool overlay
+function openFamilyPool() {
+  document.getElementById('overlay-family-pool').classList.add('open');
+}
+function closeFamilyPool() {
+  document.getElementById('overlay-family-pool').classList.remove('open');
+}
+
+// Points records overlay
+function openPointsRecords() {
+  document.getElementById('overlay-points-records').classList.add('open');
+}
+function closePointsRecords() {
+  document.getElementById('overlay-points-records').classList.remove('open');
+}
+function switchRecFilter(el) {
+  el.closest('div').querySelectorAll('.rec-filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Earn rules sheet
+function openEarnRules() {
+  document.getElementById('sheet-earn-rules').classList.add('open');
+}
+function closeEarnRules() {
+  document.getElementById('sheet-earn-rules').classList.remove('open');
 }
 
 // Overlay open/close
