@@ -1668,208 +1668,6 @@
 
   </div><!-- /quizlink-overlay -->
 
-</div><!-- /phone-wrap -->
-
-<script>
-function switchTab(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab-item').forEach(t => {
-    t.classList.remove('active');
-    t.querySelector('.tab-label').style.color = '';
-  });
-  document.getElementById('screen-' + name).classList.add('active');
-  const tab = document.getElementById('tab-' + name);
-  if (tab) {
-    tab.classList.add('active');
-    tab.querySelector('.tab-label').style.color = '#1A56DB';
-  }
-}
-function goDetail() {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-detail').classList.add('active');
-}
-function switchDetailTab(idx, el) {
-  document.querySelectorAll('#detail-tabs .sub-tab').forEach((t,i) => {
-    t.classList.toggle('active', i === idx);
-    document.getElementById('detail-panel-' + i).style.display = i === idx ? 'block' : 'none';
-  });
-}
-function filterSignals(type, el) {
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  document.querySelectorAll('.signal-card').forEach(card => {
-    card.style.display = (type === 'all' || card.dataset.type === type) ? '' : 'none';
-  });
-}
-function sortCustomers(val) {
-  // Prototype: just show a toast indicating sort applied
-  const labels = {
-    signal: '已按信号优先级排序',
-    contact: '已按最后联系时间排序',
-    score: '已按保障分排序',
-    renewal: '已按续保到期时间排序',
-    birthday: '已按生日临近排序'
-  };
-  const toast = document.createElement('div');
-  toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;font-size:12px;padding:8px 16px;border-radius:20px;z-index:9999;pointer-events:none;';
-  toast.textContent = labels[val] || '已排序';
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 2000);
-}
-
-/* === F-002 Plan Book Logic === */
-function startPlanBook() {
-  var overlay = document.getElementById('planbook-overlay');
-  if (!overlay) return;
-  overlay.classList.add('pb-active');
-  document.querySelectorAll('.pb-screen').forEach(function(s){ s.classList.remove('pb-cur'); });
-  var s0 = document.getElementById('pb-0');
-  if (s0) s0.classList.add('pb-cur');
-}
-function closePlanBook() {
-  var overlay = document.getElementById('planbook-overlay');
-  if (overlay) overlay.classList.remove('pb-active');
-}
-function pbNext(step) {
-  document.querySelectorAll('.pb-screen').forEach(function(s){ s.classList.remove('pb-cur'); });
-  var el = document.getElementById('pb-' + step);
-  if (el) {
-    el.classList.add('pb-cur');
-    var scroll = el.querySelector('.pb-scroll');
-    if (scroll) scroll.scrollTop = 0;
-  }
-}
-function pbBack(cur) {
-  pbNext(cur - 1);
-}
-
-/* === MISS-A01: Quiz Link Overlay === */
-var qlCopyTexts = {
-  moments: '🛡️ 花5分钟做个免费保障测评，看看你家的保险有没有盲区~ 报告超详细，还有守护顾问可以1对1解读。分享给你试试：https://shh.com/quiz/agent/ZY8821',
-  friend:  '嘿，刚好想到你～ 发你个免费保障测评，做完有守护顾问帮你解读，挺实用的。需要的话可以找我聊聊哈：https://shh.com/quiz/agent/ZY8821',
-  existing: '你好，我这边有个更新的保障健康测评，5分钟就能出报告，帮你看看现在的保障还有没有优化空间。点击免费测评：https://shh.com/quiz/agent/ZY8821'
-};
-var qlSelectedType = 'moments';
-function openQuizLink() {
-  document.getElementById('quizlink-overlay').classList.add('ql-active');
-  qlNext(0);
-}
-function closeQuizLink() {
-  document.getElementById('quizlink-overlay').classList.remove('ql-active');
-}
-function qlNext(step) {
-  document.querySelectorAll('.ql-screen').forEach(function(s){ s.classList.remove('ql-cur'); });
-  var el = document.getElementById('ql-' + step);
-  if (el) {
-    el.classList.add('ql-cur');
-    var scroll = el.querySelector('.ql-scroll');
-    if (scroll) scroll.scrollTop = 0;
-  }
-}
-function selectQlType(card, type) {
-  qlSelectedType = type;
-  ['moments','friend','existing'].forEach(function(t) {
-    var c = document.getElementById('ql-type-' + t);
-    var ch = document.getElementById('ql-check-' + t);
-    if (t === type) {
-      c.classList.add('selected');
-      ch.style.background = '#1A56DB';
-      ch.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-    } else {
-      c.classList.remove('selected');
-      ch.style.background = '#E5E7EB';
-      ch.innerHTML = '';
-    }
-  });
-  document.getElementById('ql-copy-preview').innerHTML = qlCopyTexts[type].replace('https://shh.com/quiz/agent/ZY8821', '<span style="color:#1A56DB;">https://shh.com/quiz/agent/ZY8821</span>');
-}
-function copyQlLink() {
-  navigator.clipboard && navigator.clipboard.writeText('https://shh.com/quiz/agent/ZY8821').catch(function(){});
-  alert('链接已复制！粘贴到微信发送即可。（原型演示）');
-}
-function copyQlText() {
-  var text = qlCopyTexts[qlSelectedType];
-  navigator.clipboard && navigator.clipboard.writeText(text).catch(function(){});
-  alert('文案+链接已复制！粘贴到微信发送即可。（原型演示）');
-}
-
-/* === §2.1 Customer Activity Ranking === */
-function openActRanking() {
-  document.getElementById('act-ranking-overlay').classList.add('open');
-}
-function closeActRanking() {
-  document.getElementById('act-ranking-overlay').classList.remove('open');
-}
-function switchRankTab(type, el) {
-  ['active','warm','cool','all'].forEach(function(t) {
-    var tab = document.getElementById('rtab-' + t);
-    if (tab) { tab.style.color = 'var(--gray-500)'; tab.style.borderBottomColor = 'transparent'; tab.style.fontWeight = '500'; }
-  });
-  if (el) { el.style.fontWeight = '600'; el.style.borderBottomColor = el.id === 'rtab-active' ? '#EF4444' : el.id === 'rtab-warm' ? '#F59E0B' : el.id === 'rtab-cool' ? '#FF6B35' : 'var(--primary)'; el.style.color = el.id === 'rtab-active' ? '#EF4444' : el.id === 'rtab-warm' ? '#F59E0B' : el.id === 'rtab-cool' ? '#FF6B35' : 'var(--primary)'; }
-}
-
-/* === §2.3 Activity Invite Tool === */
-function openActivityInvite() {
-  document.getElementById('activity-invite-overlay').classList.add('open');
-}
-function closeActivityInvite() {
-  document.getElementById('activity-invite-overlay').classList.remove('open');
-  closeBatchInvite();
-}
-function openBatchInvite() {
-  var sheet = document.getElementById('batch-invite-sheet');
-  if (sheet) { sheet.style.display = 'flex'; }
-}
-function closeBatchInvite() {
-  var sheet = document.getElementById('batch-invite-sheet');
-  if (sheet) { sheet.style.display = 'none'; }
-}
-
-/* ===== F-005: 每日战报 ===== */
-function openDailyReport() {
-  document.getElementById('daily-report-overlay').style.display = 'flex';
-}
-function closeDailyReport() {
-  document.getElementById('daily-report-overlay').style.display = 'none';
-}
-
-/* ===== F-004: 新人每日任务 ===== */
-function openNewAgentTasks() {
-  document.getElementById('new-agent-tasks-overlay').style.display = 'flex';
-}
-function closeNewAgentTasks() {
-  document.getElementById('new-agent-tasks-overlay').style.display = 'none';
-}
-function toggleAgentTask(el) {
-  var check = el.querySelector('.agent-task-check');
-  var done = check.classList.contains('done');
-  if (!done) {
-    check.classList.add('done');
-    check.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
-    el.style.opacity = '0.6';
-  }
-}
-
-/* ===== F-003: 线索热度通知 ===== */
-function openLeadsNotif() {
-  document.getElementById('leads-notif-overlay').style.display = 'flex';
-}
-function closeLeadsNotif() {
-  document.getElementById('leads-notif-overlay').style.display = 'none';
-}
-function switchLeadsTab(tab, el) {
-  document.querySelectorAll('.leads-tab-btn').forEach(function(b){
-    b.style.color = '#6B7280'; b.style.borderBottomColor = 'transparent'; b.style.fontWeight = '500';
-  });
-  el.style.color = tab==='hot' ? '#EF4444' : tab==='warm' ? '#F59E0B' : '#1A56DB';
-  el.style.borderBottomColor = tab==='hot' ? '#EF4444' : tab==='warm' ? '#F59E0B' : '#1A56DB';
-  el.style.fontWeight = '700';
-}
-function callContact(name) {
-  alert('拨打 ' + name + ' 的电话。（原型演示）');
-}
-
-</script>
 
 <!-- ===== F-005: 每日战报 Overlay ===== -->
 <div id="daily-report-overlay" style="position:absolute;inset:0;background:#F4F6FA;z-index:220;flex-direction:column;display:none;overflow-y:auto;">
@@ -2216,6 +2014,208 @@ function callContact(name) {
     </div>
   </div>
 </div>
+
+</div><!-- /phone-wrap -->
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => {
+    t.classList.remove('active');
+    t.querySelector('.tab-label').style.color = '';
+  });
+  document.getElementById('screen-' + name).classList.add('active');
+  const tab = document.getElementById('tab-' + name);
+  if (tab) {
+    tab.classList.add('active');
+    tab.querySelector('.tab-label').style.color = '#1A56DB';
+  }
+}
+function goDetail() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-detail').classList.add('active');
+}
+function switchDetailTab(idx, el) {
+  document.querySelectorAll('#detail-tabs .sub-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === idx);
+    document.getElementById('detail-panel-' + i).style.display = i === idx ? 'block' : 'none';
+  });
+}
+function filterSignals(type, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.signal-card').forEach(card => {
+    card.style.display = (type === 'all' || card.dataset.type === type) ? '' : 'none';
+  });
+}
+function sortCustomers(val) {
+  // Prototype: just show a toast indicating sort applied
+  const labels = {
+    signal: '已按信号优先级排序',
+    contact: '已按最后联系时间排序',
+    score: '已按保障分排序',
+    renewal: '已按续保到期时间排序',
+    birthday: '已按生日临近排序'
+  };
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;font-size:12px;padding:8px 16px;border-radius:20px;z-index:9999;pointer-events:none;';
+  toast.textContent = labels[val] || '已排序';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+/* === F-002 Plan Book Logic === */
+function startPlanBook() {
+  var overlay = document.getElementById('planbook-overlay');
+  if (!overlay) return;
+  overlay.classList.add('pb-active');
+  document.querySelectorAll('.pb-screen').forEach(function(s){ s.classList.remove('pb-cur'); });
+  var s0 = document.getElementById('pb-0');
+  if (s0) s0.classList.add('pb-cur');
+}
+function closePlanBook() {
+  var overlay = document.getElementById('planbook-overlay');
+  if (overlay) overlay.classList.remove('pb-active');
+}
+function pbNext(step) {
+  document.querySelectorAll('.pb-screen').forEach(function(s){ s.classList.remove('pb-cur'); });
+  var el = document.getElementById('pb-' + step);
+  if (el) {
+    el.classList.add('pb-cur');
+    var scroll = el.querySelector('.pb-scroll');
+    if (scroll) scroll.scrollTop = 0;
+  }
+}
+function pbBack(cur) {
+  pbNext(cur - 1);
+}
+
+/* === MISS-A01: Quiz Link Overlay === */
+var qlCopyTexts = {
+  moments: '🛡️ 花5分钟做个免费保障测评，看看你家的保险有没有盲区~ 报告超详细，还有守护顾问可以1对1解读。分享给你试试：https://shh.com/quiz/agent/ZY8821',
+  friend:  '嘿，刚好想到你～ 发你个免费保障测评，做完有守护顾问帮你解读，挺实用的。需要的话可以找我聊聊哈：https://shh.com/quiz/agent/ZY8821',
+  existing: '你好，我这边有个更新的保障健康测评，5分钟就能出报告，帮你看看现在的保障还有没有优化空间。点击免费测评：https://shh.com/quiz/agent/ZY8821'
+};
+var qlSelectedType = 'moments';
+function openQuizLink() {
+  document.getElementById('quizlink-overlay').classList.add('ql-active');
+  qlNext(0);
+}
+function closeQuizLink() {
+  document.getElementById('quizlink-overlay').classList.remove('ql-active');
+}
+function qlNext(step) {
+  document.querySelectorAll('.ql-screen').forEach(function(s){ s.classList.remove('ql-cur'); });
+  var el = document.getElementById('ql-' + step);
+  if (el) {
+    el.classList.add('ql-cur');
+    var scroll = el.querySelector('.ql-scroll');
+    if (scroll) scroll.scrollTop = 0;
+  }
+}
+function selectQlType(card, type) {
+  qlSelectedType = type;
+  ['moments','friend','existing'].forEach(function(t) {
+    var c = document.getElementById('ql-type-' + t);
+    var ch = document.getElementById('ql-check-' + t);
+    if (t === type) {
+      c.classList.add('selected');
+      ch.style.background = '#1A56DB';
+      ch.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else {
+      c.classList.remove('selected');
+      ch.style.background = '#E5E7EB';
+      ch.innerHTML = '';
+    }
+  });
+  document.getElementById('ql-copy-preview').innerHTML = qlCopyTexts[type].replace('https://shh.com/quiz/agent/ZY8821', '<span style="color:#1A56DB;">https://shh.com/quiz/agent/ZY8821</span>');
+}
+function copyQlLink() {
+  navigator.clipboard && navigator.clipboard.writeText('https://shh.com/quiz/agent/ZY8821').catch(function(){});
+  alert('链接已复制！粘贴到微信发送即可。（原型演示）');
+}
+function copyQlText() {
+  var text = qlCopyTexts[qlSelectedType];
+  navigator.clipboard && navigator.clipboard.writeText(text).catch(function(){});
+  alert('文案+链接已复制！粘贴到微信发送即可。（原型演示）');
+}
+
+/* === §2.1 Customer Activity Ranking === */
+function openActRanking() {
+  document.getElementById('act-ranking-overlay').classList.add('open');
+}
+function closeActRanking() {
+  document.getElementById('act-ranking-overlay').classList.remove('open');
+}
+function switchRankTab(type, el) {
+  ['active','warm','cool','all'].forEach(function(t) {
+    var tab = document.getElementById('rtab-' + t);
+    if (tab) { tab.style.color = 'var(--gray-500)'; tab.style.borderBottomColor = 'transparent'; tab.style.fontWeight = '500'; }
+  });
+  if (el) { el.style.fontWeight = '600'; el.style.borderBottomColor = el.id === 'rtab-active' ? '#EF4444' : el.id === 'rtab-warm' ? '#F59E0B' : el.id === 'rtab-cool' ? '#FF6B35' : 'var(--primary)'; el.style.color = el.id === 'rtab-active' ? '#EF4444' : el.id === 'rtab-warm' ? '#F59E0B' : el.id === 'rtab-cool' ? '#FF6B35' : 'var(--primary)'; }
+}
+
+/* === §2.3 Activity Invite Tool === */
+function openActivityInvite() {
+  document.getElementById('activity-invite-overlay').classList.add('open');
+}
+function closeActivityInvite() {
+  document.getElementById('activity-invite-overlay').classList.remove('open');
+  closeBatchInvite();
+}
+function openBatchInvite() {
+  var sheet = document.getElementById('batch-invite-sheet');
+  if (sheet) { sheet.style.display = 'flex'; }
+}
+function closeBatchInvite() {
+  var sheet = document.getElementById('batch-invite-sheet');
+  if (sheet) { sheet.style.display = 'none'; }
+}
+
+/* ===== F-005: 每日战报 ===== */
+function openDailyReport() {
+  document.getElementById('daily-report-overlay').style.display = 'flex';
+}
+function closeDailyReport() {
+  document.getElementById('daily-report-overlay').style.display = 'none';
+}
+
+/* ===== F-004: 新人每日任务 ===== */
+function openNewAgentTasks() {
+  document.getElementById('new-agent-tasks-overlay').style.display = 'flex';
+}
+function closeNewAgentTasks() {
+  document.getElementById('new-agent-tasks-overlay').style.display = 'none';
+}
+function toggleAgentTask(el) {
+  var check = el.querySelector('.agent-task-check');
+  var done = check.classList.contains('done');
+  if (!done) {
+    check.classList.add('done');
+    check.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+    el.style.opacity = '0.6';
+  }
+}
+
+/* ===== F-003: 线索热度通知 ===== */
+function openLeadsNotif() {
+  document.getElementById('leads-notif-overlay').style.display = 'flex';
+}
+function closeLeadsNotif() {
+  document.getElementById('leads-notif-overlay').style.display = 'none';
+}
+function switchLeadsTab(tab, el) {
+  document.querySelectorAll('.leads-tab-btn').forEach(function(b){
+    b.style.color = '#6B7280'; b.style.borderBottomColor = 'transparent'; b.style.fontWeight = '500';
+  });
+  el.style.color = tab==='hot' ? '#EF4444' : tab==='warm' ? '#F59E0B' : '#1A56DB';
+  el.style.borderBottomColor = tab==='hot' ? '#EF4444' : tab==='warm' ? '#F59E0B' : '#1A56DB';
+  el.style.fontWeight = '700';
+}
+function callContact(name) {
+  alert('拨打 ' + name + ' 的电话。（原型演示）');
+}
+
+</script>
 
 </body>
 </html>
