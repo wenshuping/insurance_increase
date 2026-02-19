@@ -18,6 +18,7 @@ skills:
   - architecture-decision-records  # ADR 决策记录
   - c4-architecture             # C4 架构图（Mermaid）
   - microservices-patterns      # 微服务设计
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### 📋 产品经理
@@ -32,6 +33,7 @@ skills:
   - product-manager-toolkit     # PM 综合工具包
   - prd-generator               # PRD 需求文档生成
   - user-story-mapping          # 用户故事地图
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### 📁 项目经理
@@ -44,6 +46,7 @@ skills:
   - c4-architecture             # 辅助跨团队沟通
   - planning-with-files         # 文件驱动项目规划
   - obsidian-bases              # Obsidian 知识库管理
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### 🎨 UI 设计师
@@ -57,6 +60,7 @@ skills:
   - web-design-guidelines      # UI 规范审查
   - accessibility-compliance   # WCAG 2.2 无障碍
   - better-icons               # 图标库设计
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### 💻 前端开发
@@ -68,6 +72,7 @@ skills:
   - tailwind-design-system     # 组件实现
   - accessibility-compliance   # 无障碍交互
   - ralph-wiggum               # 规范驱动自主编码
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### ⚙️ 后端开发
@@ -77,6 +82,7 @@ skills:
   - architecture-patterns      # 分层架构、领域模型
   - microservices-patterns     # 服务间通信
   - ralph-wiggum               # 规范驱动自主编码
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### 🧪 测试工程师
@@ -86,6 +92,7 @@ skills:
   - webapp-testing             # Playwright 自动化测试
   - accessibility-compliance   # 无障碍合规测试
   - postmortem-writing         # Bug 复盘报告
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### 📣 市场营销 (Marketing)
@@ -98,6 +105,7 @@ skills:
   - seo-audit                  # SEO 审查优化
   - programmatic-seo           # 程序化 SEO
   - product-marketing-context  # 产品营销定位
+  - x-article-publisher         # 文章发布到 X
 ```
 
 ### 👥 客户角色 (Customer Persona)
@@ -107,6 +115,7 @@ skills:
 ```
 skills:
   - customer-persona           # 客户角色模拟（多年龄/性别/身份）
+  - x-article-publisher         # 文章发布到 X
 ```
 
 **内置角色：**
@@ -122,6 +131,7 @@ skills:
 ```
 skills:
   - insurance-staff-persona    # 从业人员角色模拟（不同层级/阅历）
+  - x-article-publisher         # 文章发布到 X
 ```
 
 **内置角色：**
