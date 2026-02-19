@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>守护+ 业务员工作台</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #1A56DB;
+    --primary-light: #EBF2FF;
+    --orange: #FF6B35;
+    --orange-light: #FFF3EE;
+    --teal: #0D9488;
+    --teal-light: #CCFBF1;
+    --green: #10B981;
+    --green-light: #D1FAE5;
+    --red: #EF4444;
+    --red-light: #FEE2E2;
+    --yellow: #F59E0B;
+    --yellow-light: #FEF3C7;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #E8ECF0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .phone-wrap {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    background: #fff;
+    border-radius: 44px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.25), 0 0 0 12px #1A1A2E, 0 0 0 14px #2D2D3E;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    height: 44px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-900);
+    flex-shrink: 0;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; }
+  .status-icons { display: flex; gap: 6px; align-items: center; }
+
+  /* Screens */
+  .screen { display: none; flex: 1; overflow-y: auto; background: var(--gray-50); flex-direction: column; }
+  .screen.active { display: flex; }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* Top Nav */
+  .top-nav {
+    background: #fff;
+    padding: 12px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--gray-100);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .top-nav .logo { font-size: 18px; font-weight: 700; color: var(--primary); }
+  .top-nav .nav-right { display: flex; gap: 14px; align-items: center; }
+  .nav-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+  .badge { position: absolute; top: -2px; right: -2px; background: var(--red); color: #fff; font-size: 10px; min-width: 16px; height: 16px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+  /* Stats bar */
+  .stats-bar {
+    background: linear-gradient(135deg, #1A56DB 0%, #1E40AF 100%);
+    padding: 16px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  .stat-item { text-align: center; }
+  .stat-item + .stat-item { border-left: 1px solid rgba(255,255,255,0.2); }
+  .stat-value { font-size: 22px; font-weight: 700; color: #fff; }
+  .stat-label { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+
+  /* Filter chips */
+  .filter-bar { padding: 12px 16px; background: #fff; display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid var(--gray-100); flex-shrink: 0; }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .chip { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1.5px solid var(--gray-200); color: var(--gray-500); white-space: nowrap; cursor: pointer; transition: all 0.2s; }
+  .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+  /* Signal Cards */
+  .signals-feed { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .signal-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid;
+    position: relative;
+    overflow: hidden;
+  }
+  .signal-card.intent { border-color: var(--red); }
+  .signal-card.renewal { border-color: var(--orange); }
+  .signal-card.lifecycle { border-color: var(--primary); }
+  .signal-card.marketing { border-color: var(--teal); }
+  .signal-card.newclient { border-color: var(--green); }
+
+  .signal-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .signal-meta { flex: 1; }
+  .signal-title { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+  .signal-time { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+  .signal-type-badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .badge-intent { background: var(--red-light); color: var(--red); }
+  .badge-renewal { background: var(--orange-light); color: var(--orange); }
+  .badge-lifecycle { background: var(--primary-light); color: var(--primary); }
+  .badge-marketing { background: var(--teal-light); color: var(--teal); }
+  .badge-newclient { background: var(--green-light); color: var(--green); }
+
+  .signal-desc { font-size: 13px; color: var(--gray-700); line-height: 1.5; margin-bottom: 12px; }
+  .signal-actions { display: flex; gap: 8px; }
+  .btn-sm {
+    padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-ghost { background: var(--gray-100); color: var(--gray-700); }
+  .btn-teal { background: var(--teal); color: #fff; }
+
+  /* Customer List */
+  .search-bar { padding: 12px 16px; background: #fff; border-bottom: 1px solid var(--gray-100); }
+  .search-input-wrap { background: var(--gray-100); border-radius: 10px; display: flex; align-items: center; padding: 8px 12px; gap: 8px; }
+  .search-input-wrap input { border: none; background: transparent; font-size: 14px; flex: 1; outline: none; font-family: inherit; color: var(--gray-900); }
+  .search-input-wrap input::placeholder { color: var(--gray-500); }
+
+  .customer-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .customer-card { background: #fff; border-radius: 14px; padding: 14px; box-shadow: var(--shadow-sm); }
+  .customer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .customer-info { flex: 1; }
+  .customer-name { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .customer-sub { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .coverage-score { text-align: right; }
+  .score-num { font-size: 20px; font-weight: 700; color: var(--primary); }
+  .score-label { font-size: 10px; color: var(--gray-500); }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+  .tag-system { background: var(--primary-light); color: var(--primary); }
+  .tag-manual { background: var(--orange-light); color: var(--orange); }
+  .tag-policy { background: var(--yellow-light); color: var(--yellow); }
+  .quick-actions { display: flex; gap: 8px; border-top: 1px solid var(--gray-100); padding-top: 10px; }
+  .quick-btn { flex: 1; padding: 6px; border-radius: 8px; font-size: 11px; font-weight: 500; text-align: center; background: var(--gray-100); color: var(--gray-700); cursor: pointer; }
+
+  /* Customer Detail */
+  .detail-header { background: linear-gradient(135deg, #1A56DB, #1E40AF); padding: 20px; color: #fff; }
+  .detail-back { display: flex; align-items: center; gap: 6px; font-size: 13px; opacity: 0.8; margin-bottom: 16px; cursor: pointer; }
+  .detail-avatar-row { display: flex; align-items: center; gap: 14px; }
+  .detail-avatar { width: 56px; height: 56px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; background: rgba(255,255,255,0.2); }
+  .detail-name { font-size: 20px; font-weight: 700; }
+  .detail-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .detail-tag { background: rgba(255,255,255,0.2); color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+
+  .sub-tabs { display: flex; background: #fff; border-bottom: 1px solid var(--gray-200); }
+  .sub-tab { flex: 1; padding: 12px 8px; text-align: center; font-size: 13px; font-weight: 500; color: var(--gray-500); border-bottom: 2px solid transparent; cursor: pointer; }
+  .sub-tab.active { color: var(--primary); border-color: var(--primary); }
+
+  .detail-content { padding: 16px; }
+  .info-section { margin-bottom: 20px; }
+  .info-section-title { font-size: 13px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
+  .info-label { font-size: 13px; color: var(--gray-500); }
+  .info-value { font-size: 13px; font-weight: 500; color: var(--gray-900); }
+
+  /* Radar Chart */
+  .radar-wrap { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+  .radar-title { font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 12px; text-align: center; }
+
+  /* Performance */
+  .perf-header { background: linear-gradient(135deg, #1A56DB, #1E40AF); padding: 20px 20px 30px; }
+  .perf-month { font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 4px; }
+  .perf-total { font-size: 32px; font-weight: 700; color: #fff; }
+  .perf-unit { font-size: 14px; }
+  .perf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; margin-top: -10px; }
+  .perf-card { background: #fff; border-radius: 14px; padding: 14px; box-shadow: var(--shadow-sm); }
+  .perf-card-label { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+  .perf-card-value { font-size: 22px; font-weight: 700; color: var(--gray-900); }
+  .perf-card-sub { font-size: 11px; color: var(--green); margin-top: 2px; }
+  .rank-card { margin: 0 16px 16px; background: linear-gradient(135deg, #FFF7ED, #FEF3C7); border-radius: 14px; padding: 16px; border: 1px solid #FDE68A; display: flex; align-items: center; gap: 14px; }
+  .rank-num { font-size: 40px; font-weight: 900; color: var(--orange); }
+  .rank-info .rank-label { font-size: 13px; color: var(--gray-500); }
+  .rank-info .rank-team { font-size: 15px; font-weight: 600; color: var(--gray-900); margin-top: 2px; }
+
+  /* Touch log table */
+  .touch-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .touch-table th { background: var(--gray-100); padding: 8px 10px; text-align: left; color: var(--gray-500); font-weight: 500; }
+  .touch-table td { padding: 8px 10px; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
+  .status-sent { color: var(--green); font-weight: 600; }
+  .status-opened { color: var(--primary); font-weight: 600; }
+
+  /* === F-002 PLAN BOOK OVERLAY === */
+  #planbook-overlay { position:absolute;inset:0;background:#F4F6FA;z-index:200;flex-direction:column;display:none;overflow:hidden; }
+  #planbook-overlay.pb-active { display:flex; }
+  .pb-screen { display:none;flex-direction:column;flex:1;overflow:hidden; }
+  .pb-screen.pb-cur { display:flex; }
+  .pb-scroll { flex:1;overflow-y:auto; }
+  .pb-scroll::-webkit-scrollbar { display:none; }
+
+  /* === MISS-A01: QUIZ LINK OVERLAY === */
+  #quizlink-overlay { position:absolute;inset:0;background:#F4F6FA;z-index:210;flex-direction:column;display:none;overflow:hidden; }
+  #quizlink-overlay.ql-active { display:flex; }
+  .ql-screen { display:none;flex-direction:column;flex:1;overflow:hidden; }
+  .ql-screen.ql-cur { display:flex; }
+  .ql-scroll { flex:1;overflow-y:auto;padding:16px; }
+  .ql-scroll::-webkit-scrollbar { display:none; }
+  .ql-topbar { display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;border-bottom:1px solid #E5E7EB;flex-shrink:0; }
+  .ql-back { width:36px;height:36px;border-radius:50%;border:none;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer; }
+  .ql-title { font-size:15px;font-weight:700;color:#0F172A; }
+  .ql-footer { padding:16px;background:#fff;border-top:1px solid #E5E7EB;flex-shrink:0; }
+  .ql-btn { width:100%;height:52px;border-radius:14px;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans SC'; }
+  .ql-btn-primary { background:linear-gradient(135deg,#1A56DB,#0D9488);color:#fff; }
+  .ql-btn-ghost { background:#F3F4F6;color:#374151;height:44px;margin-top:8px; }
+  .ql-type-card { border:2px solid #E5E7EB;border-radius:14px;padding:14px;cursor:pointer;margin-bottom:10px;background:#fff;transition:border-color 0.15s,background 0.15s; }
+  .ql-type-card.selected { border-color:#1A56DB;background:#EBF2FF; }
+  .ql-type-title { font-size:14px;font-weight:700;color:#0F172A;margin-bottom:3px; }
+  .ql-type-desc { font-size:12px;color:#6B7280;line-height:1.4; }
+  .ql-link-box { background:#fff;border-radius:14px;border:1.5px solid #DDE4ED;padding:14px;font-size:13px;color:#1A56DB;word-break:break-all;line-height:1.5;margin-bottom:12px; }
+  .ql-qr { width:120px;height:120px;border-radius:12px;background:#F3F4F6;display:flex;align-items:center;justify-content:center;margin:0 auto 12px; }
+  .pb-topbar { display:flex;align-items:center;padding:12px 16px;background:#fff;border-bottom:1px solid #E8ECF4;flex-shrink:0; }
+  .pb-back { width:36px;height:36px;border-radius:50%;background:#F4F6FA;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0; }
+  .pb-title { flex:1;text-align:center;font-size:15px;font-weight:600;color:#0F172A; }
+  .pb-steps { display:flex;padding:12px 16px;background:#fff;border-bottom:1px solid #E8ECF4;flex-shrink:0; }
+  .pb-step { flex:1;display:flex;flex-direction:column;align-items:center;gap:4px; }
+  .pb-step-dot { width:24px;height:24px;border-radius:50%;background:#E8ECF4;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#64748B; }
+  .pb-step-dot.active { background:#1A56DB;color:#fff; }
+  .pb-step-dot.done { background:#10B981;color:#fff; }
+  .pb-step-lbl { font-size:9px;color:#64748B;text-align:center;white-space:nowrap; }
+  .pb-step-lbl.active { color:#1A56DB;font-weight:600; }
+  .pb-step-line { flex:1;height:2px;background:#E8ECF4;margin:11px 0; }
+  .pb-step-line.done { background:#10B981; }
+  .pb-footer { padding:12px 16px 16px;background:#fff;border-top:1px solid #E8ECF4;flex-shrink:0; }
+  .pb-btn { width:100%;height:48px;border-radius:10px;border:none;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans SC'; }
+  .pb-btn-primary { background:#1A56DB;color:#fff; }
+  .pb-btn-ghost { background:#F4F6FA;color:#374151; }
+  .pb-risk-tag { display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:8px; }
+  .pb-risk-high { background:#FEE2E2;color:#EF4444; }
+  .pb-risk-med { background:#FEF3C7;color:#F59E0B; }
+  .pb-risk-ok { background:#D1FAE5;color:#10B981; }
+  .pb-product-row { display:flex;align-items:center;gap:12px;background:#F9FAFB;border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer; }
+  .pb-product-row.selected { background:#EBF2FF;border:1.5px solid #1A56DB; }
+  .pb-prod-chk { width:20px;height:20px;border-radius:6px;border:1.5px solid #D1D5DB;flex-shrink:0;display:flex;align-items:center;justify-content:center; }
+  .pb-product-row.selected .pb-prod-chk { background:#1A56DB;border-color:#1A56DB; }
+  .pb-prod-name { font-size:13px;font-weight:600;color:#0F172A;flex:1; }
+  .pb-prod-price { font-size:12px;color:#1A56DB;font-weight:700;white-space:nowrap; }
+  .pb-preview-page { background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+  .pb-page-num { font-size:11px;font-weight:600;color:#1A56DB;background:#EBF2FF;padding:2px 8px;border-radius:6px;display:inline-block;margin-bottom:8px; }
+  .pb-page-title { font-size:15px;font-weight:700;color:#0F172A;margin-bottom:6px; }
+  .pb-page-body { font-size:13px;color:#374151;line-height:1.6; }
+
+
+  /* Bottom Tab Bar */
+  .bottom-tabs {
+    height: 60px;
+    background: #fff;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    flex-shrink: 0;
+  }
+  .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; transition: all 0.2s; }
+  .tab-icon { display: flex; align-items: center; justify-content: center; color: var(--gray-500); transition: color 0.2s; }
+  .tab-item.active .tab-icon { color: var(--primary); }
+  .tab-label { font-size: 10px; font-weight: 500; color: var(--gray-500); }
+  .tab-item.active .tab-label { color: var(--primary); }
+  .tab-item.active .tab-icon { transform: scale(1.1); }
+
+  /* Timeline */
+  .timeline { padding: 0; }
+  .timeline-item { display: flex; gap: 12px; margin-bottom: 16px; }
+  .timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--primary); margin-top: 4px; flex-shrink: 0; position: relative; }
+  .timeline-dot::after { content: ''; position: absolute; left: 4px; top: 10px; width: 1px; height: calc(100% + 6px); background: var(--gray-200); }
+  .timeline-content { flex: 1; }
+  .timeline-time { font-size: 11px; color: var(--gray-500); margin-bottom: 3px; }
+  .timeline-text { font-size: 13px; color: var(--gray-700); line-height: 1.5; }
+
+  /* Settings */
+  .settings-profile { background: linear-gradient(135deg, #1A56DB, #1E40AF); padding: 24px 20px; display: flex; align-items: center; gap: 16px; }
+  .settings-avatar { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: #fff; border: 3px solid rgba(255,255,255,0.4); }
+  .settings-name { font-size: 20px; font-weight: 700; color: #fff; }
+  .settings-id { font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 3px; }
+  .settings-section { margin: 16px; background: #fff; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item-left { display: flex; align-items: center; gap: 12px; }
+  .settings-icon-wrap { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .settings-item-label { font-size: 14px; color: var(--gray-900); }
+  .settings-item-value { font-size: 13px; color: var(--gray-500); }
+  .toggle { width: 44px; height: 24px; border-radius: 12px; background: var(--green); position: relative; cursor: pointer; }
+  .toggle::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #fff; top: 2px; right: 2px; transition: right 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+
+  .section-padding { padding: 16px; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--gray-900); margin-bottom: 12px; }
+
+  /* Points Signal */
+  .signal-card.points { border-color: #7C3AED; }
+  .badge-points { background: #F5F3FF; color: #7C3AED; }
+
+  /* Generic Agent Overlay */
+  .ag-overlay {
+    position: absolute; inset: 0; z-index: 220;
+    background: var(--gray-50); display: none; flex-direction: column;
+    overflow-y: auto;
+  }
+  .ag-overlay.open { display: flex; }
+  .ag-ov-topbar {
+    background: #fff; padding: 12px 20px;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--gray-100); flex-shrink: 0;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .ag-ov-back { width: 32px; height: 32px; border-radius: 8px; background: var(--gray-100); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+  .ag-ov-title { font-size: 16px; font-weight: 700; color: var(--gray-900); flex: 1; }
+
+  /* Customer Activity Ranking */
+  .rank-entry-card {
+    margin: 0 16px 12px;
+    background: linear-gradient(135deg, #1A56DB 0%, #7C3AED 100%);
+    border-radius: 14px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+  }
+  .rank-entry-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .act-status-fire { color: #EF4444; font-weight: 700; font-size: 12px; }
+  .act-status-ok { color: #10B981; font-weight: 700; font-size: 12px; }
+  .act-status-warm { color: #F59E0B; font-weight: 700; font-size: 12px; }
+  .act-status-cool { color: #FF6B35; font-weight: 700; font-size: 12px; }
+  .act-status-cold { color: #6B7280; font-weight: 600; font-size: 12px; }
+
+  /* Rank list items */
+  .rank-list-item {
+    background: #fff; border-radius: 12px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  .rank-list-num { width: 24px; text-align: center; font-size: 14px; font-weight: 700; color: var(--gray-500); flex-shrink: 0; }
+  .rank-list-num.top1 { color: #EAB308; }
+  .rank-list-num.top2 { color: #9CA3AF; }
+  .rank-list-num.top3 { color: #D97706; }
+  .rank-list-pts { font-size: 13px; font-weight: 700; color: var(--primary); }
+
+  /* Activity Invite */
+  .invite-act-card {
+    background: #fff; border-radius: 14px; padding: 14px 16px;
+    box-shadow: var(--shadow-sm); margin-bottom: 10px;
+  }
+  .invite-act-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .invite-act-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .invite-act-title { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+  .invite-act-sub { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+  .invite-btn { background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+  /* Daily task items */
+  .task-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+  .task-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--gray-300); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .task-check.done { background: var(--green); border-color: var(--green); }
+  .task-pts { font-size: 11px; color: var(--primary); font-weight: 600; background: var(--primary-light); padding: 2px 7px; border-radius: 10px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="phone-wrap">
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="3" width="3" height="9" rx="1" fill="#111"/><rect x="4.5" y="2" width="3" height="10" rx="1" fill="#111"/><rect x="9" y="0" width="3" height="12" rx="1" fill="#111"/><rect x="13.5" y="0" width="2" height="12" rx="1" fill="#111" opacity="0.3"/></svg>
+      <svg width="16" height="12" viewBox="0 0 24 18"><path d="M12 3.5C8.5 3.5 5.3 4.9 3 7.2L0 4.2C3.1 1.6 7 0 12 0s8.9 1.6 12 4.2l-3 3C18.7 4.9 15.5 3.5 12 3.5z" fill="#111"/><path d="M12 8.5c-1.9 0-3.6.8-4.8 2L4.5 7.8C6.4 6 9.1 5 12 5s5.6 1 7.5 2.8l-2.7 2.7C15.6 9.3 13.9 8.5 12 8.5z" fill="#111"/><circle cx="12" cy="15" r="3" fill="#111"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="1" width="22" height="10" rx="2" stroke="#111" stroke-width="1.5" fill="none"/><rect x="22.5" y="3.5" width="2" height="5" rx="1" fill="#111" opacity="0.5"/><rect x="1.5" y="2.5" width="16" height="7" rx="1" fill="#111"/></svg>
+    </div>
+  </div>
+
+  <!-- Workbench Screen -->
+  <div class="screen active" id="screen-workbench">
+    <div class="top-nav">
+      <span class="logo">守护+ 工作台</span>
+      <div class="nav-right">
+        <div class="nav-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#374151" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+          <div class="badge">3</div>
+        </div>
+        <div class="nav-icon" style="background:var(--primary);color:#fff;font-weight:700;font-size:14px;">张</div>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-item"><div class="stat-value">8</div><div class="stat-label">今日待跟进</div></div>
+      <div class="stat-item"><div class="stat-value">342</div><div class="stat-label">客户总数</div></div>
+      <div class="stat-item"><div class="stat-value">¥8.4万</div><div class="stat-label">本月保费</div></div>
+    </div>
+    <!-- MISS-A01: 测评链接生成入口卡 (MVP飞轮起点) -->
+    <div onclick="openQuizLink()" style="margin:12px 16px 0;background:linear-gradient(135deg,#1A56DB,#0D9488);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;position:relative;overflow:hidden;">
+      <div style="position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.08);pointer-events:none;"></div>
+      <div style="width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:3px;">生成测评链接</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.78);">发给客户/朋友圈，0成本触达新客户 ✦ MVP核心</div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+    <!-- Today's Focus -->
+    <div style="padding:12px 16px 4px;background:#fff;border-bottom:1px solid var(--gray-100);">
+      <div style="font-size:12px;font-weight:700;color:var(--gray-500);letter-spacing:0.5px;margin-bottom:8px;">TODAY'S FOCUS</div>
+      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;">
+        <div style="flex-shrink:0;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;min-width:130px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#EF4444;display:inline-block;"></span>
+            <span style="font-size:11px;font-weight:700;color:#DC2626;">紧急</span>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:var(--gray-900);">李华 续保到期</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">明日到期，立即联系</div>
+        </div>
+        <div style="flex-shrink:0;background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:10px 12px;min-width:130px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#FF6B35;display:inline-block;"></span>
+            <span style="font-size:11px;font-weight:700;color:#EA580C;">今日</span>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:var(--gray-900);">王芳 高意向</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">发送定制计划书</div>
+        </div>
+        <div style="flex-shrink:0;background:#F0FDFA;border:1px solid #99F6E4;border-radius:10px;padding:10px 12px;min-width:130px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#0D9488;display:inline-block;"></span>
+            <span style="font-size:11px;font-weight:700;color:#0D9488;">提醒</span>
+          </div>
+          <div style="font-size:12px;font-weight:600;color:var(--gray-900);">张明 生日</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">3天后，准备祝福语</div>
+        </div>
+      </div>
+    </div>
+    <!-- §2.1 + §2.3: Quick access row -->
+    <div style="display:flex;gap:10px;margin:10px 16px 0;">
+      <div class="rank-entry-card" style="flex:1;" onclick="openActRanking()">
+        <div class="rank-entry-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;">客户活跃榜</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">5冷却客户待唤醒</div>
+        </div>
+      </div>
+      <div onclick="openActivityInvite()" style="flex:1;background:linear-gradient(135deg,#0D9488,#059669);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff;">活动邀请</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">3场活动进行中</div>
+        </div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <div class="chip active" onclick="filterSignals('all',this)">全部 <strong>14</strong></div>
+      <div class="chip" onclick="filterSignals('intent',this)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#EF4444;margin-right:4px;flex-shrink:0;"></span>高意向 <strong>3</strong></div>
+      <div class="chip" onclick="filterSignals('renewal',this)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FF6B35;margin-right:4px;flex-shrink:0;"></span>续保 <strong>4</strong></div>
+      <div class="chip" onclick="filterSignals('lifecycle',this)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#1A56DB;margin-right:4px;flex-shrink:0;"></span>人生节点 <strong>2</strong></div>
+      <div class="chip" onclick="filterSignals('marketing',this)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0D9488;margin-right:4px;flex-shrink:0;"></span>策略触达 <strong>3</strong></div>
+      <div class="chip" onclick="filterSignals('points',this)"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#7C3AED;margin-right:4px;flex-shrink:0;"></span>积分信号 <strong>2</strong></div>
+    </div>
+    <div class="signals-feed">
+      <div class="signal-card intent" data-type="intent">
+        <div class="signal-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#EF4444,#DC2626);">李</div>
+          <div class="signal-meta">
+            <div class="signal-title">李华 · 高意向信号 <span class="signal-type-badge badge-intent">高意向</span></div>
+            <div class="signal-time">10分钟前</div>
+          </div>
+        </div>
+        <div class="signal-desc">近7天浏览重疾险产品页5次，昨日发起在线询价，购买意向强烈。建议立即联系推送定制计划书。</div>
+        <div class="signal-actions">
+          <button class="btn-sm btn-primary" onclick="goDetail()">查看客户</button>
+          <button class="btn-sm btn-ghost">生成计划书</button>
+          <button class="btn-sm btn-ghost">标记跟进</button>
+        </div>
+      </div>
+      <div class="signal-card renewal" data-type="renewal">
+        <div class="signal-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#FF6B35,#EA580C);">王</div>
+          <div class="signal-meta">
+            <div class="signal-title">王芳 · 续保提醒 <span class="signal-type-badge badge-renewal">续保</span></div>
+            <div class="signal-time">1小时前</div>
+          </div>
+        </div>
+        <div class="signal-desc">平安重疾险（鑫享保20年期）将于15天后到期，断保后重新投保面临健康告知风险，建议今日联系。</div>
+        <div class="signal-actions">
+          <button class="btn-sm btn-primary" onclick="switchTab('customers')">查看客户</button>
+          <button class="btn-sm btn-ghost">发续保提醒</button>
+        </div>
+      </div>
+      <div class="signal-card lifecycle" data-type="lifecycle">
+        <div class="signal-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#1A56DB,#1E40AF);">张</div>
+          <div class="signal-meta">
+            <div class="signal-title">张三 · 生日关怀 <span class="signal-type-badge badge-lifecycle">人生节点</span></div>
+            <div class="signal-time">今天 09:00</div>
+          </div>
+        </div>
+        <div class="signal-desc">张三本周六（2月22日）生日，系统已在生日当天发放188积分。建议今日发送祝福并附上专属保障规划建议。</div>
+        <div class="signal-actions">
+          <button class="btn-sm btn-primary">发送祝福</button>
+          <button class="btn-sm btn-ghost">生成计划书</button>
+        </div>
+      </div>
+      <div class="signal-card marketing" data-type="marketing">
+        <div class="signal-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#0D9488,#0F766E);">李</div>
+          <div class="signal-meta">
+            <div class="signal-title">李华 · 策略触达 <span class="signal-type-badge badge-marketing">策略触达</span></div>
+            <div class="signal-time">10:32</div>
+          </div>
+        </div>
+        <div class="signal-desc">客户已收到「医疗缺口精准引导」推送，推送内容：「测评显示您的医疗保障可以更完善…」，<strong>已打开推送（2分钟前）</strong>，现在是最佳跟进时机。</div>
+        <div class="signal-actions">
+          <button class="btn-sm btn-teal" onclick="goDetail()">查看客户</button>
+          <button class="btn-sm btn-ghost">生成计划书</button>
+          <button class="btn-sm btn-ghost">标记已跟进</button>
+        </div>
+      </div>
+      <div class="signal-card newclient" data-type="newclient">
+        <div class="signal-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#10B981,#059669);">刘</div>
+          <div class="signal-meta">
+            <div class="signal-title">刘小明 · 新客激活 <span class="signal-type-badge badge-newclient">新激活</span></div>
+            <div class="signal-time">昨天 15:20</div>
+          </div>
+        </div>
+        <div class="signal-desc">新客户刘小明刚完成首次测评，综合保障得分42分（低），医疗缺口大。200积分新手礼包已自动发放，建议24h内联系。</div>
+        <div class="signal-actions">
+          <button class="btn-sm btn-primary">联系客户</button>
+          <button class="btn-sm btn-ghost">查看测评</button>
+        </div>
+      </div>
+      <!-- §2.2 Points-triggered signal: intent from dashboard behavior -->
+      <div class="signal-card points" data-type="points">
+        <div class="signal-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#7C3AED,#5B21B6);">林</div>
+          <div class="signal-meta">
+            <div class="signal-title">林晓月 · 高意向 <span class="signal-type-badge badge-points">积分信号</span></div>
+            <div class="signal-time">今天 08:30</div>
+          </div>
+        </div>
+        <div class="signal-desc">林晓月<strong>连续3天</strong>在积分仪表盘中查看「养老保障」维度，积分等级已升至<strong>银卡</strong>，高购买意向特征明显。建议今日推送养老险专属方案。</div>
+        <div class="signal-actions">
+          <button class="btn-sm btn-primary" onclick="goDetail()">查看客户</button>
+          <button class="btn-sm btn-ghost">推送方案</button>
+          <button class="btn-sm btn-ghost">标记跟进</button>
+        </div>
+      </div>
+      <!-- §2.2 Points-triggered signal: referral warning -->
+      <div class="signal-card points" data-type="points">
+        <div class="signal-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#D97706,#B45309);">张</div>
+          <div class="signal-meta">
+            <div class="signal-title">张建国 · 转介绍预警 <span class="signal-type-badge badge-points">积分信号</span></div>
+            <div class="signal-time">今天 09:15</div>
+          </div>
+        </div>
+        <div class="signal-desc">张建国邀请的朋友<strong>王先生</strong>已注册但<strong>24h未完成测评</strong>，转介绍积分即将失效。建议提醒张建国联系王先生尽快完成测评（剩余：23h）。</div>
+        <div class="signal-actions">
+          <button class="btn-sm" style="background:#FEF3C7;color:#B45309;font-weight:600;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;">提醒张建国</button>
+          <button class="btn-sm btn-ghost">查看详情</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customers Screen -->
+  <div class="screen" id="screen-customers">
+    <div class="top-nav">
+      <span class="logo">我的客户</span>
+      <div class="nav-right">
+        <div class="nav-icon">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#374151" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+    </div>
+    <div class="search-bar">
+      <div class="search-input-wrap">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="搜索客户姓名、手机号...">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5h10M11 9h7M11 13h4"/><path d="m3 17 3 3 3-3"/><path d="M6 20V4"/></svg>
+        <select style="flex:1;font-size:12px;color:var(--gray-700);border:1px solid var(--gray-200);border-radius:8px;padding:4px 8px;background:#fff;cursor:pointer;outline:none;" onchange="sortCustomers(this.value)">
+          <option value="signal">按信号优先级</option>
+          <option value="contact">按最后联系时间</option>
+          <option value="score">按保障分（低→高）</option>
+          <option value="renewal">按续保到期时间</option>
+          <option value="birthday">按生日临近</option>
+        </select>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <div class="chip active">全部 342</div>
+      <div class="chip"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#EF4444;margin-right:4px;flex-shrink:0;"></span>高意向</div>
+      <div class="chip"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#9CA3AF;margin-right:4px;flex-shrink:0;"></span>沉睡</div>
+      <div class="chip"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#FF6B35;margin-right:4px;flex-shrink:0;"></span>续保到期</div>
+      <div class="chip"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#EC4899;margin-right:4px;flex-shrink:0;"></span>本月生日</div>
+    </div>
+    <div class="customer-list">
+      <div class="customer-card" onclick="goDetail()">
+        <div class="customer-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#EF4444,#DC2626);width:44px;height:44px;font-size:18px;">李</div>
+          <div class="customer-info">
+            <div class="customer-name">李华</div>
+            <div class="customer-sub">男 · 34岁 · 上次联系 2天前</div>
+          </div>
+          <div class="coverage-score"><div class="score-num">38</div><div class="score-label">保障分</div></div>
+        </div>
+        <div class="tag-row">
+          <span class="tag tag-system">高意向</span>
+          <span class="tag tag-system">医疗缺口大</span>
+          <span class="tag tag-system">比价中</span>
+          <span class="tag tag-manual">价格敏感</span>
+        </div>
+        <div class="quick-actions">
+          <div class="quick-btn">+ 打标签</div>
+          <div class="quick-btn" onclick="startPlanBook()">生成计划书</div>
+          <div class="quick-btn">发消息</div>
+        </div>
+      </div>
+      <div class="customer-card">
+        <div class="customer-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#FF6B35,#EA580C);width:44px;height:44px;font-size:18px;">王</div>
+          <div class="customer-info">
+            <div class="customer-name">王芳</div>
+            <div class="customer-sub">女 · 42岁 · 上次联系 5天前</div>
+          </div>
+          <div class="coverage-score"><div class="score-num">65</div><div class="score-label">保障分</div></div>
+        </div>
+        <div class="tag-row">
+          <span class="tag tag-policy">续保紧急</span>
+          <span class="tag tag-system">低频活跃</span>
+          <span class="tag tag-manual">家族客户</span>
+        </div>
+        <div class="quick-actions">
+          <div class="quick-btn">+ 打标签</div>
+          <div class="quick-btn">续保跟进</div>
+          <div class="quick-btn">发消息</div>
+        </div>
+      </div>
+      <div class="customer-card">
+        <div class="customer-header">
+          <div class="avatar" style="background:linear-gradient(135deg,#1A56DB,#1E40AF);width:44px;height:44px;font-size:18px;">赵</div>
+          <div class="customer-info">
+            <div class="customer-name">赵雪梅</div>
+            <div class="customer-sub">女 · 28岁 · 新婚家庭</div>
+          </div>
+          <div class="coverage-score"><div class="score-num">51</div><div class="score-label">保障分</div></div>
+        </div>
+        <div class="tag-row">
+          <span class="tag tag-system">新婚</span>
+          <span class="tag tag-system">保障缺口大</span>
+          <span class="tag tag-system">中意向</span>
+        </div>
+        <div class="quick-actions">
+          <div class="quick-btn">+ 打标签</div>
+          <div class="quick-btn" onclick="startPlanBook()">生成计划书</div>
+          <div class="quick-btn">发消息</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Customer Detail Screen -->
+  <div class="screen" id="screen-detail">
+    <div class="detail-header">
+      <div class="detail-back" onclick="switchTab('customers')">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        返回客户列表
+      </div>
+      <div class="detail-avatar-row">
+        <div class="detail-avatar">李</div>
+        <div>
+          <div class="detail-name">李华</div>
+          <div style="font-size:13px;opacity:0.8;margin-top:3px;">男 · 34岁 · 上海</div>
+          <div class="detail-tags">
+            <span class="detail-tag">高意向</span>
+            <span class="detail-tag">医疗缺口大</span>
+            <span class="detail-tag">比价中</span>
+          </div>
+        </div>
+        <div style="margin-left:auto;text-align:center;">
+          <div style="font-size:28px;font-weight:800;color:#fff;">38</div>
+          <div style="font-size:11px;opacity:0.7;">保障分</div>
+        </div>
+      </div>
+    </div>
+    <div class="sub-tabs" id="detail-tabs">
+      <div class="sub-tab active" onclick="switchDetailTab(0,this)">基本信息</div>
+      <div class="sub-tab" onclick="switchDetailTab(1,this)">保单</div>
+      <div class="sub-tab" onclick="switchDetailTab(2,this)">跟进记录</div>
+      <div class="sub-tab" onclick="switchDetailTab(3,this)">系统触达</div>
+    </div>
+    <div class="detail-content" id="detail-panel-0" style="overflow-y:auto;flex:1;">
+      <div class="radar-wrap">
+        <div class="radar-title">保障雷达图</div>
+        <svg viewBox="0 0 200 180" width="100%">
+          <polygon points="100,15 180,65 155,155 45,155 20,65" fill="none" stroke="#E5E7EB" stroke-width="1"/>
+          <polygon points="100,37 156,73 138,139 62,139 44,73" fill="none" stroke="#E5E7EB" stroke-width="1"/>
+          <polygon points="100,59 132,81 121,123 79,123 68,81" fill="none" stroke="#E5E7EB" stroke-width="1"/>
+          <polygon points="100,18 174,62 150,149 50,149 26,62" fill="rgba(26,86,219,0.15)" stroke="#1A56DB" stroke-width="2"/>
+          <circle cx="100" cy="18" r="4" fill="#1A56DB"/>
+          <circle cx="174" cy="62" r="4" fill="#1A56DB"/>
+          <circle cx="150" cy="149" r="4" fill="#1A56DB"/>
+          <circle cx="50" cy="149" r="4" fill="#1A56DB"/>
+          <circle cx="26" cy="62" r="4" fill="#1A56DB"/>
+          <text x="100" y="8" text-anchor="middle" font-size="11" fill="#374151" font-family="Noto Sans SC">医疗 22</text>
+          <text x="186" y="67" text-anchor="start" font-size="11" fill="#374151" font-family="Noto Sans SC">重疾 35</text>
+          <text x="157" y="162" text-anchor="middle" font-size="11" fill="#374151" font-family="Noto Sans SC">寿险 48</text>
+          <text x="43" y="162" text-anchor="middle" font-size="11" fill="#374151" font-family="Noto Sans SC">养老 30</text>
+          <text x="0" y="67" text-anchor="start" font-size="11" fill="#374151" font-family="Noto Sans SC">意外 60</text>
+        </svg>
+      </div>
+      <div class="info-section">
+        <div class="info-section-title">基本信息</div>
+        <div class="info-row"><span class="info-label">手机号</span><span class="info-value">138****8899</span></div>
+        <div class="info-row"><span class="info-label">生日</span><span class="info-value">1991-07-15</span></div>
+        <div class="info-row"><span class="info-label">婚姻状态</span><span class="info-value">已婚</span></div>
+        <div class="info-row"><span class="info-label">职业</span><span class="info-value">互联网从业者</span></div>
+        <div class="info-row"><span class="info-label">积分余额</span><span class="info-value" style="color:var(--orange);font-weight:600;">1,280 分</span></div>
+      </div>
+    </div>
+    <div class="detail-content" id="detail-panel-1" style="display:none;overflow-y:auto;flex:1;">
+      <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow-sm);">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:14px;font-weight:600;">平安意外险</span>
+          <span class="tag tag-policy" style="font-size:12px;padding:3px 10px;">续保中</span>
+        </div>
+        <div style="font-size:12px;color:var(--gray-500);">保费 ¥368/年 · 到期日 2026-08-01</div>
+      </div>
+      <div style="background:#FFF7ED;border-radius:14px;padding:16px;border:1px solid #FDE68A;">
+        <div style="font-size:13px;color:var(--orange);font-weight:600;">⚠️ 暂无重疾险/医疗险保单</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:4px;">测评显示医疗缺口大，建议推荐百万医疗险</div>
+      </div>
+    </div>
+    <div class="detail-content" id="detail-panel-2" style="display:none;overflow-y:auto;flex:1;">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-time">2026-02-18 14:30</div>
+            <div class="timeline-text">电话跟进，客户表示正在对比3家重疾险方案，要求发送计划书</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background:var(--teal)"></div>
+          <div class="timeline-content">
+            <div class="timeline-time">2026-02-16 10:32</div>
+            <div class="timeline-text"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#0D9488;margin-right:4px;vertical-align:middle;"></span>系统触达：医疗缺口精准引导推送已送达，客户已打开</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot" style="background:var(--orange)"></div>
+          <div class="timeline-content">
+            <div class="timeline-time">2026-02-12 09:00</div>
+            <div class="timeline-text">微信沟通，客户询问重疾险保额建议，发送了保额计算器链接</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-content" id="detail-panel-3" style="display:none;overflow-y:auto;flex:1;">
+      <div style="overflow-x:auto;">
+        <table class="touch-table">
+          <thead><tr><th>时间</th><th>策略</th><th>渠道</th><th>结果</th></tr></thead>
+          <tbody>
+            <tr><td>02-16 10:32</td><td>医疗缺口引导</td><td>APP推送</td><td class="status-opened">已打开</td></tr>
+            <tr><td>02-10 09:00</td><td>沉睡唤醒</td><td>站内信</td><td class="status-sent">已送达</td></tr>
+            <tr><td>01-28 09:30</td><td>积分过期提醒</td><td>APP推送</td><td class="status-opened">已打开</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Screen -->
+  <div class="screen" id="screen-perf">
+    <div class="perf-header">
+      <div class="perf-month">2026年2月 本月业绩</div>
+      <div class="perf-total"><span class="perf-unit">¥</span>84,200</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+        <span style="font-size:12px;color:rgba(255,255,255,0.7);">目标 ¥100,000 · 完成率 84%</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5);">差 ¥15,800</span>
+      </div>
+      <div style="background:rgba(255,255,255,0.2);border-radius:6px;height:6px;margin-top:8px;overflow:hidden;">
+        <div style="width:84%;height:100%;background:#fff;border-radius:6px;"></div>
+      </div>
+    </div>
+    <div class="perf-grid">
+      <div class="perf-card">
+        <div class="perf-card-label">成交保单</div>
+        <div class="perf-card-value">7</div>
+        <div class="perf-card-sub">↑ 较上月 +2</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-card-label">新增客户</div>
+        <div class="perf-card-value">18</div>
+        <div class="perf-card-sub">↑ 较上月 +5</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-card-label">续保率</div>
+        <div class="perf-card-value">91%</div>
+        <div class="perf-card-sub">↑ 较上月 +3%</div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-card-label">预计佣金</div>
+        <div class="perf-card-value">¥12,630</div>
+        <div class="perf-card-sub" style="color:var(--gray-500);">结算日 3月5日</div>
+      </div>
+    </div>
+    <div class="rank-card">
+      <div class="rank-num">#3</div>
+      <div class="rank-info">
+        <div class="rank-label">团队排名</div>
+        <div class="rank-team">张伟团队（共12人）</div>
+        <div style="font-size:12px;color:var(--gray-500);margin-top:4px;">与第2名相差 ¥3,200</div>
+      </div>
+      <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#FEE68A" stroke-width="4"/><circle cx="20" cy="20" r="18" fill="none" stroke="var(--orange)" stroke-width="4" stroke-dasharray="90 113" stroke-linecap="round" transform="rotate(-90 20 20)"/><text x="20" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="var(--orange)">79%</text></svg>
+    </div>
+    <!-- Mini target progress cards -->
+    <div style="margin:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow-sm);">
+        <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;">成交保单目标</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px;">
+          <span style="font-size:18px;font-weight:700;color:var(--gray-900);">7</span>
+          <span style="font-size:11px;color:var(--gray-500);">/ 10单</span>
+        </div>
+        <div style="background:var(--gray-100);border-radius:4px;height:5px;overflow:hidden;">
+          <div style="width:70%;height:100%;background:var(--primary);border-radius:4px;"></div>
+        </div>
+        <div style="font-size:11px;color:var(--primary);margin-top:4px;font-weight:600;">70% · 差3单</div>
+      </div>
+      <div style="background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow-sm);">
+        <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;">新增客户目标</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px;">
+          <span style="font-size:18px;font-weight:700;color:var(--gray-900);">18</span>
+          <span style="font-size:11px;color:var(--gray-500);">/ 20人</span>
+        </div>
+        <div style="background:var(--gray-100);border-radius:4px;height:5px;overflow:hidden;">
+          <div style="width:90%;height:100%;background:var(--teal);border-radius:4px;"></div>
+        </div>
+        <div style="font-size:11px;color:var(--teal);margin-top:4px;font-weight:600;">90% · 差2人</div>
+      </div>
+    </div>
+    <div class="section-padding">
+      <div class="section-title">本月保费趋势</div>
+      <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow-sm);">
+        <svg viewBox="0 0 300 100" width="100%">
+          <defs><linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1A56DB" stop-opacity="0.3"/><stop offset="100%" stop-color="#1A56DB" stop-opacity="0"/></linearGradient></defs>
+          <path d="M10,80 L30,70 L60,60 L90,65 L120,45 L150,50 L180,35 L210,30 L240,25 L270,20 L290,15" fill="none" stroke="#1A56DB" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M10,80 L30,70 L60,60 L90,65 L120,45 L150,50 L180,35 L210,30 L240,25 L270,20 L290,15 L290,95 L10,95 Z" fill="url(#lineGrad)"/>
+          <line x1="10" y1="95" x2="290" y2="95" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="10" y="105" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">2/1</text>
+          <text x="140" y="105" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">2/10</text>
+          <text x="275" y="105" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">2/19</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Screen -->
+  <div class="screen" id="screen-settings">
+    <div class="settings-profile">
+      <div class="settings-avatar">张</div>
+      <div>
+        <div class="settings-name">张业明</div>
+        <div class="settings-id">工号 AG-20241128 · 太平洋保险华南区</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:4px;">专业版 · 到期 2026-12-31</div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-icon-wrap" style="background:#EBF2FF;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <span class="settings-item-label">个人资料</span>
+        </div>
+        <span class="settings-item-value">→</span>
+      </div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-icon-wrap" style="background:#FEF3C7;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div>
+          <span class="settings-item-label">我的订阅</span>
+        </div>
+        <span class="settings-item-value" style="color:var(--orange);">专业版 →</span>
+      </div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-icon-wrap" style="background:#D1FAE5;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+          <span class="settings-item-label">消息推送通知</span>
+        </div>
+        <div class="toggle"></div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-icon-wrap" style="background:#FEE2E2;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <span class="settings-item-label">账号安全</span>
+        </div>
+        <span class="settings-item-value">→</span>
+      </div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-icon-wrap" style="background:#F3F4F6;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
+          <span class="settings-item-label">隐私政策</span>
+        </div>
+        <span class="settings-item-value">→</span>
+      </div>
+      <div class="settings-item">
+        <div class="settings-item-left">
+          <div class="settings-icon-wrap" style="background:#F3F4F6;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg></div>
+          <span class="settings-item-label">版本</span>
+        </div>
+        <span class="settings-item-value">v2.1.0</span>
+      </div>
+    </div>
+    <div style="text-align:center;padding:20px;color:var(--gray-500);font-size:13px;">退出登录</div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- §2.1 CUSTOMER ACTIVITY RANKING OVERLAY                       -->
+  <!-- ============================================================ -->
+  <div class="ag-overlay" id="act-ranking-overlay">
+    <div class="ag-ov-topbar">
+      <button class="ag-ov-back" onclick="closeActRanking()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="ag-ov-title">客户活跃排行</span>
+      <div style="font-size:12px;color:var(--gray-500);">共342人</div>
+    </div>
+
+    <!-- Status legend -->
+    <div style="background:#fff;padding:10px 16px;border-bottom:1px solid var(--gray-100);display:flex;gap:12px;overflow-x:auto;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:4px;white-space:nowrap;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        <span class="act-status-fire">活跃</span><span style="font-size:11px;color:var(--gray-500);">89人</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><span style="width:8px;height:8px;border-radius:50%;background:#10B981;display:inline-block;"></span><span class="act-status-ok">正常</span><span style="font-size:11px;color:var(--gray-500);">156人</span></div>
+      <div style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;display:inline-block;"></span><span class="act-status-warm">降温</span><span style="font-size:11px;color:var(--gray-500);">52人</span></div>
+      <div style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><span style="width:8px;height:8px;border-radius:50%;background:#FF6B35;display:inline-block;"></span><span class="act-status-cool">冷却</span><span style="font-size:11px;color:var(--gray-500);">30人</span></div>
+      <div style="display:flex;align-items:center;gap:4px;white-space:nowrap;"><span style="width:8px;height:8px;border-radius:50%;background:#6B7280;display:inline-block;"></span><span class="act-status-cold">沉睡</span><span style="font-size:11px;color:var(--gray-500);">15人</span></div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="background:#fff;display:flex;border-bottom:1px solid var(--gray-200);flex-shrink:0;">
+      <div onclick="switchRankTab('active',this)" style="flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:600;color:#EF4444;border-bottom:2px solid #EF4444;cursor:pointer;" id="rtab-active">🔥 活跃</div>
+      <div onclick="switchRankTab('warm',this)" style="flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--gray-500);border-bottom:2px solid transparent;cursor:pointer;" id="rtab-warm">⚠️ 降温</div>
+      <div onclick="switchRankTab('cool',this)" style="flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--gray-500);border-bottom:2px solid transparent;cursor:pointer;" id="rtab-cool">🔴 冷却</div>
+      <div onclick="switchRankTab('all',this)" style="flex:1;padding:10px 4px;text-align:center;font-size:12px;font-weight:500;color:var(--gray-500);border-bottom:2px solid transparent;cursor:pointer;" id="rtab-all">全部</div>
+    </div>
+
+    <!-- Ranking list -->
+    <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+      <!-- Rank 1 -->
+      <div class="rank-list-item">
+        <div class="rank-list-num top1">1</div>
+        <div class="avatar" style="background:linear-gradient(135deg,#EF4444,#DC2626);width:34px;height:34px;font-size:13px;">林</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900);">林晓月</div>
+          <div style="font-size:11px;color:var(--gray-500);">银卡 · 连续打卡14天 · 本月+680分</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="rank-list-pts">1,840分</div>
+          <div class="act-status-fire" style="font-size:11px;">🔥 活跃</div>
+        </div>
+      </div>
+      <!-- Rank 2 -->
+      <div class="rank-list-item">
+        <div class="rank-list-num top2">2</div>
+        <div class="avatar" style="background:linear-gradient(135deg,#1A56DB,#1E40AF);width:34px;height:34px;font-size:13px;">张</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900);">张建国</div>
+          <div style="font-size:11px;color:var(--gray-500);">普通卡 · 已邀请2人 · 本月+320分</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="rank-list-pts">960分</div>
+          <div class="act-status-ok" style="font-size:11px;">✅ 正常</div>
+        </div>
+      </div>
+      <!-- Rank 3 -->
+      <div class="rank-list-item">
+        <div class="rank-list-num top3">3</div>
+        <div class="avatar" style="background:linear-gradient(135deg,#10B981,#059669);width:34px;height:34px;font-size:13px;">王</div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900);">王芳</div>
+          <div style="font-size:11px;color:var(--gray-500);">普通卡 · 完成测评2次 · 本月+180分</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="rank-list-pts">540分</div>
+          <div class="act-status-ok" style="font-size:11px;">✅ 正常</div>
+        </div>
+      </div>
+      <!-- Cooling/dormant section -->
+      <div style="font-size:12px;font-weight:700;color:var(--orange);margin:8px 0 4px;display:flex;align-items:center;gap:6px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF6B35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        待唤醒客户（冷却 / 沉睡）
+      </div>
+      <div class="rank-list-item" style="border-left:3px solid #FF6B35;">
+        <div class="avatar" style="background:linear-gradient(135deg,#9CA3AF,#6B7280);width:34px;height:34px;font-size:13px;">陈</div>
+        <div style="flex:1;margin-left:8px;">
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900);">陈大明</div>
+          <div style="font-size:11px;color:var(--gray-500);">已28天未登录 · 上次互动：1月22日</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:var(--orange);">🔴 冷却</div>
+          <button class="invite-btn" style="margin-top:4px;font-size:11px;padding:4px 10px;" onclick="alert('已发送唤醒消息（原型演示）')">唤醒</button>
+        </div>
+      </div>
+      <div class="rank-list-item" style="border-left:3px solid #9CA3AF;">
+        <div class="avatar" style="background:linear-gradient(135deg,#D1D5DB,#9CA3AF);width:34px;height:34px;font-size:13px;">赵</div>
+        <div style="flex:1;margin-left:8px;">
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900);">赵小红</div>
+          <div style="font-size:11px;color:var(--gray-500);">已56天未登录 · 有1份待续保单</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:#6B7280;">❄️ 沉睡</div>
+          <button class="invite-btn" style="margin-top:4px;font-size:11px;padding:4px 10px;background:var(--orange);" onclick="alert('已发送唤醒消息（原型演示）')">唤醒</button>
+        </div>
+      </div>
+      <div class="rank-list-item" style="border-left:3px solid #9CA3AF;">
+        <div class="avatar" style="background:linear-gradient(135deg,#D1D5DB,#9CA3AF);width:34px;height:34px;font-size:13px;">孙</div>
+        <div style="flex:1;margin-left:8px;">
+          <div style="font-size:14px;font-weight:600;color:var(--gray-900);">孙建华</div>
+          <div style="font-size:11px;color:var(--gray-500);">已62天未登录 · 曾做测评得分28</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:#6B7280;">❄️ 沉睡</div>
+          <button class="invite-btn" style="margin-top:4px;font-size:11px;padding:4px 10px;background:var(--orange);" onclick="alert('已发送唤醒消息（原型演示）')">唤醒</button>
+        </div>
+      </div>
+      <!-- Batch action -->
+      <div style="margin-top:8px;background:var(--primary-light);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--primary);">批量唤醒冷睡客户</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">选中后发送统一唤醒推送</div>
+        </div>
+        <button class="invite-btn" onclick="alert('批量唤醒：已发送唤醒消息至5位冷睡客户（原型演示）')">批量操作</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- §2.3 ACTIVITY INVITE TOOL OVERLAY                            -->
+  <!-- ============================================================ -->
+  <div class="ag-overlay" id="activity-invite-overlay">
+    <div class="ag-ov-topbar">
+      <button class="ag-ov-back" onclick="closeActivityInvite()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="ag-ov-title">活动邀请工具</span>
+      <div style="font-size:12px;color:var(--gray-500);">§2.3</div>
+    </div>
+
+    <!-- My invite stats -->
+    <div style="background:linear-gradient(135deg,#0D9488,#059669);padding:14px 16px;flex-shrink:0;">
+      <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:8px;">本月邀请统计</div>
+      <div style="display:flex;gap:0;background:rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;">
+        <div style="flex:1;padding:10px;text-align:center;border-right:1px solid rgba(255,255,255,0.2);">
+          <div style="font-size:22px;font-weight:700;color:#fff;">12</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);">邀请人数</div>
+        </div>
+        <div style="flex:1;padding:10px;text-align:center;border-right:1px solid rgba(255,255,255,0.2);">
+          <div style="font-size:22px;font-weight:700;color:#fff;">7</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);">已报名</div>
+        </div>
+        <div style="flex:1;padding:10px;text-align:center;">
+          <div style="font-size:22px;font-weight:700;color:#fff;">+140</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.75);">获得积分</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active activities -->
+    <div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:2px;">进行中的活动</div>
+
+      <!-- Activity 1 -->
+      <div class="invite-act-card">
+        <div class="invite-act-header">
+          <div class="invite-act-icon" style="background:#EBF2FF;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+          </div>
+          <div>
+            <div class="invite-act-title">春节保障大礼包 | 线上活动</div>
+            <div class="invite-act-sub">截止 2026-02-28 · 剩余9天</div>
+          </div>
+          <div style="margin-left:auto;font-size:12px;font-weight:600;color:#10B981;background:#D1FAE5;padding:3px 8px;border-radius:8px;">进行中</div>
+        </div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px;">参与人数：<strong style="color:var(--gray-900);">127人</strong> · 您邀请：<strong style="color:var(--primary);">4人</strong> · 每邀请1人得20分</div>
+        <div style="display:flex;gap:8px;">
+          <button class="invite-btn" style="flex:1;" onclick="openBatchInvite()">批量邀请客户</button>
+          <button class="btn-sm btn-ghost" onclick="alert('复制专属邀请链接（原型演示）')">复制链接</button>
+        </div>
+      </div>
+
+      <!-- Activity 2 -->
+      <div class="invite-act-card">
+        <div class="invite-act-header">
+          <div class="invite-act-icon" style="background:#F5F3FF;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="invite-act-title">健康管理讲座 | 线下沙龙</div>
+            <div class="invite-act-sub">2026-02-22 · 广州天河区 · 限50人</div>
+          </div>
+          <div style="margin-left:auto;font-size:12px;font-weight:600;color:#F59E0B;background:#FEF3C7;padding:3px 8px;border-radius:8px;">名额紧张</div>
+        </div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px;">剩余名额：<strong style="color:#EF4444;">8个</strong> · 您邀请：<strong style="color:var(--primary);">2人</strong> · 每邀请1人得30分</div>
+        <div style="display:flex;gap:8px;">
+          <button class="invite-btn" style="flex:1;" onclick="openBatchInvite()">批量邀请客户</button>
+          <button class="btn-sm btn-ghost" onclick="alert('复制专属邀请链接（原型演示）')">复制链接</button>
+        </div>
+      </div>
+
+      <!-- Activity 3 -->
+      <div class="invite-act-card">
+        <div class="invite-act-header">
+          <div class="invite-act-icon" style="background:#ECFDF5;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+          </div>
+          <div>
+            <div class="invite-act-title">年金险财富规划直播</div>
+            <div class="invite-act-sub">2026-02-25 20:00 · 钉钉直播</div>
+          </div>
+          <div style="margin-left:auto;font-size:12px;font-weight:600;color:#10B981;background:#D1FAE5;padding:3px 8px;border-radius:8px;">预告中</div>
+        </div>
+        <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px;">预约人数：<strong style="color:var(--gray-900);">43人</strong> · 您邀请：<strong style="color:var(--primary);">1人</strong> · 每邀请1人得15分</div>
+        <div style="display:flex;gap:8px;">
+          <button class="invite-btn" style="flex:1;" onclick="openBatchInvite()">批量邀请客户</button>
+          <button class="btn-sm btn-ghost" onclick="alert('复制专属邀请链接（原型演示）')">复制链接</button>
+        </div>
+      </div>
+
+      <!-- §2.4 Daily tasks -->
+      <div style="background:#fff;border-radius:14px;padding:14px 16px;box-shadow:var(--shadow-sm);margin-top:4px;">
+        <div style="font-size:13px;font-weight:700;color:var(--gray-900);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18m-9 4 2 2 4-4"/></svg>
+          今日积分任务
+        </div>
+        <div class="task-item">
+          <div class="task-check done"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div style="flex:1;font-size:13px;color:var(--gray-700);">跟进高意向客户（林晓月）</div>
+          <div class="task-pts">+20分</div>
+        </div>
+        <div class="task-item">
+          <div class="task-check"></div>
+          <div style="flex:1;font-size:13px;color:var(--gray-900);">邀请3位客户参加活动</div>
+          <div class="task-pts">+60分</div>
+        </div>
+        <div class="task-item">
+          <div class="task-check"></div>
+          <div style="flex:1;font-size:13px;color:var(--gray-900);">唤醒冷却客户1名</div>
+          <div class="task-pts">+30分</div>
+        </div>
+        <div class="task-item" style="border-bottom:none;">
+          <div class="task-check"></div>
+          <div style="flex:1;font-size:13px;color:var(--gray-900);">查看圈子客户活跃排行榜</div>
+          <div class="task-pts">+10分</div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--gray-500);text-align:center;">今日已得 20/120 积分</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Batch invite sheet (inside activity invite overlay) -->
+  <div id="batch-invite-sheet" style="position:absolute;inset:0;z-index:240;background:rgba(0,0,0,0.5);display:none;align-items:flex-end;">
+    <div style="background:#fff;width:100%;border-radius:20px 20px 0 0;padding:20px 16px;max-height:70%;">
+      <div style="font-size:15px;font-weight:700;color:var(--gray-900);margin-bottom:4px;">选择邀请客户</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:14px;">勾选客户后一键发送邀请</div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto;">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);">
+          <div class="avatar" style="background:linear-gradient(135deg,#EF4444,#DC2626);width:30px;height:30px;font-size:12px;">林</div>
+          <div style="flex:1;font-size:13px;font-weight:500;color:var(--gray-900);">林晓月</div>
+          <span style="font-size:11px;color:#10B981;">🔥 活跃</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);">
+          <div class="avatar" style="background:linear-gradient(135deg,#1A56DB,#1E40AF);width:30px;height:30px;font-size:12px;">张</div>
+          <div style="flex:1;font-size:13px;font-weight:500;color:var(--gray-900);">张建国</div>
+          <span style="font-size:11px;color:#10B981;">✅ 正常</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100);">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);">
+          <div class="avatar" style="background:linear-gradient(135deg,#9CA3AF,#6B7280);width:30px;height:30px;font-size:12px;">陈</div>
+          <div style="flex:1;font-size:13px;font-weight:500;color:var(--gray-900);">陈大明</div>
+          <span style="font-size:11px;color:#FF6B35;">🔴 冷却</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--primary);">
+          <div class="avatar" style="background:linear-gradient(135deg,#D1D5DB,#9CA3AF);width:30px;height:30px;font-size:12px;">赵</div>
+          <div style="flex:1;font-size:13px;font-weight:500;color:var(--gray-900);">赵小红</div>
+          <span style="font-size:11px;color:#6B7280;">❄️ 沉睡</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button onclick="closeBatchInvite()" style="flex:1;padding:12px;border-radius:10px;background:var(--gray-100);color:var(--gray-700);font-size:14px;font-weight:600;border:none;cursor:pointer;">取消</button>
+        <button onclick="alert('邀请已发送至选中客户（原型演示）');closeBatchInvite();" style="flex:2;padding:12px;border-radius:10px;background:var(--primary);color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;">发送邀请</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Tabs -->
+  <div class="bottom-tabs">
+    <div class="tab-item active" id="tab-workbench" onclick="switchTab('workbench')">
+      <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span class="tab-label" style="color:var(--primary);">工作台</span>
+    </div>
+    <div class="tab-item" id="tab-customers" onclick="switchTab('customers')">
+      <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></span><span class="tab-label">客户</span>
+    </div>
+    <div class="tab-item" id="tab-perf" onclick="switchTab('perf')">
+      <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21v-6m7 6V3m7 18V9"/></svg></span><span class="tab-label">业绩</span>
+    </div>
+    <div class="tab-item" id="tab-settings" onclick="switchTab('settings')">
+      <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="tab-label">我的</span>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- F-002 PLAN BOOK OVERLAY                                      -->
+  <!-- ============================================================ -->
+  <div id="planbook-overlay">
+    <div class="pb-screen pb-cur" id="pb-0">
+      <div class="pb-topbar">
+        <button class="pb-back" onclick="closePlanBook()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="pb-title">傻瓜计划书生成</span>
+        <div style="width:36px;"></div>
+      </div>
+      <!-- Step indicators -->
+      <div class="pb-steps">
+        <div class="pb-step"><div class="pb-step-dot active">1</div><div class="pb-step-lbl active">客户信息</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">2</div><div class="pb-step-lbl">风险分析</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">3</div><div class="pb-step-lbl">产品选择</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">4</div><div class="pb-step-lbl">方案预览</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">5</div><div class="pb-step-lbl">生成分享</div></div>
+      </div>
+      <div class="pb-scroll" style="padding:16px;">
+        <div style="font-size:14px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">选择客户</div>
+        <!-- Selected customer card -->
+        <div style="background:#EBF2FF;border:1.5px solid #1A56DB;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+          <div style="width:44px;height:44px;border-radius:50%;background:#1A56DB;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#fff;flex-shrink:0;">张</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:#0F172A;">张伟国</div>
+            <div style="font-size:12px;color:#1A56DB;margin-top:2px;">42岁 · 企业主 · 高意向</div>
+          </div>
+          <div style="width:20px;height:20px;border-radius:50%;background:#1A56DB;display:flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        </div>
+        <div style="font-size:14px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">补充信息</div>
+        <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F3F4F6;">
+              <span style="font-size:13px;color:#64748B;">当前重疾保额</span>
+              <span style="font-size:13px;font-weight:600;color:#0F172A;">10万</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F3F4F6;">
+              <span style="font-size:13px;color:#64748B;">月收入范围</span>
+              <span style="font-size:13px;font-weight:600;color:#0F172A;">5万以上</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+              <span style="font-size:13px;color:#64748B;">家庭结构</span>
+              <span style="font-size:13px;font-weight:600;color:#0F172A;">已婚，有孩子</span>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#A8B4C0;text-align:center;line-height:1.6;">点击"下一步"，AI将在3-5秒内完成风险分析</div>
+      </div>
+      <div class="pb-footer">
+        <button class="pb-btn pb-btn-primary" onclick="pbNext(1)">下一步：AI风险分析</button>
+      </div>
+    </div>
+
+    <!-- Step 2: AI Risk Analysis -->
+    <div class="pb-screen" id="pb-1">
+      <div class="pb-topbar">
+        <button class="pb-back" onclick="pbBack(1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="pb-title">AI 风险分析</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="pb-steps">
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">客户信息</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot active">2</div><div class="pb-step-lbl active">风险分析</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">3</div><div class="pb-step-lbl">产品选择</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">4</div><div class="pb-step-lbl">方案预览</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">5</div><div class="pb-step-lbl">生成分享</div></div>
+      </div>
+      <div class="pb-scroll" style="padding:16px;">
+        <div style="background:#1A56DB;border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></svg></div>
+          <div><div style="font-size:13px;font-weight:600;color:#fff;">AI 已完成风险扫描</div><div style="font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;">发现 2 个核心守护盲区 · 1 个已满足</div></div>
+        </div>
+        <div style="font-size:14px;font-weight:600;color:#0F172A;margin-bottom:12px;">风险分析结果</div>
+        <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div class="pb-risk-tag pb-risk-high"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>重疾保障不足</div>
+          <div style="font-size:13px;color:#374151;line-height:1.6;">当前保额仅 <strong>10万</strong>，以42岁企业主收入水平，建议配置 <strong>50万</strong> 重疾险，补足 40万缺口</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div class="pb-risk-tag pb-risk-med"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>寿险缺口较大</div>
+          <div style="font-size:13px;color:#374151;line-height:1.6;">作为家庭主要收入来源，建议配置 <strong>200万</strong> 定期寿险，保障家庭财务稳定</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+          <div class="pb-risk-tag pb-risk-ok"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>医疗险：基本满足</div>
+          <div style="font-size:13px;color:#374151;line-height:1.6;">已有百万医疗险，基本覆盖住院及手术需求</div>
+        </div>
+      </div>
+      <div class="pb-footer">
+        <button class="pb-btn pb-btn-primary" onclick="pbNext(2)">下一步：选择产品</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Product Selection -->
+    <div class="pb-screen" id="pb-2">
+      <div class="pb-topbar">
+        <button class="pb-back" onclick="pbBack(2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="pb-title">选择产品</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="pb-steps">
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">客户信息</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">风险分析</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot active">3</div><div class="pb-step-lbl active">产品选择</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">4</div><div class="pb-step-lbl">方案预览</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">5</div><div class="pb-step-lbl">生成分享</div></div>
+      </div>
+      <div class="pb-scroll" style="padding:16px;">
+        <div style="font-size:13px;color:#64748B;margin-bottom:12px;">AI 已预选最优组合，可按需调整</div>
+        <div style="font-size:13px;font-weight:600;color:#0F172A;margin-bottom:8px;">重疾险（补足40万保额）</div>
+        <div class="pb-product-row selected" onclick="this.classList.toggle('selected')">
+          <div class="pb-prod-chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div style="flex:1;"><div class="pb-prod-name">友邦重疾险·守护一生</div><div style="font-size:11px;color:#64748B;margin-top:2px;">保额50万 · 保至70岁 · 含轻症赔付</div></div>
+          <div class="pb-prod-price">月缴 ¥1,380</div>
+        </div>
+        <div class="pb-product-row" onclick="this.classList.toggle('selected')">
+          <div class="pb-prod-chk"></div>
+          <div style="flex:1;"><div class="pb-prod-name">达尔文6号重疾险</div><div style="font-size:11px;color:#64748B;margin-top:2px;">保额50万 · 保至终身 · 含癌症多次赔</div></div>
+          <div class="pb-prod-price">月缴 ¥1,680</div>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:#0F172A;margin:14px 0 8px;">定期寿险（家庭收入保障）</div>
+        <div class="pb-product-row selected" onclick="this.classList.toggle('selected')">
+          <div class="pb-prod-chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div style="flex:1;"><div class="pb-prod-name">招商信诺定期寿险</div><div style="font-size:11px;color:#64748B;margin-top:2px;">保额200万 · 保至65岁</div></div>
+          <div class="pb-prod-price">月缴 ¥680</div>
+        </div>
+      </div>
+      <div style="padding:10px 16px 0;background:#fff;border-top:1px solid #E8ECF4;flex-shrink:0;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+          <span style="font-size:13px;color:#64748B;">已选 2 款产品，总月缴</span>
+          <span style="font-size:18px;font-weight:700;color:#1A56DB;">¥2,060</span>
+        </div>
+      </div>
+      <div class="pb-footer">
+        <button class="pb-btn pb-btn-primary" onclick="pbNext(3)">下一步：预览方案</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Plan Preview -->
+    <div class="pb-screen" id="pb-3">
+      <div class="pb-topbar">
+        <button class="pb-back" onclick="pbBack(3)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="pb-title">方案预览（客户视角）</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="pb-steps">
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">客户信息</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">风险分析</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">产品选择</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot active">4</div><div class="pb-step-lbl active">方案预览</div></div>
+        <div class="pb-step-line"></div>
+        <div class="pb-step"><div class="pb-step-dot">5</div><div class="pb-step-lbl">生成分享</div></div>
+      </div>
+      <div class="pb-scroll" style="padding:16px;">
+        <div style="font-size:13px;color:#64748B;margin-bottom:12px;">以下是客户收到计划书时看到的内容</div>
+        <div class="pb-preview-page">
+          <div class="pb-page-num">第 1 页</div>
+          <div class="pb-page-title">张先生，您目前面临的风险</div>
+          <div class="pb-page-body">作为家庭顶梁柱，您目前的重疾保额仅有 10 万元。一旦确诊大病，治疗+康复费用平均达 <strong>38 万元</strong>，现有保障仅能覆盖约 26%。</div>
+        </div>
+        <div class="pb-preview-page">
+          <div class="pb-page-num">第 2 页</div>
+          <div class="pb-page-title">为您量身设计的方案</div>
+          <div class="pb-page-body">• 友邦重疾险·守护一生：保额 50 万，含轻症赔付<br>• 招商信诺定期寿险：保额 200 万，保障家人未来</div>
+        </div>
+        <div class="pb-preview-page">
+          <div class="pb-page-num">第 3 页</div>
+          <div class="pb-page-title">每月费用</div>
+          <div class="pb-page-body">合计月缴 <strong>¥2,060</strong>，守护全家医疗、重疾、寿险三重保障。</div>
+        </div>
+        <div class="pb-preview-page">
+          <div class="pb-page-num">第 4 页</div>
+          <div class="pb-page-title">理赔时能拿到多少？</div>
+          <div class="pb-page-body">若确诊重疾，<strong>30日内到账 50 万</strong>，无需发票，一次性赔付，专注治疗不担心钱。</div>
+        </div>
+      </div>
+      <div class="pb-footer">
+        <button class="pb-btn pb-btn-primary" onclick="pbNext(4)">生成专属链接</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Generate & Share -->
+    <div class="pb-screen" id="pb-4">
+      <div class="pb-topbar">
+        <button class="pb-back" onclick="pbBack(4)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="pb-title">生成 · 分享</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="pb-steps">
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">客户信息</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">风险分析</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">产品选择</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl">方案预览</div></div>
+        <div class="pb-step-line done"></div>
+        <div class="pb-step"><div class="pb-step-dot done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="pb-step-lbl active">生成分享</div></div>
+      </div>
+      <div class="pb-scroll" style="padding:16px;">
+        <!-- Success card -->
+        <div style="background:linear-gradient(135deg,#1A56DB,#1E40AF);border-radius:14px;padding:20px;text-align:center;margin-bottom:16px;">
+          <div style="width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,0.2);border:2px solid #10B981;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">计划书已生成！</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.7);">张伟国 的专属家庭守护方案</div>
+          <!-- QR Code placeholder -->
+          <div style="margin:16px auto 0;width:80px;height:80px;background:rgba(255,255,255,0.9);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <svg width="56" height="56" viewBox="0 0 32 32" fill="#1A56DB"><rect x="2" y="2" width="12" height="12" rx="1.5"/><rect x="18" y="2" width="12" height="12" rx="1.5"/><rect x="2" y="18" width="12" height="12" rx="1.5"/><rect x="4" y="4" width="8" height="8" rx="1" fill="#fff"/><rect x="20" y="4" width="8" height="8" rx="1" fill="#fff"/><rect x="4" y="20" width="8" height="8" rx="1" fill="#fff"/><rect x="5.5" y="5.5" width="5" height="5" rx="0.5" fill="#1A56DB"/><rect x="21.5" y="5.5" width="5" height="5" rx="0.5" fill="#1A56DB"/><rect x="5.5" y="21.5" width="5" height="5" rx="0.5" fill="#1A56DB"/><rect x="20" y="20" width="3" height="3" rx="0.5"/><rect x="25" y="20" width="3" height="3" rx="0.5"/><rect x="20" y="25" width="3" height="3" rx="0.5"/><rect x="25" y="25" width="3" height="3" rx="0.5"/></svg>
+          </div>
+        </div>
+        <!-- Link -->
+        <div style="background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);display:flex;align-items:center;gap:10px;">
+          <div style="flex:1;font-size:13px;color:#374151;font-weight:500;">sht.com/plan/<strong>ZWG2024</strong></div>
+          <button style="padding:6px 14px;border-radius:8px;border:none;background:#1A56DB;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans SC';">复制</button>
+        </div>
+        <!-- Notification hint -->
+        <div style="background:#EBF2FF;border-radius:10px;padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0m-10.47-5.674A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+          <span style="font-size:13px;color:#1A56DB;">客户每次查看，你都会收到通知</span>
+        </div>
+        <!-- Actions -->
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button style="height:48px;width:100%;border-radius:10px;border:none;background:#1A56DB;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans SC';display:flex;align-items:center;justify-content:center;gap:8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>分享到微信</button>
+          <button style="height:44px;width:100%;border-radius:10px;border:1.5px solid #E5E7EB;background:#fff;color:#374151;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans SC';">预览完整计划书</button>
+          <button style="height:44px;width:100%;border-radius:10px;border:1.5px solid #E5E7EB;background:#fff;color:#374151;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans SC';display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>导出PDF <span style="font-size:11px;color:#F59E0B;background:#FEF3C7;border-radius:4px;padding:1px 6px;margin-left:2px;">付费版</span></button>
+          <button onclick="closePlanBook()" style="height:40px;width:100%;border-radius:10px;border:none;background:none;color:#64748B;font-size:13px;cursor:pointer;font-family:'Noto Sans SC';">返回客户列表</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /planbook-overlay -->
+
+  <!-- ============================================================ -->
+  <!-- MISS-A01: 测评链接生成 OVERLAY (MVP飞轮起点)                 -->
+  <!-- ============================================================ -->
+  <div id="quizlink-overlay">
+
+    <!-- STEP 0: Landing -->
+    <div class="ql-screen ql-cur" id="ql-0">
+      <div class="ql-topbar">
+        <button class="ql-back" onclick="closeQuizLink()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="ql-title">生成测评链接</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="ql-scroll" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 20px;">
+        <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#EBF2FF,#DBEAFE);display:flex;align-items:center;justify-content:center;margin-bottom:20px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <div style="font-size:20px;font-weight:800;color:#0F172A;margin-bottom:8px;">测评链接，开启守护旅程</div>
+        <div style="font-size:13px;color:#6B7280;line-height:1.7;margin-bottom:28px;">你的专属测评链接携带你的业务员ID，<br>客户完成测评后<strong style="color:#1A56DB;">自动绑定到你名下</strong>，<br>K因子增长的起点就在这里。</div>
+        <div style="width:100%;background:#fff;border-radius:16px;padding:16px;margin-bottom:12px;text-align:left;box-shadow:0 1px 6px rgba(0,0,0,0.06);">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:#EBF2FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="font-size:13px;">📤</span></div>
+            <div><div style="font-size:13px;font-weight:600;color:#0F172A;margin-bottom:2px;">发到朋友圈 / 微信群</div><div style="font-size:12px;color:#6B7280;">免费测评吸引眼球，自然裂变</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:#D1FAE5;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="font-size:13px;">👤</span></div>
+            <div><div style="font-size:13px;font-weight:600;color:#0F172A;margin-bottom:2px;">发给特定潜在客户</div><div style="font-size:12px;color:#6B7280;">报告出来后，你是第一联系人</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <div style="width:28px;height:28px;border-radius:8px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;"><span style="font-size:13px;">🎯</span></div>
+            <div><div style="font-size:13px;font-weight:600;color:#0F172A;margin-bottom:2px;">完成测评自动成为你的客户</div><div style="font-size:12px;color:#6B7280;">系统实时通知你，信号卡第一时间推送</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ql-footer">
+        <button class="ql-btn ql-btn-primary" onclick="qlNext(1)">开始生成 →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: Configure -->
+    <div class="ql-screen" id="ql-1">
+      <div class="ql-topbar">
+        <button class="ql-back" onclick="qlNext(0)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="ql-title">选择发送对象</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="ql-scroll">
+        <div style="font-size:12px;color:#6B7280;margin-bottom:14px;">选择一个场景，系统帮你生成最合适的文案</div>
+        <div class="ql-type-card selected" id="ql-type-moments" onclick="selectQlType(this,'moments')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">📢</span>
+            <div>
+              <div class="ql-type-title">发朋友圈 / 微信群</div>
+              <div class="ql-type-desc">吸引陌生人完成免费测评，扩展新客户来源</div>
+            </div>
+            <div id="ql-check-moments" style="width:20px;height:20px;border-radius:50%;background:#1A56DB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+        </div>
+        <div class="ql-type-card" id="ql-type-friend" onclick="selectQlType(this,'friend')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">👤</span>
+            <div>
+              <div class="ql-type-title">发给特定朋友</div>
+              <div class="ql-type-desc">一对一发送，附上你的暖心推荐语</div>
+            </div>
+            <div id="ql-check-friend" style="width:20px;height:20px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto;"></div>
+          </div>
+        </div>
+        <div class="ql-type-card" id="ql-type-existing" onclick="selectQlType(this,'existing')">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">🔄</span>
+            <div>
+              <div class="ql-type-title">发给存量老客户</div>
+              <div class="ql-type-desc">激活沉睡客户，发现增购/加保机会</div>
+            </div>
+            <div id="ql-check-existing" style="width:20px;height:20px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto;"></div>
+          </div>
+        </div>
+        <div style="margin-top:18px;">
+          <div style="font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;">预览推送文案</div>
+          <div id="ql-copy-preview" style="background:#fff;border-radius:12px;padding:14px;border:1.5px solid #EBF2FF;font-size:13px;color:#374151;line-height:1.7;">
+            🛡️ 花5分钟做个免费保障测评，看看你家的保险有没有盲区~<br><br>报告超详细，还有守护顾问可以1对1解读。我做完感觉挺有用的，分享给你试试：<br><br><span style="color:#1A56DB;">https://shh.com/quiz/agent/ZY8821</span>
+          </div>
+        </div>
+        <div style="margin-top:14px;">
+          <div style="font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;">你的专属业务员码</div>
+          <div style="background:#F9FAFB;border-radius:10px;padding:10px 14px;font-size:13px;color:#374151;display:flex;align-items:center;gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>张业明 · <strong style="color:#1A56DB;">ZY8821</strong> · 链接自动携带此码</span>
+          </div>
+        </div>
+      </div>
+      <div class="ql-footer">
+        <button class="ql-btn ql-btn-primary" onclick="qlNext(2)">生成我的专属链接 →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Generated Link -->
+    <div class="ql-screen" id="ql-2">
+      <div class="ql-topbar">
+        <button class="ql-back" onclick="qlNext(1)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="ql-title">你的专属测评链接</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="ql-scroll" style="text-align:center;">
+        <div style="background:linear-gradient(135deg,#EBF2FF,#DBEAFE);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;">
+          <div style="font-size:14px;font-weight:700;color:#1A56DB;margin-bottom:12px;">扫码 / 点击链接，开启守护测评</div>
+          <div class="ql-qr">
+            <!-- QR Code placeholder -->
+            <svg width="80" height="80" viewBox="0 0 32 32" fill="#1A56DB"><rect x="2" y="2" width="12" height="12" rx="1.5"/><rect x="18" y="2" width="12" height="12" rx="1.5"/><rect x="2" y="18" width="12" height="12" rx="1.5"/><rect x="4" y="4" width="8" height="8" rx="1" fill="#EBF2FF"/><rect x="20" y="4" width="8" height="8" rx="1" fill="#EBF2FF"/><rect x="4" y="20" width="8" height="8" rx="1" fill="#EBF2FF"/><rect x="5.5" y="5.5" width="5" height="5" rx="0.5" fill="#1A56DB"/><rect x="21.5" y="5.5" width="5" height="5" rx="0.5" fill="#1A56DB"/><rect x="5.5" y="21.5" width="5" height="5" rx="0.5" fill="#1A56DB"/><rect x="20" y="20" width="3" height="3" rx="0.5"/><rect x="25" y="20" width="3" height="3" rx="0.5"/><rect x="20" y="25" width="3" height="3" rx="0.5"/><rect x="25" y="25" width="3" height="3" rx="0.5"/></svg>
+          </div>
+          <div style="font-size:12px;color:#3B82F6;">专属码 · ZY8821</div>
+        </div>
+        <div style="text-align:left;margin-bottom:12px;">
+          <div style="font-size:12px;color:#6B7280;margin-bottom:6px;">链接地址</div>
+          <div class="ql-link-box">https://shh.com/quiz/agent/<strong>ZY8821</strong></div>
+          <button onclick="copyQlLink()" style="width:100%;height:44px;border-radius:10px;border:none;background:#1A56DB;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Noto Sans SC';display:flex;align-items:center;justify-content:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>一键复制链接</button>
+        </div>
+        <div style="text-align:left;margin-bottom:12px;">
+          <div style="font-size:12px;color:#6B7280;margin-bottom:8px;">分享文案（含链接）</div>
+          <div style="background:#fff;border-radius:12px;border:1.5px solid #E5E7EB;padding:12px;font-size:12px;color:#374151;line-height:1.7;margin-bottom:8px;" id="ql-share-text">🛡️ 花5分钟做个免费保障测评，看看你家的保险有没有盲区~ 报告超详细，还有守护顾问可以1对1解读。分享给你试试：https://shh.com/quiz/agent/ZY8821</div>
+          <button onclick="copyQlText()" style="width:100%;height:40px;border-radius:10px;border:1.5px solid #E5E7EB;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans SC';">复制全部文案+链接</button>
+        </div>
+        <div style="background:#ECFDF5;border-radius:12px;padding:12px;text-align:left;">
+          <div style="font-size:12px;font-weight:700;color:#059669;margin-bottom:4px;">📊 实时追踪提示</div>
+          <div style="font-size:12px;color:#065F46;line-height:1.6;">有人点击或完成测评，工作台信号卡实时推送，不错过任何高意向时机。</div>
+        </div>
+      </div>
+      <div class="ql-footer">
+        <button class="ql-btn ql-btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;" onclick="qlNext(3)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>分享到微信</button>
+        <button class="ql-btn ql-btn-ghost" onclick="closeQuizLink()">返回工作台</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Share Success -->
+    <div class="ql-screen" id="ql-3">
+      <div class="ql-topbar">
+        <button class="ql-back" onclick="qlNext(2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <span class="ql-title">已分享</span>
+        <div style="width:36px;"></div>
+      </div>
+      <div class="ql-scroll" style="text-align:center;padding-top:32px;">
+        <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#D1FAE5,#A7F3D0);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div style="font-size:20px;font-weight:800;color:#0F172A;margin-bottom:8px;">链接已发出 🎉</div>
+        <div style="font-size:13px;color:#6B7280;line-height:1.7;margin-bottom:28px;">有人完成测评，你会第一时间<br>收到信号卡推送。守护旅程开始了！</div>
+        <div style="background:#fff;border-radius:16px;padding:16px;text-align:left;box-shadow:0 1px 6px rgba(0,0,0,0.06);margin-bottom:14px;">
+          <div style="font-size:13px;font-weight:700;color:#0F172A;margin-bottom:12px;">本次链接追踪数据</div>
+          <div style="display:flex;justify-content:space-around;">
+            <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:#1A56DB;">0</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">点击次数</div></div>
+            <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:#0D9488;">0</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">完成测评</div></div>
+            <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:#F59E0B;">0</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">新增客户</div></div>
+          </div>
+        </div>
+        <div style="font-size:12px;color:#A8B4C0;margin-bottom:24px;">数据实时更新，有新动态时工作台会推送通知</div>
+        <button class="ql-btn ql-btn-primary" onclick="closeQuizLink()">返回工作台</button>
+      </div>
+    </div>
+
+  </div><!-- /quizlink-overlay -->
+
+</div><!-- /phone-wrap -->
+
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t => {
+    t.classList.remove('active');
+    t.querySelector('.tab-label').style.color = '';
+  });
+  document.getElementById('screen-' + name).classList.add('active');
+  const tab = document.getElementById('tab-' + name);
+  if (tab) {
+    tab.classList.add('active');
+    tab.querySelector('.tab-label').style.color = '#1A56DB';
+  }
+}
+function goDetail() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-detail').classList.add('active');
+}
+function switchDetailTab(idx, el) {
+  document.querySelectorAll('#detail-tabs .sub-tab').forEach((t,i) => {
+    t.classList.toggle('active', i === idx);
+    document.getElementById('detail-panel-' + i).style.display = i === idx ? 'block' : 'none';
+  });
+}
+function filterSignals(type, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.signal-card').forEach(card => {
+    card.style.display = (type === 'all' || card.dataset.type === type) ? '' : 'none';
+  });
+}
+function sortCustomers(val) {
+  // Prototype: just show a toast indicating sort applied
+  const labels = {
+    signal: '已按信号优先级排序',
+    contact: '已按最后联系时间排序',
+    score: '已按保障分排序',
+    renewal: '已按续保到期时间排序',
+    birthday: '已按生日临近排序'
+  };
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.75);color:#fff;font-size:12px;padding:8px 16px;border-radius:20px;z-index:9999;pointer-events:none;';
+  toast.textContent = labels[val] || '已排序';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+/* === F-002 Plan Book Logic === */
+function startPlanBook() {
+  var overlay = document.getElementById('planbook-overlay');
+  if (!overlay) return;
+  overlay.classList.add('pb-active');
+  document.querySelectorAll('.pb-screen').forEach(function(s){ s.classList.remove('pb-cur'); });
+  var s0 = document.getElementById('pb-0');
+  if (s0) s0.classList.add('pb-cur');
+}
+function closePlanBook() {
+  var overlay = document.getElementById('planbook-overlay');
+  if (overlay) overlay.classList.remove('pb-active');
+}
+function pbNext(step) {
+  document.querySelectorAll('.pb-screen').forEach(function(s){ s.classList.remove('pb-cur'); });
+  var el = document.getElementById('pb-' + step);
+  if (el) {
+    el.classList.add('pb-cur');
+    var scroll = el.querySelector('.pb-scroll');
+    if (scroll) scroll.scrollTop = 0;
+  }
+}
+function pbBack(cur) {
+  pbNext(cur - 1);
+}
+
+/* === MISS-A01: Quiz Link Overlay === */
+var qlCopyTexts = {
+  moments: '🛡️ 花5分钟做个免费保障测评，看看你家的保险有没有盲区~ 报告超详细，还有守护顾问可以1对1解读。分享给你试试：https://shh.com/quiz/agent/ZY8821',
+  friend:  '嘿，刚好想到你～ 发你个免费保障测评，做完有守护顾问帮你解读，挺实用的。需要的话可以找我聊聊哈：https://shh.com/quiz/agent/ZY8821',
+  existing: '你好，我这边有个更新的保障健康测评，5分钟就能出报告，帮你看看现在的保障还有没有优化空间。点击免费测评：https://shh.com/quiz/agent/ZY8821'
+};
+var qlSelectedType = 'moments';
+function openQuizLink() {
+  document.getElementById('quizlink-overlay').classList.add('ql-active');
+  qlNext(0);
+}
+function closeQuizLink() {
+  document.getElementById('quizlink-overlay').classList.remove('ql-active');
+}
+function qlNext(step) {
+  document.querySelectorAll('.ql-screen').forEach(function(s){ s.classList.remove('ql-cur'); });
+  var el = document.getElementById('ql-' + step);
+  if (el) {
+    el.classList.add('ql-cur');
+    var scroll = el.querySelector('.ql-scroll');
+    if (scroll) scroll.scrollTop = 0;
+  }
+}
+function selectQlType(card, type) {
+  qlSelectedType = type;
+  ['moments','friend','existing'].forEach(function(t) {
+    var c = document.getElementById('ql-type-' + t);
+    var ch = document.getElementById('ql-check-' + t);
+    if (t === type) {
+      c.classList.add('selected');
+      ch.style.background = '#1A56DB';
+      ch.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    } else {
+      c.classList.remove('selected');
+      ch.style.background = '#E5E7EB';
+      ch.innerHTML = '';
+    }
+  });
+  document.getElementById('ql-copy-preview').innerHTML = qlCopyTexts[type].replace('https://shh.com/quiz/agent/ZY8821', '<span style="color:#1A56DB;">https://shh.com/quiz/agent/ZY8821</span>');
+}
+function copyQlLink() {
+  navigator.clipboard && navigator.clipboard.writeText('https://shh.com/quiz/agent/ZY8821').catch(function(){});
+  alert('链接已复制！粘贴到微信发送即可。（原型演示）');
+}
+function copyQlText() {
+  var text = qlCopyTexts[qlSelectedType];
+  navigator.clipboard && navigator.clipboard.writeText(text).catch(function(){});
+  alert('文案+链接已复制！粘贴到微信发送即可。（原型演示）');
+}
+
+/* === §2.1 Customer Activity Ranking === */
+function openActRanking() {
+  document.getElementById('act-ranking-overlay').classList.add('open');
+}
+function closeActRanking() {
+  document.getElementById('act-ranking-overlay').classList.remove('open');
+}
+function switchRankTab(type, el) {
+  ['active','warm','cool','all'].forEach(function(t) {
+    var tab = document.getElementById('rtab-' + t);
+    if (tab) { tab.style.color = 'var(--gray-500)'; tab.style.borderBottomColor = 'transparent'; tab.style.fontWeight = '500'; }
+  });
+  if (el) { el.style.fontWeight = '600'; el.style.borderBottomColor = el.id === 'rtab-active' ? '#EF4444' : el.id === 'rtab-warm' ? '#F59E0B' : el.id === 'rtab-cool' ? '#FF6B35' : 'var(--primary)'; el.style.color = el.id === 'rtab-active' ? '#EF4444' : el.id === 'rtab-warm' ? '#F59E0B' : el.id === 'rtab-cool' ? '#FF6B35' : 'var(--primary)'; }
+}
+
+/* === §2.3 Activity Invite Tool === */
+function openActivityInvite() {
+  document.getElementById('activity-invite-overlay').classList.add('open');
+}
+function closeActivityInvite() {
+  document.getElementById('activity-invite-overlay').classList.remove('open');
+  closeBatchInvite();
+}
+function openBatchInvite() {
+  var sheet = document.getElementById('batch-invite-sheet');
+  if (sheet) { sheet.style.display = 'flex'; }
+}
+function closeBatchInvite() {
+  var sheet = document.getElementById('batch-invite-sheet');
+  if (sheet) { sheet.style.display = 'none'; }
+}
+</script>
+</body>
+</html>

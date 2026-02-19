@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>守护+ · 原型导航</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: #060D1F;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Background effect */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 20%, rgba(99,102,241,0.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 80%, rgba(13,148,136,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(245,166,35,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Grid dots */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 56px;
+    position: relative;
+    z-index: 1;
+  }
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(99,102,241,0.15);
+    border: 1px solid rgba(99,102,241,0.3);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 12px;
+    color: #A5B4FC;
+    font-weight: 600;
+    margin-bottom: 20px;
+    letter-spacing: 0.5px;
+  }
+  .header-badge::before { content: '●'; color: #6EE7B7; animation: blink 2s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .logo {
+    font-size: 52px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .logo span { color: #F5A623; }
+  .logo-tagline {
+    font-size: 16px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-desc {
+    margin-top: 16px;
+    font-size: 15px;
+    color: rgba(255,255,255,0.5);
+    max-width: 480px;
+    line-height: 1.7;
+  }
+
+  /* Card grid */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 380px);
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+  }
+
+  .proto-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 28px;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+  }
+  .proto-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 24px;
+  }
+  .proto-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .proto-card:hover::before { opacity: 1; }
+
+  /* Card accent colors */
+  .card-customer::before { background: radial-gradient(ellipse at top left, rgba(245,166,35,0.12) 0%, transparent 60%); }
+  .card-customer { border-color: rgba(245,166,35,0.15); }
+  .card-customer:hover { border-color: rgba(245,166,35,0.3); box-shadow: 0 20px 60px rgba(245,166,35,0.08); }
+
+  .card-agent::before { background: radial-gradient(ellipse at top left, rgba(26,86,219,0.15) 0%, transparent 60%); }
+  .card-agent { border-color: rgba(26,86,219,0.15); }
+  .card-agent:hover { border-color: rgba(26,86,219,0.35); box-shadow: 0 20px 60px rgba(26,86,219,0.1); }
+
+  .card-company::before { background: radial-gradient(ellipse at top left, rgba(16,185,129,0.12) 0%, transparent 60%); }
+  .card-company { border-color: rgba(16,185,129,0.15); }
+  .card-company:hover { border-color: rgba(16,185,129,0.3); box-shadow: 0 20px 60px rgba(16,185,129,0.08); }
+
+  .card-platform::before { background: radial-gradient(ellipse at top left, rgba(99,102,241,0.15) 0%, transparent 60%); }
+  .card-platform { border-color: rgba(99,102,241,0.15); }
+  .card-platform:hover { border-color: rgba(99,102,241,0.35); box-shadow: 0 20px 60px rgba(99,102,241,0.1); }
+
+  .card-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .icon-customer { background: linear-gradient(135deg, rgba(245,166,35,0.3), rgba(245,166,35,0.1)); border: 1px solid rgba(245,166,35,0.2); }
+  .icon-agent { background: linear-gradient(135deg, rgba(26,86,219,0.3), rgba(26,86,219,0.1)); border: 1px solid rgba(26,86,219,0.2); }
+  .icon-company { background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(16,185,129,0.1)); border: 1px solid rgba(16,185,129,0.2); }
+  .icon-platform { background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(99,102,241,0.1)); border: 1px solid rgba(99,102,241,0.2); }
+
+  .card-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    color: rgba(255,255,255,0.4);
+    font-size: 14px;
+  }
+  .proto-card:hover .card-arrow {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.9);
+    transform: translate(2px, -2px);
+  }
+
+  .card-role {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .role-customer { color: #F5A623; }
+  .role-agent { color: #60A5FA; }
+  .role-company { color: #34D399; }
+  .role-platform { color: #A5B4FC; }
+
+  .card-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .card-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .feature-chip {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.55);
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .proto-card:hover .feature-chip {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.75);
+  }
+
+  .card-platform-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+  }
+  .platform-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .dot-mobile { background: #F5A623; }
+  .dot-app { background: #60A5FA; }
+  .dot-web { background: #34D399; }
+  .dot-saas { background: #A5B4FC; }
+
+  /* Footer */
+  .footer {
+    margin-top: 48px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .footer-text {
+    font-size: 13px;
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 12px;
+  }
+  .tech-stack {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .tech-chip {
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.3);
+  }
+
+  /* Version info */
+  .version-bar {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .version-item {
+    text-align: center;
+  }
+  .version-num { font-size: 22px; font-weight: 800; color: rgba(255,255,255,0.7); }
+  .version-label { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 2px; letter-spacing: 0.5px; }
+  .version-divider { width: 1px; background: rgba(255,255,255,0.08); }
+
+  @media (max-width: 860px) {
+    .card-grid { grid-template-columns: 1fr; max-width: 420px; }
+  }
+</style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-badge">INTERACTIVE PROTOTYPE · v1.0</div>
+    <div class="logo">守护<span>+</span></div>
+    <div class="logo-tagline">Insurance Marketing Platform</div>
+    <div class="header-desc">保险营销增长平台 — 连接客户、业务员、保险公司、平台运营四方的SaaS产品原型演示</div>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="version-bar">
+    <div class="version-item">
+      <div class="version-num">4</div>
+      <div class="version-label">端口原型</div>
+    </div>
+    <div class="version-divider"></div>
+    <div class="version-item">
+      <div class="version-num">36</div>
+      <div class="version-label">客户标签</div>
+    </div>
+    <div class="version-divider"></div>
+    <div class="version-item">
+      <div class="version-num">10</div>
+      <div class="version-label">营销策略</div>
+    </div>
+    <div class="version-divider"></div>
+    <div class="version-item">
+      <div class="version-num">5</div>
+      <div class="version-label">积分等级</div>
+    </div>
+  </div>
+
+  <!-- Card Grid -->
+  <div class="card-grid">
+
+    <!-- Customer H5 -->
+    <a href="customer/index.html" class="proto-card card-customer">
+      <div class="card-header-row">
+        <div class="card-icon icon-customer">📱</div>
+        <div class="card-arrow">↗</div>
+      </div>
+      <div class="card-role role-customer">CUSTOMER · 客户端</div>
+      <div class="card-title">保险用户 H5</div>
+      <div class="card-desc">客户视角的移动端体验：查看保障评分、积分中心、每日打卡、个性化推荐</div>
+      <div class="card-features">
+        <span class="feature-chip">保障雷达图</span>
+        <span class="feature-chip">5维评分</span>
+        <span class="feature-chip">积分中心</span>
+        <span class="feature-chip">每日打卡</span>
+        <span class="feature-chip">消息推送</span>
+      </div>
+      <div class="card-platform-badge">
+        <span class="platform-dot dot-mobile"></span> H5 · 小程序 · Vue3 + uni-app
+      </div>
+    </a>
+
+    <!-- Agent App -->
+    <a href="agent/index.html" class="proto-card card-agent">
+      <div class="card-header-row">
+        <div class="card-icon icon-agent">💼</div>
+        <div class="card-arrow">↗</div>
+      </div>
+      <div class="card-role role-agent">AGENT · 业务员端</div>
+      <div class="card-title">业务员工作台</div>
+      <div class="card-desc">业务员核心工作界面：信号卡管理、客户标签、跟进记录、营销触达展示</div>
+      <div class="card-features">
+        <span class="feature-chip">5类信号卡</span>
+        <span class="feature-chip">策略触达信号</span>
+        <span class="feature-chip">客户标签</span>
+        <span class="feature-chip">业绩分析</span>
+        <span class="feature-chip">触达记录</span>
+      </div>
+      <div class="card-platform-badge">
+        <span class="platform-dot dot-app"></span> App · Vue3 + Vant
+      </div>
+    </a>
+
+    <!-- Company Admin -->
+    <a href="company-admin/index.html" class="proto-card card-company">
+      <div class="card-header-row">
+        <div class="card-icon icon-company">🏢</div>
+        <div class="card-arrow">↗</div>
+      </div>
+      <div class="card-role role-company">COMPANY ADMIN · 保险公司管理员</div>
+      <div class="card-title">公司管理后台</div>
+      <div class="card-desc">保险公司管理员专属门户：查看团队业绩大盘、管理组织架构、员工账号管理</div>
+      <div class="card-features">
+        <span class="feature-chip">总览大盘</span>
+        <span class="feature-chip">组织架构树</span>
+        <span class="feature-chip">员工管理</span>
+        <span class="feature-chip">团队排行</span>
+        <span class="feature-chip">营销策略</span>
+      </div>
+      <div class="card-platform-badge">
+        <span class="platform-dot dot-web"></span> PC Web · Vue3 + Element Plus
+      </div>
+    </a>
+
+    <!-- Platform Admin -->
+    <a href="platform-admin/index.html" class="proto-card card-platform">
+      <div class="card-header-row">
+        <div class="card-icon icon-platform">⚡</div>
+        <div class="card-arrow">↗</div>
+      </div>
+      <div class="card-role role-platform">PLATFORM ADMIN · 平台超级管理员</div>
+      <div class="card-title">SaaS 平台后台</div>
+      <div class="card-desc">平台最高权限管理：多租户管理、跨公司数据大盘、营销策略审核、全局标签库</div>
+      <div class="card-features">
+        <span class="feature-chip">跨公司大盘</span>
+        <span class="feature-chip">租户管理</span>
+        <span class="feature-chip">策略审核</span>
+        <span class="feature-chip">标签库</span>
+        <span class="feature-chip">合规配置</span>
+      </div>
+      <div class="card-platform-badge">
+        <span class="platform-dot dot-saas"></span> PC Web · Vue3 + Element Plus
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-text">保险裂变增长平台 · PRD v1.0 · 原型设计稿</div>
+    <div class="tech-stack">
+      <span class="tech-chip">Vue3 + uni-app</span>
+      <span class="tech-chip">Vant 4.x</span>
+      <span class="tech-chip">Element Plus</span>
+      <span class="tech-chip">Tailwind CSS</span>
+      <span class="tech-chip">NestJS + PostgreSQL</span>
+    </div>
+  </div>
+</body>
+</html>

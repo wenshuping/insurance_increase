@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>平台管理员端 — 守护+ SaaS</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sidebar-bg: #0A0F1E;
+    --sidebar-border: rgba(255,255,255,0.06);
+    --purple: #6366F1;
+    --purple-light: #EEF2FF;
+    --teal: #0D9488;
+    --teal-light: #CCFBF1;
+    --gold: #F59E0B;
+    --gold-light: #FEF3C7;
+    --success: #10B981;
+    --success-light: #D1FAE5;
+    --danger: #EF4444;
+    --danger-light: #FEE2E2;
+    --gray-50: #F8FAFC;
+    --gray-100: #F1F5F9;
+    --gray-200: #E2E8F0;
+    --gray-500: #64748B;
+    --gray-700: #334155;
+    --gray-900: #0F172A;
+    --body-bg: #F0F2F8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans SC', sans-serif; background: var(--body-bg); min-height: 100vh; display: flex; color: var(--gray-900); }
+
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+    min-height: 100vh;
+    position: fixed;
+    left: 0; top: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    border-right: 1px solid var(--sidebar-border);
+  }
+  .sidebar-logo {
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid var(--sidebar-border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--purple), #4F46E5); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { }
+  .logo-brand { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .logo-brand span { color: #A5B4FC; }
+  .logo-sub { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 1px; letter-spacing: 0.5px; }
+  .sidebar-nav { flex: 1; padding: 14px 10px; overflow-y: auto; }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+  .nav-group-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 1.5px; padding: 10px 12px 4px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.5);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+    position: relative;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(99,102,241,0.2); color: #fff; font-weight: 600; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 0 3px 3px 0; background: var(--purple); }
+  .nav-icon { width: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+  .nav-badge-warn { background: var(--gold); color: #fff; }
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--sidebar-border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .admin-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), #4F46E5); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; }
+  .admin-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); }
+  .admin-role { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+  /* Main */
+  .main { margin-left: 260px; flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+  .topbar {
+    height: 60px;
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .breadcrumb { font-size: 12px; color: var(--gray-500); }
+  .topbar-title { font-size: 18px; font-weight: 800; color: var(--gray-900); }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .topbar-badge-btn { position: relative; cursor: pointer; }
+  .topbar-badge-dot { position: absolute; top: -3px; right: -3px; background: var(--danger); width: 16px; height: 16px; border-radius: 50%; font-size: 9px; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid #fff; }
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* Pages */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* KPI Cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-card::after { content: attr(data-icon); position: absolute; right: 16px; top: 16px; font-size: 32px; opacity: 0.15; }
+  .kpi-label { font-size: 12px; color: var(--gray-500); font-weight: 500; margin-bottom: 8px; }
+  .kpi-value { font-size: 30px; font-weight: 800; color: var(--gray-900); line-height: 1; margin-bottom: 8px; }
+  .kpi-trend { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+  .kpi-up { color: var(--success); font-weight: 600; }
+  .kpi-warn { color: var(--gold); font-weight: 600; }
+
+  /* Tables */
+  .card { background: #fff; border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 20px; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--gray-900); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 11px 16px; text-align: left; font-size: 11.5px; font-weight: 600; color: var(--gray-500); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: var(--gray-700); border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-50); }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge-ok { background: var(--success-light); color: #065F46; }
+  .badge-trial { background: #EDE9FE; color: #5B21B6; }
+  .badge-warn { background: var(--gold-light); color: #92400E; }
+  .badge-danger { background: var(--danger-light); color: #991B1B; }
+  .badge-gray { background: var(--gray-100); color: var(--gray-700); }
+  .badge-purple { background: var(--purple-light); color: #4338CA; }
+  .badge-teal { background: var(--teal-light); color: #0F766E; }
+  .badge-gold { background: #FEF3C7; color: #B45309; }
+
+  /* Tier badges */
+  .tier-basic { background: var(--gray-100); color: var(--gray-700); }
+  .tier-pro { background: var(--purple-light); color: #4338CA; }
+  .tier-flagship { background: linear-gradient(135deg, #7C3AED, #6366F1); color: #fff; }
+  .tier-custom { background: linear-gradient(135deg, #D97706, #F59E0B); color: #fff; }
+
+  /* Buttons */
+  .btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; }
+  .btn-primary { background: var(--purple); color: #fff; }
+  .btn-primary:hover { background: #4F46E5; }
+  .btn-ghost { background: var(--gray-100); color: var(--gray-700); }
+  .btn-ghost:hover { background: var(--gray-200); }
+  .btn-danger { background: var(--danger-light); color: var(--danger); }
+  .btn-success { background: var(--success-light); color: #065F46; }
+  .action-btns { display: flex; gap: 6px; }
+
+  /* Filters */
+  .filter-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+  .search-input { flex: 1; max-width: 280px; padding: 9px 14px; border: 1.5px solid var(--gray-200); border-radius: 10px; font-size: 13px; font-family: inherit; outline: none; }
+  .search-input:focus { border-color: var(--purple); }
+  .select-input { padding: 9px 14px; border: 1.5px solid var(--gray-200); border-radius: 10px; font-size: 13px; font-family: inherit; outline: none; background: #fff; }
+
+  /* Tab filters */
+  .tab-filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab-filter { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1.5px solid var(--gray-200); color: var(--gray-500); cursor: pointer; transition: all 0.15s; }
+  .tab-filter.active { border-color: var(--purple); color: var(--purple); background: var(--purple-light); font-weight: 600; }
+  .tab-filter.warn { border-color: var(--gold); color: #92400E; background: var(--gold-light); }
+
+  /* Section */
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--gray-900); }
+  .section-sub { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+
+  /* Two col */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .three-col { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 20px; }
+
+  /* Progress */
+  .progress { background: var(--gray-100); border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; }
+
+  /* Alert */
+  .alert { border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .alert-warn { background: var(--gold-light); border: 1px solid #FDE68A; color: #92400E; }
+  .alert-info { background: var(--purple-light); border: 1px solid #C7D2FE; color: #3730A3; }
+
+  /* Tag Library */
+  .tag-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 500; margin: 3px; }
+  .tag-activity { background: #DBEAFE; color: #1E40AF; }
+  .tag-intent { background: #FCE7F3; color: #9D174D; }
+  .tag-coverage { background: #D1FAE5; color: #065F46; }
+  .tag-lifecycle { background: #FEF3C7; color: #92400E; }
+  .tag-policy { background: #EDE9FE; color: #5B21B6; }
+  .tag-engagement { background: #CCFBF1; color: #0F766E; }
+
+  /* Seat indicator */
+  .seat-indicator { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .seat-bar { flex: 1; background: var(--gray-100); border-radius: 3px; height: 5px; overflow: hidden; min-width: 60px; }
+  .seat-fill { height: 100%; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A5B4FC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></div>
+    <div class="logo-text">
+      <div class="logo-brand">守护<span>+</span> Platform</div>
+      <div class="logo-sub">SUPER ADMIN · v2.1.0</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-group-label">平台总览</div>
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21v-6m7 6V3m7 18V9"/></svg></span> 跨公司大盘
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">租户管理</div>
+    <div class="nav-item" onclick="showPage('tenants', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4m-4-4h4m0 13v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg></span> 租户管理
+      <span class="nav-badge nav-badge-warn">2</span>
+    </div>
+    <div class="nav-item" onclick="showPage('agents', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> 独立业务员
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">内容审核</div>
+    <div class="nav-item" onclick="showPage('strategy-review', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> 策略审核
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" onclick="showPage('tags', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg></span> 标签库管理
+      <span class="nav-badge">5</span>
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">用户管理</div>
+    <div class="nav-item" onclick="showPage('users', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></span> 全平台用户
+    </div>
+    <div class="nav-item" onclick="showPage('roles', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> 角色权限矩阵
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">内容管理</div>
+    <div class="nav-item" onclick="showPage('knowledge', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/></svg></span> 知识科普文章
+    </div>
+    <div class="nav-item" onclick="showPage('quiz-bank', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3m.08 4h.01"/></svg></span> 答题题库
+      <span class="nav-badge">新</span>
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">积分管理</div>
+    <div class="nav-item" onclick="showPage('points-config', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg></span> 积分规则配置
+    </div>
+    <div class="nav-item" onclick="showPage('redemption', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg></span> 兑换商品管理
+    </div>
+    <div class="nav-item" onclick="showPage('level-config', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></span> 等级体系配置
+    </div>
+    <div class="nav-item" onclick="showPage('points-dashboard', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span> 积分大盘
+    </div>
+    <div class="nav-item" onclick="showPage('anomaly-monitor', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg></span> 异常监控
+      <span class="nav-badge nav-badge-warn">3</span>
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">活动管理</div>
+    <div class="nav-item" onclick="showPage('activities', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></span> 活动列表
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">推送管理</div>
+    <div class="nav-item" onclick="showPage('push-templates', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> 推送模板
+    </div>
+    <div class="nav-item" onclick="showPage('push-history', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></span> 推送历史记录
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">合规管理</div>
+    <div class="nav-item" onclick="showPage('compliance', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></span> 合规规则配置
+      <span class="nav-badge nav-badge-warn">1</span>
+    </div>
+    <div class="nav-item" onclick="showPage('data-gov', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></svg></span> 数据治理 / PIPL
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">系统管理</div>
+    <div class="nav-item" onclick="showPage('ops-accounts', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span> 运营账号管理
+    </div>
+    <div class="nav-item" onclick="showPage('audit-log', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span> 操作日志
+    </div>
+
+    <div class="nav-group-label" style="margin-top:6px;">平台配置</div>
+    <div class="nav-item" onclick="showPage('settings', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0a2.34 2.34 0 0 0 3.319 1.915a2.34 2.34 0 0 1 2.33 4.033a2.34 2.34 0 0 0 0 3.831a2.34 2.34 0 0 1-2.33 4.033a2.34 2.34 0 0 0-3.319 1.915a2.34 2.34 0 0 1-4.659 0a2.34 2.34 0 0 0-3.32-1.915a2.34 2.34 0 0 1-2.33-4.033a2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg></span> 平台设置
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-avatar">管</div>
+    <div>
+      <div class="admin-name">超级管理员</div>
+      <div class="admin-role">PLATFORM OWNER</div>
+    </div>
+    <span style="margin-left:auto;cursor:pointer;opacity:0.4;display:flex;align-items:center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0a2.34 2.34 0 0 0 3.319 1.915a2.34 2.34 0 0 1 2.33 4.033a2.34 2.34 0 0 0 0 3.831a2.34 2.34 0 0 1-2.33 4.033a2.34 2.34 0 0 0-3.319 1.915a2.34 2.34 0 0 1-4.659 0a2.34 2.34 0 0 0-3.32-1.915a2.34 2.34 0 0 1-2.33-4.033a2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
+    </span>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="page-title">跨公司大盘</div>
+    </div>
+    <div class="topbar-right">
+      <div style="font-size:13px;color:var(--gray-500);">2026-02-19 09:41</div>
+      <div class="topbar-badge-btn">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#64748B" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="topbar-badge-dot">8</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="alert alert-warn" style="margin-bottom:0;flex:1;margin-right:16px;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#92400E" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>
+          有 2 家企业租户将在30天内到期，请及时联系续费。另有 1 家租户账号已暂停。
+        </div>
+        <span style="background:#EDE9FE;color:#5B21B6;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;white-space:nowrap;flex-shrink:0;">平台超管视图 · 全公司数据可见</span>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card" data-icon="📱">
+          <div class="kpi-label">月活用户 MAU</div>
+          <div class="kpi-value">2.8万</div>
+          <div class="kpi-trend"><span class="kpi-up">↑ +12.4%</span> 环比</div>
+        </div>
+        <div class="kpi-card" data-icon="🔗">
+          <div class="kpi-label">K 因子（裂变系数）</div>
+          <div class="kpi-value">1.35</div>
+          <div class="kpi-trend"><span class="kpi-up">↑ 上月 1.12</span> · 目标 &gt;1.2 ✓</div>
+        </div>
+        <div class="kpi-card" data-icon="📊">
+          <div class="kpi-label">测评→投保 转化率</div>
+          <div class="kpi-value">8.7%</div>
+          <div class="kpi-trend"><span class="kpi-up">↑ +1.2pp</span> 环比</div>
+        </div>
+        <div class="kpi-card" data-icon="📤">
+          <div class="kpi-label">报告分享率</div>
+          <div class="kpi-value">47.3%</div>
+          <div class="kpi-trend"><span class="kpi-up">↑ +3.6pp</span> 环比</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Top companies chart -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Top 5 企业保费排行</div>
+            <div style="font-size:12px;color:var(--gray-500);">本月</div>
+          </div>
+          <div style="padding:20px;">
+            <svg viewBox="0 0 360 200" width="100%">
+              <!-- Horizontal bars -->
+              <text x="0" y="22" font-size="11" fill="#334155" font-family="Noto Sans SC" font-weight="600">太平洋保险华南</text>
+              <rect x="130" y="10" width="200" height="18" rx="4" fill="#6366F1"/>
+              <text x="334" y="22" font-size="11" fill="#4338CA" font-weight="700" font-family="Noto Sans SC">¥128.5万</text>
+
+              <text x="0" y="58" font-size="11" fill="#334155" font-family="Noto Sans SC" font-weight="600">新华保险北京</text>
+              <rect x="130" y="46" width="160" height="18" rx="4" fill="#6366F1" opacity="0.75"/>
+              <text x="294" y="58" font-size="11" fill="#4338CA" font-weight="700" font-family="Noto Sans SC">¥102.3万</text>
+
+              <text x="0" y="94" font-size="11" fill="#334155" font-family="Noto Sans SC" font-weight="600">平安人寿上海</text>
+              <rect x="130" y="82" width="130" height="18" rx="4" fill="#6366F1" opacity="0.6"/>
+              <text x="264" y="94" font-size="11" fill="#4338CA" font-weight="700" font-family="Noto Sans SC">¥83.2万</text>
+
+              <text x="0" y="130" font-size="11" fill="#334155" font-family="Noto Sans SC" font-weight="600">中国人寿广州</text>
+              <rect x="130" y="118" width="100" height="18" rx="4" fill="#6366F1" opacity="0.45"/>
+              <text x="234" y="130" font-size="11" fill="#4338CA" font-weight="700" font-family="Noto Sans SC">¥63.8万</text>
+
+              <text x="0" y="166" font-size="11" fill="#334155" font-family="Noto Sans SC" font-weight="600">友邦保险深圳</text>
+              <rect x="130" y="154" width="75" height="18" rx="4" fill="#6366F1" opacity="0.3"/>
+              <text x="209" y="166" font-size="11" fill="#4338CA" font-weight="700" font-family="Noto Sans SC">¥47.9万</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Tenant status summary -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">租户状态速览</div><span onclick="showPage('tenants',document.querySelectorAll('.nav-item')[1])" style="font-size:13px;color:var(--purple);cursor:pointer;font-weight:500;">查看全部 →</span></div>
+          <table>
+            <thead><tr><th>公司</th><th>套餐</th><th>席位</th><th>到期日</th><th>状态</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;font-size:12px;">太平洋华南</td>
+                <td><span class="badge tier-flagship">旗舰版</span></td>
+                <td><div class="seat-indicator"><div class="seat-bar"><div class="seat-fill" style="width:80%;background:var(--purple);"></div></div><span style="color:var(--gray-500);">128/160</span></div></td>
+                <td style="font-size:12px;">2026-12-31</td>
+                <td><span class="badge badge-ok">正常</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;font-size:12px;">新华保险京</td>
+                <td><span class="badge tier-pro">专业版</span></td>
+                <td><div class="seat-indicator"><div class="seat-bar"><div class="seat-fill" style="width:90%;background:var(--gold);"></div></div><span style="color:var(--gold);">45/50</span></div></td>
+                <td style="font-size:12px;">2026-03-15</td>
+                <td><span class="badge badge-warn">即将到期</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;font-size:12px;">平安人寿沪</td>
+                <td><span class="badge tier-flagship">旗舰版</span></td>
+                <td><div class="seat-indicator"><div class="seat-bar"><div class="seat-fill" style="width:60%;background:var(--success);"></div></div><span style="color:var(--gray-500);">96/160</span></div></td>
+                <td style="font-size:12px;">2026-09-30</td>
+                <td><span class="badge badge-ok">正常</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;font-size:12px;">中国人寿穗</td>
+                <td><span class="badge tier-pro">专业版</span></td>
+                <td><div class="seat-indicator"><div class="seat-bar"><div class="seat-fill" style="width:95%;background:var(--danger);"></div></div><span style="color:var(--danger);">47/50</span></div></td>
+                <td style="font-size:12px;">2026-02-28</td>
+                <td><span class="badge badge-warn">即将到期</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;font-size:12px;">华夏保险</td>
+                <td><span class="badge tier-basic">基础版</span></td>
+                <td><div class="seat-indicator"><div class="seat-bar"><div class="seat-fill" style="width:100%;background:var(--danger);"></div></div><span style="color:var(--danger);">20/20</span></div></td>
+                <td style="font-size:12px;">2025-12-01</td>
+                <td><span class="badge badge-danger">已暂停</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TENANTS PAGE -->
+    <div class="page" id="page-tenants">
+      <div class="tab-filters">
+        <div class="tab-filter active">全部 (28)</div>
+        <div class="tab-filter">企业租户 (24)</div>
+        <div class="tab-filter">独立业务员 (156)</div>
+        <div class="tab-filter warn">即将到期 (2)</div>
+        <div class="tab-filter">已暂停 (1)</div>
+      </div>
+      <div class="filter-bar">
+        <input class="search-input" type="text" placeholder="🔍 搜索租户名称、联系人...">
+        <select class="select-input"><option>全部套餐</option><option>基础版</option><option>专业版</option><option>旗舰版</option><option>定制版</option></select>
+        <select class="select-input"><option>全部状态</option><option>正常</option><option>即将到期</option><option>已暂停</option></select>
+        <div style="margin-left:auto;">
+          <button class="btn btn-primary" onclick="showPage('create-tenant',this)">+ 新建企业租户</button>
+        </div>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th>租户名称</th>
+              <th>类型</th>
+              <th>管理员</th>
+              <th>套餐</th>
+              <th>席位使用</th>
+              <th>到期日</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div style="font-weight:700;font-size:13px;">太平洋保险华南区</div>
+                <div style="font-size:11px;color:var(--gray-500);">ID: TEN-2024001</div>
+              </td>
+              <td><span class="badge badge-purple">企业租户</span></td>
+              <td style="font-size:12px;">陈志远<br><span style="color:var(--gray-500);">admin@tpic-south.com</span></td>
+              <td><span class="badge tier-flagship">旗舰版</span></td>
+              <td>
+                <div class="seat-indicator">
+                  <div class="seat-bar"><div class="seat-fill" style="width:80%;background:var(--purple);"></div></div>
+                  <span style="font-size:12px;color:var(--gray-500);">128/160</span>
+                </div>
+              </td>
+              <td style="font-size:12px;font-weight:500;">2026-12-31</td>
+              <td><span class="badge badge-ok">正常</span></td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">查看</button>
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">编辑</button>
+                </div>
+              </td>
+            </tr>
+            <tr style="background:#FFFBEB;">
+              <td>
+                <div style="font-weight:700;font-size:13px;">新华保险北京分公司</div>
+                <div style="font-size:11px;color:var(--gray-500);">ID: TEN-2024008</div>
+              </td>
+              <td><span class="badge badge-purple">企业租户</span></td>
+              <td style="font-size:12px;">李志强<br><span style="color:var(--gray-500);">admin@xinhua-bj.com</span></td>
+              <td><span class="badge tier-pro">专业版</span></td>
+              <td>
+                <div class="seat-indicator">
+                  <div class="seat-bar"><div class="seat-fill" style="width:90%;background:var(--gold);"></div></div>
+                  <span style="font-size:12px;color:var(--gold);font-weight:600;">45/50 · 近满</span>
+                </div>
+              </td>
+              <td style="font-size:12px;font-weight:500;color:var(--gold);">2026-03-15 · 即将到期</td>
+              <td><span class="badge badge-warn">即将到期</span></td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">查看</button>
+                  <button class="btn btn-success" style="padding:4px 10px;font-size:11px;">续费提醒</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div style="font-weight:700;font-size:13px;">平安人寿上海营业部</div>
+                <div style="font-size:11px;color:var(--gray-500);">ID: TEN-2023015</div>
+              </td>
+              <td><span class="badge badge-purple">企业租户</span></td>
+              <td style="font-size:12px;">王建国<br><span style="color:var(--gray-500);">admin@pa-sh.com</span></td>
+              <td><span class="badge tier-flagship">旗舰版</span></td>
+              <td>
+                <div class="seat-indicator">
+                  <div class="seat-bar"><div class="seat-fill" style="width:60%;background:var(--success);"></div></div>
+                  <span style="font-size:12px;color:var(--gray-500);">96/160</span>
+                </div>
+              </td>
+              <td style="font-size:12px;font-weight:500;">2026-09-30</td>
+              <td><span class="badge badge-ok">正常</span></td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">查看</button>
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">编辑</button>
+                </div>
+              </td>
+            </tr>
+            <tr style="background:#FFF5F5;">
+              <td>
+                <div style="font-weight:700;font-size:13px;">华夏保险区域中心</div>
+                <div style="font-size:11px;color:var(--gray-500);">ID: TEN-2023003</div>
+              </td>
+              <td><span class="badge badge-purple">企业租户</span></td>
+              <td style="font-size:12px;">赵国栋<br><span style="color:var(--gray-500);">admin@huaxia.com</span></td>
+              <td><span class="badge tier-basic">基础版</span></td>
+              <td>
+                <div class="seat-indicator">
+                  <div class="seat-bar"><div class="seat-fill" style="width:100%;background:var(--danger);"></div></div>
+                  <span style="font-size:12px;color:var(--danger);font-weight:600;">20/20</span>
+                </div>
+              </td>
+              <td style="font-size:12px;font-weight:500;color:var(--danger);">2025-12-01（已过期）</td>
+              <td><span class="badge badge-danger">已暂停</span></td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">查看</button>
+                  <button class="btn btn-primary" style="padding:4px 10px;font-size:11px;">恢复</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:14px 16px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:13px;color:var(--gray-500);">共 24 家企业租户</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" style="padding:5px 12px;">1</button>
+            <button class="btn btn-ghost" style="padding:5px 12px;">2</button>
+            <button class="btn btn-ghost" style="padding:5px 12px;">下一页</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INDEPENDENT AGENTS PAGE -->
+    <div class="page" id="page-agents">
+      <div class="filter-bar">
+        <input class="search-input" type="text" placeholder="🔍 搜索姓名、手机号...">
+        <select class="select-input"><option>全部套餐</option><option>基础版</option><option>专业版</option></select>
+        <select class="select-input"><option>全部状态</option><option>活跃</option><option>即将到期</option><option>已暂停</option></select>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>姓名</th><th>手机号</th><th>注册日期</th><th>套餐</th><th>到期日</th><th>客户数</th><th>本月保费</th><th>状态</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">刘建军</td>
+              <td style="font-size:12px;color:var(--gray-500);">138****8899</td>
+              <td style="font-size:12px;">2025-08-15</td>
+              <td><span class="badge tier-pro">专业版</span></td>
+              <td style="font-size:12px;">2026-08-15</td>
+              <td>183</td>
+              <td style="font-weight:700;">¥24,600</td>
+              <td><span class="badge badge-ok">活跃</span></td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">详情</button></div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">张晓丽</td>
+              <td style="font-size:12px;color:var(--gray-500);">156****2233</td>
+              <td style="font-size:12px;">2025-11-20</td>
+              <td><span class="badge tier-basic">基础版</span></td>
+              <td style="font-size:12px;color:var(--gold);">2026-03-01 · 即将到期</td>
+              <td>46</td>
+              <td style="font-weight:700;">¥8,200</td>
+              <td><span class="badge badge-warn">即将到期</span></td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">详情</button><button class="btn btn-success" style="padding:4px 10px;font-size:11px;">续费提醒</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STRATEGY REVIEW PAGE -->
+    <div class="page" id="page-strategy-review">
+      <div class="alert alert-info" style="margin-bottom:16px;">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#3730A3" stroke-width="2"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8l6 6v12a2 2 0 0 1-2 2z"/><path d="M14 2v6h6M10 9H8m8 4H8m8 4H8"/></svg>
+        有 3 个营销策略正在等待平台审核（四眼原则：审核人不得是创建人）
+      </div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header"><div class="card-title">待审核策略 (3)</div></div>
+        <table>
+          <thead><tr><th>策略名称</th><th>提交公司</th><th>提交时间</th><th>策略类型</th><th>目标人群</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">新婚家庭保障唤醒</td>
+              <td>太平洋华南</td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-02-19 08:30</td>
+              <td><span class="badge badge-teal">人生节点</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">NEWLY_MARRIED + COVERAGE_GAP_HIGH</td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">预览</button><button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="approveStrategy(this,'新婚家庭保障唤醒')">通过</button><button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="showRejectModal('新婚家庭保障唤醒',this)">驳回</button></div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">高净值客户专属关怀</td>
+              <td>新华保险北京</td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-02-18 15:20</td>
+              <td><span class="badge badge-purple">VIP转化</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">手动标签「高净值」+ INTENT_MEDIUM+</td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">预览</button><button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="approveStrategy(this,'高净值客户专属关怀')">通过</button><button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="showRejectModal('高净值客户专属关怀',this)">驳回</button></div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">打卡里程碑奖励</td>
+              <td>平安人寿上海</td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-02-17 11:00</td>
+              <td><span class="badge badge-teal">积分运营</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">STREAK_7（连续打卡7天）</td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">预览</button><button class="btn btn-success" style="padding:4px 10px;font-size:11px;" onclick="approveStrategy(this,'打卡里程碑奖励')">通过</button><button class="btn btn-danger" style="padding:4px 10px;font-size:11px;" onclick="showRejectModal('打卡里程碑奖励',this)">驳回</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">近期审核记录</div></div>
+        <table>
+          <thead><tr><th>策略名称</th><th>提交公司</th><th>审核时间</th><th>审核结果</th><th>审核人</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">生日暖心关怀</td>
+              <td>太平洋华南</td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-02-15 14:00</td>
+              <td><span class="badge badge-ok">✓ 已通过</span></td>
+              <td style="font-size:12px;">管理员A</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">续保紧急触达（含「保证赔付」字样）</td>
+              <td>华夏保险</td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-02-14 10:30</td>
+              <td><span class="badge badge-danger">✕ 已驳回</span></td>
+              <td style="font-size:12px;">管理员A</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAG LIBRARY PAGE -->
+    <div class="page" id="page-tags">
+      <div style="display:flex;gap:0;border-bottom:2px solid var(--gray-200);margin-bottom:20px;">
+        <div style="padding:10px 20px;font-size:14px;font-weight:700;color:var(--purple);border-bottom:2px solid var(--purple);margin-bottom:-2px;cursor:pointer;">系统标签</div>
+        <div style="padding:10px 20px;font-size:14px;font-weight:500;color:var(--gray-500);cursor:pointer;">预设标签库</div>
+        <div style="padding:10px 20px;font-size:14px;font-weight:500;color:var(--gray-500);cursor:pointer;">自定义审核 <span style="background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;">5</span></div>
+      </div>
+
+      <div class="section-header">
+        <div><div class="section-title">系统自动标签</div><div class="section-sub">由后台算法自动计算，只读，不可修改</div></div>
+      </div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header"><div class="card-title">活跃度标签 (ACTIVITY)</div></div>
+        <table>
+          <thead><tr><th>标签Key</th><th>标签名</th><th>触发条件</th><th>覆盖人数</th><th>营销可用</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag-chip tag-activity">ACTIVE_HIGH</span></td><td style="font-weight:600;">高频活跃</td><td style="font-size:12px;color:var(--gray-500);">近30天登录 ≥ 15次</td><td><strong>8,420</strong></td><td style="color:#10B981;font-weight:700;">可用</td></tr>
+            <tr><td><span class="tag-chip tag-activity">DORMANT</span></td><td style="font-weight:600;">沉睡用户</td><td style="font-size:12px;color:var(--gray-500);">近30天0次登录，历史有登录</td><td><strong>3,420</strong></td><td style="color:#10B981;font-weight:700;">可用</td></tr>
+            <tr><td><span class="tag-chip tag-activity">CHURN_RISK</span></td><td style="font-weight:600;">即将流失</td><td style="font-size:12px;color:var(--gray-500);">连续60天未登录</td><td><strong>1,280</strong></td><td style="color:#10B981;font-weight:700;">可用</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎯 购买意向标签 (INTENT)</div></div>
+        <table>
+          <thead><tr><th>标签Key</th><th>标签名</th><th>触发条件</th><th>覆盖人数</th><th>营销可用</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag-chip tag-intent">INTENT_HIGH</span></td><td style="font-weight:600;">高意向</td><td style="font-size:12px;color:var(--gray-500);">近14天浏览产品页≥3次 或 发起询价</td><td><strong>2,140</strong></td><td style="color:#10B981;font-weight:700;">可用</td></tr>
+            <tr><td><span class="tag-chip tag-intent">COMPARING</span></td><td style="font-weight:600;">比价中</td><td style="font-size:12px;color:var(--gray-500);">同险种≥3款产品7天内浏览</td><td><strong>890</strong></td><td style="color:#10B981;font-weight:700;">可用</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Custom tag review section (just shown inline below for reference) -->
+      <div style="margin-top:20px;">
+        <div class="section-header"><div class="section-title">自定义标签审核 (5 待审核)</div></div>
+        <div class="card">
+          <table>
+            <thead><tr><th>提交人</th><th>所属公司</th><th>标签内容</th><th>提交时间</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600;">张伟 AG-001</td><td>太平洋华南</td><td><span class="tag-chip" style="background:#E0F2FE;color:#0369A1;">高潜力客户</span></td><td style="font-size:12px;color:var(--gray-500);">2026-02-19 09:10</td><td><div class="action-btns"><button class="btn btn-success" style="padding:4px 10px;font-size:11px;">✓ 通过</button><button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">✕ 驳回</button></div></td></tr>
+              <tr><td style="font-weight:600;">王芳 AG-042</td><td>平安人寿上海</td><td><span class="tag-chip" style="background:#FCE7F3;color:#9D174D;">老带新VIP</span></td><td style="font-size:12px;color:var(--gray-500);">2026-02-18 16:30</td><td><div class="action-btns"><button class="btn btn-success" style="padding:4px 10px;font-size:11px;">✓ 通过</button><button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">✕ 驳回</button></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="three-col">
+        <div class="card" style="padding:20px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
+            订阅套餐配置</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="border:1.5px solid var(--gray-200);border-radius:10px;padding:12px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span class="badge tier-basic">基础版</span><span style="font-size:14px;font-weight:700;">¥299/月</span></div>
+              <div style="font-size:12px;color:var(--gray-500);">20席位 · 基础功能</div>
+            </div>
+            <div style="border:1.5px solid var(--purple);border-radius:10px;padding:12px;background:var(--purple-light);">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span class="badge tier-pro">专业版</span><span style="font-size:14px;font-weight:700;">¥899/月</span></div>
+              <div style="font-size:12px;color:var(--gray-500);">50席位 · 全部功能</div>
+            </div>
+            <div style="border:1.5px solid #7C3AED;border-radius:10px;padding:12px;background:linear-gradient(135deg,#FAF5FF,#EDE9FE);">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span class="badge tier-flagship">旗舰版</span><span style="font-size:14px;font-weight:700;">¥2,499/月</span></div>
+              <div style="font-size:12px;color:var(--gray-500);">160席位 · 旗舰功能+定制</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21v-6m7 6V3m7 18V9"/></svg>
+            全局频控设置</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100);">
+              <div><div style="font-size:13px;font-weight:600;">APP推送/日</div><div style="font-size:11px;color:var(--gray-500);">每客户</div></div>
+              <div style="font-size:16px;font-weight:800;color:var(--purple);">2 条</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100);">
+              <div><div style="font-size:13px;font-weight:600;">短信/日</div><div style="font-size:11px;color:var(--gray-500);">每客户</div></div>
+              <div style="font-size:16px;font-weight:800;color:var(--purple);">1 条</div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+              <div><div style="font-size:13px;font-weight:600;">站内信/日</div><div style="font-size:11px;color:var(--gray-500);">每客户</div></div>
+              <div style="font-size:16px;font-weight:800;color:var(--purple);">3 条</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+            合规规则</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--success-light);border-radius:8px;padding:10px;font-size:12px;color:#065F46;display:flex;align-items:center;gap:8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3 9-9"/></svg>
+              65岁以上自动过滤投资型保险</div>
+            <div style="background:var(--success-light);border-radius:8px;padding:10px;font-size:12px;color:#065F46;display:flex;align-items:center;gap:8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3 9-9"/></svg>
+              30天内同客户投保邀约 ≤ 3次</div>
+            <div style="background:var(--success-light);border-radius:8px;padding:10px;font-size:12px;color:#065F46;display:flex;align-items:center;gap:8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3 9-9"/></svg>
+              理赔期间暂停所有营销推送</div>
+            <div style="background:var(--danger-light);border-radius:8px;padding:10px;font-size:12px;color:#991B1B;display:flex;align-items:center;gap:8px;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6m0-6 6 6"/></svg>
+              自动拦截违规词：保证赔付/100%赔付/绝对安全...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========= 用户管理 ========= -->
+    <div class="page" id="page-users">
+      <div class="page-header"><div class="page-title">全平台用户</div><button class="btn btn-primary">导出名单</button></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:16px;display:flex;gap:10px;border-bottom:1px solid var(--gray-100);">
+          <input class="search-input" style="flex:1;" type="text" placeholder="🔍 搜索用户手机号、姓名...">
+          <select style="border:1px solid var(--gray-200);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--gray-700);">
+            <option>全部角色</option><option>客户</option><option>业务员</option><option>企业管理员</option>
+          </select>
+        </div>
+        <table class="data-table"><thead><tr><th>用户姓名</th><th>手机号</th><th>角色</th><th>所属租户</th><th>注册时间</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>陈晓娟</td><td>138****6789</td><td><span class="badge badge-teal">客户</span></td><td>平安保险</td><td>2024-05-12</td><td><span class="badge badge-success">正常</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">查看</a></td></tr>
+          <tr><td>张业明</td><td>139****4321</td><td><span class="badge badge-purple">业务员</span></td><td>平安保险</td><td>2024-03-08</td><td><span class="badge badge-success">正常</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">查看</a></td></tr>
+          <tr><td>刘小明</td><td>137****8888</td><td><span class="badge badge-teal">客户</span></td><td>太平洋寿险</td><td>2026-02-18</td><td><span class="badge badge-success">正常</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">查看</a></td></tr>
+          <tr><td>王芳</td><td>135****2233</td><td><span class="badge badge-teal">客户</span></td><td>平安保险</td><td>2024-08-21</td><td><span class="badge badge-warn">待激活</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">查看</a></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="page-roles">
+      <div class="page-header"><div class="page-title">角色权限矩阵</div><button class="btn btn-primary">+ 新建角色</button></div>
+      <div class="card" style="padding:20px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr style="background:var(--gray-50);">
+            <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--gray-700);border-bottom:2px solid var(--gray-200);">权限项</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--purple);border-bottom:2px solid var(--gray-200);">超级管理员</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--teal);border-bottom:2px solid var(--gray-200);">内容审核员</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--gold);border-bottom:2px solid var(--gray-200);">数据分析员</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--gray-500);border-bottom:2px solid var(--gray-200);">保险公司管理员</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--gray-100);"><td style="padding:10px 14px;font-weight:600;">平台大盘数据</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td></tr>
+            <tr style="border-bottom:1px solid var(--gray-100);background:var(--gray-50);"><td style="padding:10px 14px;font-weight:600;">租户管理</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td><td style="text-align:center;">仅本公司</td></tr>
+            <tr style="border-bottom:1px solid var(--gray-100);"><td style="padding:10px 14px;font-weight:600;">策略审核</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td></tr>
+            <tr style="border-bottom:1px solid var(--gray-100);background:var(--gray-50);"><td style="padding:10px 14px;font-weight:600;">积分规则配置</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td></tr>
+            <tr style="border-bottom:1px solid var(--gray-100);"><td style="padding:10px 14px;font-weight:600;">合规规则配置</td><td style="text-align:center;">✅</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td></tr>
+            <tr style="border-bottom:1px solid var(--gray-100);background:var(--gray-50);"><td style="padding:10px 14px;font-weight:600;">运营账号管理</td><td style="text-align:center;">✅</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td><td style="text-align:center;">❌</td></tr>
+            <tr><td style="padding:10px 14px;font-weight:600;">操作日志查看</td><td style="text-align:center;">✅</td><td style="text-align:center;">仅本人</td><td style="text-align:center;">只读</td><td style="text-align:center;">仅本公司</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========= 内容管理 ========= -->
+    <div class="page" id="page-knowledge">
+      <div class="page-header"><div class="page-title">知识科普文章</div><button class="btn btn-primary">+ 发布文章</button></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div class="card" style="padding:16px;cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;"><span class="badge badge-purple">重疾险</span><span style="font-size:11px;color:var(--gray-500);">2026-02-18</span></div>
+          <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px;">一文搞懂：重疾险保什么？不保什么？</div>
+          <div style="font-size:12px;color:var(--gray-500);">阅读 12,430 · 分享 890 · 积分触达 3,200</div>
+          <div style="margin-top:10px;display:flex;gap:6px;"><span class="badge badge-success">已发布</span></div>
+        </div>
+        <div class="card" style="padding:16px;cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;"><span class="badge badge-teal">医疗险</span><span style="font-size:11px;color:var(--gray-500);">2026-02-15</span></div>
+          <div style="font-size:14px;font-weight:700;color:var(--gray-900);margin-bottom:6px;">百万医疗险续保难？这3点你要知道</div>
+          <div style="font-size:12px;color:var(--gray-500);">阅读 8,920 · 分享 543 · 积分触达 1,800</div>
+          <div style="margin-top:10px;"><span class="badge badge-success">已发布</span></div>
+        </div>
+        <div class="card" style="padding:16px;cursor:pointer;border:2px dashed var(--gray-200);">
+          <div style="margin-bottom:10px;"><span class="badge badge-warn">审核中</span></div>
+          <div style="font-size:14px;font-weight:700;color:var(--gray-700);margin-bottom:6px;">养老险：越早买越合适的3个理由</div>
+          <div style="font-size:12px;color:var(--gray-400);">待审核发布</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-quiz-bank">
+      <div class="page-header"><div class="page-title">答题题库</div><button class="btn btn-primary">+ 新增题目</button></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:14px 16px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);display:flex;gap:10px;align-items:center;">
+          <span style="font-size:13px;color:var(--gray-600);">共 <strong>48</strong> 道题 · 今日随机3题推送</span>
+          <span class="badge badge-teal" style="margin-left:auto;">自动每日轮换</span>
+        </div>
+        <table class="data-table"><thead><tr><th>题目</th><th>分类</th><th>正确选项</th><th>正确率</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td style="max-width:300px;">重疾险的"重疾"一般指什么？</td><td><span class="badge badge-purple">重疾险</span></td><td>合同约定的特定严重疾病</td><td>72.4%</td><td><span class="badge badge-success">启用</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+          <tr><td style="max-width:300px;">百万医疗险的免赔额通常是多少？</td><td><span class="badge badge-teal">医疗险</span></td><td>10,000元/年</td><td>58.1%</td><td><span class="badge badge-success">启用</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+          <tr><td style="max-width:300px;">定期寿险和终身寿险的核心区别是？</td><td><span class="badge badge-gray">寿险</span></td><td>保障期限不同，定期有截止日期</td><td>64.3%</td><td><span class="badge badge-success">启用</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- ========= 积分管理 ========= -->
+    <div class="page" id="page-points-config">
+      <div class="page-header"><div class="page-title">积分规则配置</div><button class="btn btn-primary">保存更改</button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;">获取积分规则</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray-50);border-radius:8px;"><span style="font-size:13px;font-weight:600;">每日打卡</span><div style="display:flex;align-items:center;gap:8px;"><input type="number" value="20" style="width:60px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;"><span style="font-size:12px;color:var(--gray-500);">分/次</span></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray-50);border-radius:8px;"><span style="font-size:13px;font-weight:600;">转介绍成功注册</span><div style="display:flex;align-items:center;gap:8px;"><input type="number" value="800" style="width:60px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;"><span style="font-size:12px;color:var(--gray-500);">分/人</span></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray-50);border-radius:8px;"><span style="font-size:13px;font-weight:600;">完成答题（答对）</span><div style="display:flex;align-items:center;gap:8px;"><input type="number" value="20" style="width:60px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;"><span style="font-size:12px;color:var(--gray-500);">分/题</span></div></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--gray-50);border-radius:8px;"><span style="font-size:13px;font-weight:600;">生日礼包</span><div style="display:flex;align-items:center;gap:8px;"><input type="number" value="188" style="width:60px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;"><span style="font-size:12px;color:var(--gray-500);">分/次</span></div></div>
+          </div>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;">积分等级阈值</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:#F5F3FF;"><span style="font-size:13px;font-weight:600;color:var(--purple);">普通</span><span style="font-size:13px;">0 分起</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:#F1F5F9;"><span style="font-size:13px;font-weight:600;color:#64748B;">银卡</span><span style="font-size:13px;">1,000 分</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:#FEF3C7;"><span style="font-size:13px;font-weight:600;color:#D97706;">金卡</span><span style="font-size:13px;">3,000 分</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:#EFF6FF;"><span style="font-size:13px;font-weight:600;color:#1A56DB;">钻石</span><span style="font-size:13px;">8,000 分</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:#ECFDF5;"><span style="font-size:13px;font-weight:600;color:#059669;">守护家</span><span style="font-size:13px;">20,000 分</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-redemption">
+      <div class="page-header"><div class="page-title">兑换商品管理</div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline">批量下架</button>
+          <button class="btn btn-primary">+ 上架商品</button>
+        </div>
+      </div>
+
+      <!-- Tier 1: Standard products -->
+      <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <span style="width:8px;height:8px;border-radius:2px;background:#10B981;display:inline-block;"></span>
+        基础商品（全用户可兑）· 500 – 1,500 分
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px;">
+        <table class="data-table">
+          <thead><tr><th>商品名称</th><th>积分</th><th>库存</th><th>已兑换</th><th>兑换率</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">☕</span><span style="font-weight:600;">星巴克饮品券</span></td>
+              <td style="font-weight:600;color:var(--gold);">500分</td>
+              <td>200张</td>
+              <td style="color:var(--primary);font-weight:600;">87张</td>
+              <td>43.5%</td>
+              <td><span class="badge badge-success">上架中</span></td>
+              <td style="display:flex;gap:6px;"><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a><a style="color:#EF4444;cursor:pointer;font-size:13px;">下架</a></td>
+            </tr>
+            <tr>
+              <td style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">📱</span><span style="font-weight:600;">话费充值50元</span></td>
+              <td style="font-weight:600;color:var(--gold);">1,500分</td>
+              <td>500张</td>
+              <td style="color:var(--primary);font-weight:600;">11张</td>
+              <td>2.2%</td>
+              <td><span class="badge badge-success">上架中</span></td>
+              <td style="display:flex;gap:6px;"><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a><a style="color:#EF4444;cursor:pointer;font-size:13px;">下架</a></td>
+            </tr>
+            <tr>
+              <td style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🎁</span><span style="font-weight:600;">健康年历礼盒</span></td>
+              <td style="font-weight:600;color:var(--gold);">500分</td>
+              <td>80盒</td>
+              <td style="color:var(--primary);font-weight:600;">28盒</td>
+              <td>35.0%</td>
+              <td><span class="badge badge-success">上架中</span></td>
+              <td style="display:flex;gap:6px;"><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a><a style="color:#EF4444;cursor:pointer;font-size:13px;">下架</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tier 2: Member products -->
+      <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <span style="width:8px;height:8px;border-radius:2px;background:#D97706;display:inline-block;"></span>
+        会员商品（银卡及以上）· 1,000 – 5,000 分
+        <span class="badge" style="background:#FEF3C7;color:#B45309;">会员专属</span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:20px;">
+        <table class="data-table">
+          <thead><tr><th>商品名称</th><th>积分</th><th>门槛</th><th>库存</th><th>已兑换</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🛒</span><span style="font-weight:600;">30元京东购物券</span></td>
+              <td style="font-weight:600;color:var(--gold);">1,000分</td>
+              <td><span class="badge" style="background:#F1F5F9;color:#64748B;">银卡+</span></td>
+              <td>100张</td>
+              <td style="color:var(--primary);font-weight:600;">34张</td>
+              <td><span class="badge badge-success">上架中</span></td>
+              <td style="display:flex;gap:6px;"><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a><a style="color:#EF4444;cursor:pointer;font-size:13px;">下架</a></td>
+            </tr>
+            <tr>
+              <td style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🍽️</span><span style="font-weight:600;">大众点评200元餐饮券</span></td>
+              <td style="font-weight:600;color:var(--gold);">3,000分</td>
+              <td><span class="badge" style="background:#FFFBEB;color:#D97706;">金卡+</span></td>
+              <td>50张</td>
+              <td style="color:var(--primary);font-weight:600;">8张</td>
+              <td><span class="badge badge-success">上架中</span></td>
+              <td style="display:flex;gap:6px;"><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a><a style="color:#EF4444;cursor:pointer;font-size:13px;">下架</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tier 3: Premium products -->
+      <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+        <span style="width:8px;height:8px;border-radius:2px;background:#1A56DB;display:inline-block;"></span>
+        高端商品（钻石/守护家专属）· 5,000 分以上
+        <span class="badge" style="background:#EBF2FF;color:#1A56DB;">钻石+专属</span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr><th>商品名称</th><th>积分</th><th>门槛</th><th>库存</th><th>已兑换</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">🏥</span><span style="font-weight:600;">免费体检套餐</span></td>
+              <td style="font-weight:600;color:var(--gold);">5,000分</td>
+              <td><span class="badge" style="background:#EFF6FF;color:#1A56DB;">钻石+</span></td>
+              <td>30张</td>
+              <td style="color:var(--primary);font-weight:600;">12张</td>
+              <td><span class="badge badge-success">上架中</span></td>
+              <td style="display:flex;gap:6px;"><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a><a style="color:#EF4444;cursor:pointer;font-size:13px;">下架</a></td>
+            </tr>
+            <tr>
+              <td style="display:flex;align-items:center;gap:8px;"><span style="font-size:20px;">✈️</span><span style="font-weight:600;">三亚家庭旅游套餐</span></td>
+              <td style="font-weight:600;color:var(--gold);">20,000分</td>
+              <td><span class="badge" style="background:#ECFDF5;color:#059669;">守护家</span></td>
+              <td>10套</td>
+              <td style="color:var(--primary);font-weight:600;">2套</td>
+              <td><span class="badge badge-success">上架中</span></td>
+              <td style="display:flex;gap:6px;"><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a><a style="color:#EF4444;cursor:pointer;font-size:13px;">下架</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========= §3.2 等级体系配置 ========= -->
+    <div class="page" id="page-level-config">
+      <div class="page-header"><div class="page-title">等级体系配置</div><button class="btn btn-primary">保存更改</button></div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;">
+        <div style="padding:14px 16px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);font-size:14px;font-weight:700;">积分等级阶梯</div>
+        <table class="data-table">
+          <thead><tr><th>等级名称</th><th>图标</th><th>所需积分</th><th>有效期</th><th>核心权益</th><th>会员商品解锁</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span style="font-weight:700;color:#6B7280;">普通</span></td>
+              <td>⭕</td>
+              <td>0 分起</td>
+              <td>无限制</td>
+              <td style="font-size:12px;color:var(--gray-600);">基础积分获取；标准商城兑换</td>
+              <td style="font-size:12px;color:var(--gray-500);">无额外解锁</td>
+              <td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td>
+            </tr>
+            <tr>
+              <td><span style="font-weight:700;color:#64748B;">银卡</span></td>
+              <td>🔷</td>
+              <td>
+                <input type="number" value="1000" style="width:70px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;">
+              </td>
+              <td>累计积分永久有效</td>
+              <td style="font-size:12px;color:var(--gray-600);">积分兑换率+5%；生日双倍积分</td>
+              <td style="font-size:12px;color:var(--gray-500);">解锁银卡专属商品</td>
+              <td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td>
+            </tr>
+            <tr style="background:#FFFBEB;">
+              <td><span style="font-weight:700;color:#D97706;">金卡</span></td>
+              <td>⭐</td>
+              <td>
+                <input type="number" value="3000" style="width:70px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;">
+              </td>
+              <td>累计积分永久有效</td>
+              <td style="font-size:12px;color:var(--gray-600);">积分兑换率+10%；月度专属活动邀请</td>
+              <td style="font-size:12px;color:var(--gray-500);">解锁金卡专属礼品</td>
+              <td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td>
+            </tr>
+            <tr style="background:#EFF6FF;">
+              <td><span style="font-weight:700;color:#1A56DB;">钻石</span></td>
+              <td>💎</td>
+              <td>
+                <input type="number" value="8000" style="width:70px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;">
+              </td>
+              <td>累计积分永久有效</td>
+              <td style="font-size:12px;color:var(--gray-600);">专属顾问服务；年度健康礼包</td>
+              <td style="font-size:12px;color:var(--gray-500);">解锁钻石级高端礼品</td>
+              <td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td>
+            </tr>
+            <tr style="background:#ECFDF5;">
+              <td><span style="font-weight:700;color:#059669;">守护家</span></td>
+              <td>👑</td>
+              <td>
+                <input type="number" value="20000" style="width:70px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;">
+              </td>
+              <td>累计积分永久有效</td>
+              <td style="font-size:12px;color:var(--gray-600);">家庭积分池共享；专属定制服务</td>
+              <td style="font-size:12px;color:var(--gray-500);">全解锁+专属定制</td>
+              <td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Family pool rules -->
+      <div class="card" style="padding:20px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          家庭积分池规则
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+            <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px;">解锁条件</div>
+            <div style="font-size:13px;font-weight:600;color:var(--gray-900);">等级达到 守护家</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">累计积分≥20,000分时自动开启</div>
+          </div>
+          <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+            <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px;">家庭成员上限</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="5" style="width:60px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;">
+              <span style="font-size:12px;color:var(--gray-500);">人（含户主）</span>
+            </div>
+          </div>
+          <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+            <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px;">积分共享比例</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="30" style="width:60px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;">
+              <span style="font-size:12px;color:var(--gray-500);">% 进入家庭池</span>
+            </div>
+          </div>
+          <div style="background:var(--gray-50);border-radius:8px;padding:12px;">
+            <div style="font-size:12px;color:var(--gray-500);margin-bottom:6px;">转赠单次上限</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" value="500" style="width:70px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;">
+              <span style="font-size:12px;color:var(--gray-500);">分/次</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding:10px 12px;background:#FEF3C7;border-radius:8px;font-size:12px;color:#92400E;display:flex;align-items:flex-start;gap:6px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          合规提示：家庭池积分不可用于续保场景的利益输送，每月转赠次数建议≤3次，超额需人工审核。
+        </div>
+      </div>
+    </div>
+
+    <!-- ========= §3.8 积分大盘 ========= -->
+    <div class="page" id="page-points-dashboard">
+      <div class="page-header"><div class="page-title">积分大盘</div><button class="btn btn-outline">导出报告</button></div>
+
+      <!-- 5 KPI Cards -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px;">
+        <div class="card" style="padding:16px;">
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg>
+            总流通积分
+          </div>
+          <div style="font-size:22px;font-weight:700;color:var(--gray-900);">3,284,600</div>
+          <div style="font-size:11px;color:var(--green);margin-top:4px;">↑ +12.4% vs上月</div>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            今日发放
+          </div>
+          <div style="font-size:22px;font-weight:700;color:var(--green);">+28,430</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">昨日 25,820分</div>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+            今日消耗
+          </div>
+          <div style="font-size:22px;font-weight:700;color:#EF4444;">-18,200</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">昨日 16,430分</div>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            净增积分
+          </div>
+          <div style="font-size:22px;font-weight:700;color:var(--primary);">+10,230</div>
+          <div style="font-size:11px;color:var(--green);margin-top:4px;">↑ 健康增长</div>
+        </div>
+        <div class="card" style="padding:16px;">
+          <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            冻结积分
+          </div>
+          <div style="font-size:22px;font-weight:700;color:#F59E0B;">142,000</div>
+          <div style="font-size:11px;color:var(--gray-500);margin-top:4px;">3个异常账户</div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+        <!-- Trend chart -->
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">近30日积分发放/消耗趋势</div>
+          <svg viewBox="0 0 400 160" width="100%" style="overflow:visible;">
+            <defs>
+              <linearGradient id="pgIssue" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10B981" stop-opacity="0.3"/><stop offset="100%" stop-color="#10B981" stop-opacity="0"/></linearGradient>
+              <linearGradient id="pgConsume" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EF4444" stop-opacity="0.2"/><stop offset="100%" stop-color="#EF4444" stop-opacity="0"/></linearGradient>
+            </defs>
+            <line x1="40" y1="10" x2="40" y2="140" stroke="#E5E7EB" stroke-width="1"/>
+            <line x1="40" y1="140" x2="390" y2="140" stroke="#E5E7EB" stroke-width="1"/>
+            <!-- Issue line (green) -->
+            <path d="M40,120 L80,110 L120,95 L160,100 L200,80 L240,70 L280,60 L320,50 L360,45 L390,40" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+            <path d="M40,120 L80,110 L120,95 L160,100 L200,80 L240,70 L280,60 L320,50 L360,45 L390,40 L390,140 L40,140 Z" fill="url(#pgIssue)"/>
+            <!-- Consume line (red) -->
+            <path d="M40,130 L80,125 L120,118 L160,122 L200,108 L240,100 L280,95 L320,88 L360,82 L390,78" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-dasharray="5,3"/>
+            <text x="40" y="155" font-size="10" fill="#9CA3AF">1/20</text>
+            <text x="190" y="155" font-size="10" fill="#9CA3AF">2/4</text>
+            <text x="375" y="155" font-size="10" fill="#9CA3AF">2/19</text>
+            <text x="0" y="125" font-size="9" fill="#9CA3AF">1w</text>
+            <text x="0" y="85" font-size="9" fill="#9CA3AF">2w</text>
+            <text x="0" y="45" font-size="9" fill="#9CA3AF">3w</text>
+          </svg>
+          <div style="display:flex;gap:16px;margin-top:8px;">
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-500);"><div style="width:16px;height:2px;background:#10B981;border-radius:2px;"></div>发放</div>
+            <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--gray-500);"><div style="width:16px;height:2px;background:#EF4444;border-radius:2px;border-top:1px dashed #EF4444;"></div>消耗</div>
+          </div>
+        </div>
+
+        <!-- Level distribution pie -->
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">用户等级分布</div>
+          <div style="display:flex;align-items:center;gap:20px;">
+            <svg viewBox="0 0 120 120" width="120" height="120">
+              <!-- Simple donut chart -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#E5E7EB" stroke-width="16"/>
+              <!-- 普通 45%: 288deg -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#D1D5DB" stroke-width="16" stroke-dasharray="130 289" stroke-linecap="butt" transform="rotate(-90 60 60)"/>
+              <!-- 银卡 30%: 108deg offset 130 -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#64748B" stroke-width="16" stroke-dasharray="86 333" stroke-linecap="butt" transform="rotate(-90 60 60)" stroke-dashoffset="-130"/>
+              <!-- 金卡 16%: offset 216 -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#D97706" stroke-width="16" stroke-dasharray="46 373" stroke-linecap="butt" transform="rotate(-90 60 60)" stroke-dashoffset="-216"/>
+              <!-- 钻石 7%: offset 262 -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#1A56DB" stroke-width="16" stroke-dasharray="20 399" stroke-linecap="butt" transform="rotate(-90 60 60)" stroke-dashoffset="-262"/>
+              <!-- 守护家 2%: offset 282 -->
+              <circle cx="60" cy="60" r="46" fill="none" stroke="#059669" stroke-width="16" stroke-dasharray="6 413" stroke-linecap="butt" transform="rotate(-90 60 60)" stroke-dashoffset="-282"/>
+              <text x="60" y="56" text-anchor="middle" font-size="13" font-weight="700" fill="#111">42,891</text>
+              <text x="60" y="70" text-anchor="middle" font-size="9" fill="#9CA3AF">总用户</text>
+            </svg>
+            <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#6B7280;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#D1D5DB;display:inline-block;"></span>普通</span><span style="font-weight:600;">45%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#64748B;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#64748B;display:inline-block;"></span>银卡</span><span style="font-weight:600;">30%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#D97706;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#D97706;display:inline-block;"></span>金卡</span><span style="font-weight:600;">16%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#1A56DB;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#1A56DB;display:inline-block;"></span>钻石</span><span style="font-weight:600;">7%</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#059669;display:flex;align-items:center;gap:4px;"><span style="width:8px;height:8px;border-radius:2px;background:#059669;display:inline-block;"></span>守护家</span><span style="font-weight:600;">2%</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earn behavior + Top redemptions -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <!-- Earn behavior bar chart -->
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">积分行为分布（本月）</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-700);margin-bottom:4px;"><span>每日打卡</span><span style="font-weight:600;color:var(--primary);">1,234,560分</span></div>
+              <div style="background:var(--gray-100);border-radius:4px;height:8px;"><div style="width:78%;height:100%;background:var(--primary);border-radius:4px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-700);margin-bottom:4px;"><span>转介绍成功</span><span style="font-weight:600;color:var(--teal);">890,400分</span></div>
+              <div style="background:var(--gray-100);border-radius:4px;height:8px;"><div style="width:56%;height:100%;background:var(--teal);border-radius:4px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-700);margin-bottom:4px;"><span>完成测评/答题</span><span style="font-weight:600;color:#7C3AED;">640,200分</span></div>
+              <div style="background:var(--gray-100);border-radius:4px;height:8px;"><div style="width:40%;height:100%;background:#7C3AED;border-radius:4px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-700);margin-bottom:4px;"><span>参与活动</span><span style="font-weight:600;color:var(--orange);">320,000分</span></div>
+              <div style="background:var(--gray-100);border-radius:4px;height:8px;"><div style="width:20%;height:100%;background:var(--orange);border-radius:4px;"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-700);margin-bottom:4px;"><span>生日/节日礼包</span><span style="font-weight:600;color:#D97706;">199,440分</span></div>
+              <div style="background:var(--gray-100);border-radius:4px;height:8px;"><div style="width:13%;height:100%;background:#D97706;border-radius:4px;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top 5 redemptions -->
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:14px;">Top 5 兑换商品</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:24px;height:24px;border-radius:6px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#D97706;">1</div>
+              <div style="flex:1;font-size:13px;font-weight:600;color:var(--gray-900);">星巴克饮品券</div>
+              <div style="font-size:12px;color:var(--gray-500);">87次 / -43,500分</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:24px;height:24px;border-radius:6px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#64748B;">2</div>
+              <div style="flex:1;font-size:13px;font-weight:600;color:var(--gray-900);">30元京东购物券</div>
+              <div style="font-size:12px;color:var(--gray-500);">34次 / -34,000分</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:24px;height:24px;border-radius:6px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#D97706;">3</div>
+              <div style="flex:1;font-size:13px;font-weight:600;color:var(--gray-900);">健康年历礼盒</div>
+              <div style="font-size:12px;color:var(--gray-500);">28次 / -14,000分</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:24px;height:24px;border-radius:6px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gray-500);">4</div>
+              <div style="flex:1;font-size:13px;font-weight:600;color:var(--gray-900);">体检套餐</div>
+              <div style="font-size:12px;color:var(--gray-500);">12次 / -60,000分</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:24px;height:24px;border-radius:6px;background:var(--gray-100);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gray-500);">5</div>
+              <div style="flex:1;font-size:13px;font-weight:600;color:var(--gray-900);">话费充值50元</div>
+              <div style="font-size:12px;color:var(--gray-500);">11次 / -16,500分</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========= §3.9 异常监控 ========= -->
+    <div class="page" id="page-anomaly-monitor">
+      <div class="page-header"><div class="page-title">积分异常监控</div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline">导出记录</button>
+          <button class="btn btn-primary" onclick="alert('已触发全量规则扫描（原型演示）')">立即扫描</button>
+        </div>
+      </div>
+
+      <!-- Rules table -->
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px;">
+        <div style="padding:12px 16px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);font-size:14px;font-weight:700;">检测规则说明</div>
+        <table class="data-table">
+          <thead><tr><th>规则名称</th><th>检测逻辑</th><th>风险等级</th><th>触发次数（本月）</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">多设备异常</td>
+              <td style="font-size:12px;color:var(--gray-600);">同账号24h内使用≥3台设备登录并获取积分</td>
+              <td><span class="badge" style="background:#FEE2E2;color:#DC2626;">高风险</span></td>
+              <td style="font-weight:600;color:#DC2626;">12次</td>
+              <td><span class="badge badge-success">启用</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">最短时间违规</td>
+              <td style="font-size:12px;color:var(--gray-600);">打卡/测评完成时间＜正常阅读时长的40%</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#B45309;">中风险</span></td>
+              <td style="font-weight:600;color:#B45309;">38次</td>
+              <td><span class="badge badge-success">启用</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">地理位置异常</td>
+              <td style="font-size:12px;color:var(--gray-600);">同账号1h内出现跨省登录且获取积分</td>
+              <td><span class="badge" style="background:#FEE2E2;color:#DC2626;">高风险</span></td>
+              <td style="font-weight:600;color:#DC2626;">7次</td>
+              <td><span class="badge badge-success">启用</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">高频操作</td>
+              <td style="font-size:12px;color:var(--gray-600);">单日积分获取≥日上限的300%（判定脚本刷分）</td>
+              <td><span class="badge" style="background:#FEE2E2;color:#DC2626;">高风险</span></td>
+              <td style="font-weight:600;color:#DC2626;">3次</td>
+              <td><span class="badge badge-success">启用</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">IP集中度</td>
+              <td style="font-size:12px;color:var(--gray-600);">同一IP地址1h内≥10个账号获取积分</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#B45309;">中风险</span></td>
+              <td style="font-weight:600;color:#B45309;">2次</td>
+              <td><span class="badge badge-success">启用</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Anomaly records -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:12px 16px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-size:14px;font-weight:700;">异常记录（本月 62 条）</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-outline" style="padding:5px 12px;font-size:12px;" onclick="alert('批量冻结异常账户（原型演示）')">批量冻结</button>
+            <select style="font-size:12px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;color:var(--gray-700);">
+              <option>全部状态</option>
+              <option>待处置</option>
+              <option>已冻结</option>
+              <option>待确认</option>
+            </select>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead><tr><th>时间</th><th>用户</th><th>规则命中</th><th>异常积分</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-size:12px;color:var(--gray-500);">02-19 09:12</td>
+              <td style="font-weight:600;">张XX（ID: U8821）</td>
+              <td><span class="badge" style="background:#FEE2E2;color:#DC2626;">多设备异常</span></td>
+              <td style="font-weight:600;color:#DC2626;">+1,200分</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#B45309;">待处置</span></td>
+              <td style="display:flex;gap:6px;">
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;color:#DC2626;border-color:#DC2626;" onclick="alert('已冻结账户（原型演示）')">冻结</button>
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;" onclick="alert('已标记误报（原型演示）')">误报</button>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;color:var(--gray-500);">02-19 08:45</td>
+              <td style="font-weight:600;">李XX（ID: U7734）</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#B45309;">最短时间违规</span></td>
+              <td style="font-weight:600;color:#DC2626;">+240分</td>
+              <td><span class="badge" style="background:#D1FAE5;color:#065F46;">已冻结</span></td>
+              <td><span style="font-size:12px;color:var(--gray-500);">已处理</span></td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;color:var(--gray-500);">02-18 22:30</td>
+              <td style="font-weight:600;">王XX（ID: U9901）</td>
+              <td><span class="badge" style="background:#FEE2E2;color:#DC2626;">地理位置异常</span></td>
+              <td style="font-weight:600;color:#DC2626;">+400分</td>
+              <td><span class="badge" style="background:#EFF6FF;color:#1A56DB;">待确认</span></td>
+              <td style="display:flex;gap:6px;">
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;color:#DC2626;border-color:#DC2626;" onclick="alert('已冻结账户（原型演示）')">冻结</button>
+                <button class="btn btn-outline" style="padding:3px 8px;font-size:11px;" onclick="alert('已标记误报（原型演示）')">误报</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========= §3.4 活动管理 ========= -->
+    <div class="page" id="page-activities">
+      <div class="page-header"><div class="page-title">活动管理</div><button class="btn btn-primary" onclick="alert('创建新活动（原型演示）')">+ 创建活动</button></div>
+
+      <!-- Status tab filter -->
+      <div style="display:flex;gap:0;background:#fff;border-radius:10px;border:1px solid var(--gray-200);overflow:hidden;margin-bottom:16px;width:fit-content;">
+        <div style="padding:8px 16px;font-size:13px;font-weight:600;color:#fff;background:var(--primary);cursor:pointer;">全部 (12)</div>
+        <div style="padding:8px 16px;font-size:13px;color:var(--gray-600);cursor:pointer;border-left:1px solid var(--gray-200);">进行中 (3)</div>
+        <div style="padding:8px 16px;font-size:13px;color:var(--gray-600);cursor:pointer;border-left:1px solid var(--gray-200);">预告中 (2)</div>
+        <div style="padding:8px 16px;font-size:13px;color:var(--gray-600);cursor:pointer;border-left:1px solid var(--gray-200);">已结束 (7)</div>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead>
+            <tr><th>活动名称</th><th>类型</th><th>时间</th><th>参与人数</th><th>积分奖励</th><th>状态</th><th>操作</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">春节保障大礼包</td>
+              <td><span class="badge" style="background:#EBF2FF;color:#1A56DB;">线上测评</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-01-28 ~ 02-28</td>
+              <td style="font-weight:600;">127人</td>
+              <td style="font-size:12px;">参与+50分，邀请+20分/人</td>
+              <td><span class="badge badge-success">进行中</span></td>
+              <td style="display:flex;gap:6px;">
+                <a style="color:var(--purple);cursor:pointer;font-size:13px;">详情</a>
+                <a style="color:var(--gray-500);cursor:pointer;font-size:13px;">编辑</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">健康管理讲座</td>
+              <td><span class="badge" style="background:#ECFDF5;color:#059669;">线下沙龙</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-02-22 14:00</td>
+              <td style="font-weight:600;">42人（限50）</td>
+              <td style="font-size:12px;">参与+100分，邀请+30分/人</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#B45309;">报名中</span></td>
+              <td style="display:flex;gap:6px;">
+                <a style="color:var(--purple);cursor:pointer;font-size:13px;">详情</a>
+                <a style="color:var(--gray-500);cursor:pointer;font-size:13px;">编辑</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">年金险财富规划直播</td>
+              <td><span class="badge" style="background:#F5F3FF;color:#7C3AED;">直播</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-02-25 20:00</td>
+              <td style="font-weight:600;">43人已预约</td>
+              <td style="font-size:12px;">观看+30分，邀请+15分/人</td>
+              <td><span class="badge" style="background:#EBF2FF;color:#1A56DB;">预告中</span></td>
+              <td style="display:flex;gap:6px;">
+                <a style="color:var(--purple);cursor:pointer;font-size:13px;">详情</a>
+                <a style="color:var(--gray-500);cursor:pointer;font-size:13px;">编辑</a>
+              </td>
+            </tr>
+            <tr style="opacity:0.6;">
+              <td style="font-weight:600;">元旦健康测评活动</td>
+              <td><span class="badge" style="background:#EBF2FF;color:#1A56DB;">线上测评</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">2026-01-01 ~ 01-07</td>
+              <td style="font-weight:600;">268人</td>
+              <td style="font-size:12px;">参与+50分</td>
+              <td><span class="badge badge-gray">已结束</span></td>
+              <td><a style="color:var(--purple);cursor:pointer;font-size:13px;">查看报告</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ========= 推送管理 ========= -->
+    <div class="page" id="page-push-templates">
+      <div class="page-header"><div class="page-title">推送模板</div><button class="btn btn-primary">+ 新建模板</button></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table"><thead><tr><th>模板名称</th><th>触发时机</th><th>文案预览</th><th>发送频次</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>续保到期提醒</td><td>到期前30/15/7天</td><td style="max-width:240px;font-size:12px;color:var(--gray-600);">你的{保单名}将在{N}天后到期，让守护保持不断档 →</td><td>最多3次/单</td><td><span class="badge badge-success">启用</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+          <tr><td>测评结果推荐</td><td>报告生成后24h</td><td style="max-width:240px;font-size:12px;color:var(--gray-600);">为你挑选了3款适合你的保障方案，顾问{姓名}等你 →</td><td>1次</td><td><span class="badge badge-success">启用</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+          <tr><td>生日关怀</td><td>生日当天</td><td style="max-width:240px;font-size:12px;color:var(--gray-600);">生日快乐！守护+送你188积分，愿每一天都有底气 🎂</td><td>1次/年</td><td><span class="badge badge-success">启用</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+          <tr><td>积分到期提醒</td><td>积分30天内到期</td><td style="max-width:240px;font-size:12px;color:var(--gray-600);">你有{N}积分将在{日期}到期，去兑换个好东西吧 →</td><td>1次</td><td><span class="badge badge-success">启用</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="page-push-history">
+      <div class="page-header"><div class="page-title">推送历史记录</div><button class="btn btn-outline">导出记录</button></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:14px 16px;background:var(--gray-50);border-bottom:1px solid var(--gray-100);display:flex;gap:16px;">
+          <span style="font-size:13px;color:var(--gray-600);">今日已发 <strong>8,432</strong> 条 · 打开率 <strong style="color:var(--teal);">61.2%</strong> · 点击率 <strong style="color:var(--purple);">18.4%</strong></span>
+        </div>
+        <table class="data-table"><thead><tr><th>发送时间</th><th>模板名称</th><th>发送量</th><th>打开率</th><th>点击率</th><th>拦截量</th></tr></thead>
+        <tbody>
+          <tr><td>2026-02-19 10:00</td><td>续保到期提醒</td><td>342</td><td>68.4%</td><td>22.1%</td><td>12</td></tr>
+          <tr><td>2026-02-19 09:30</td><td>生日关怀</td><td>28</td><td>91.2%</td><td>45.3%</td><td>0</td></tr>
+          <tr><td>2026-02-18 18:00</td><td>测评结果推荐</td><td>1,204</td><td>54.8%</td><td>16.9%</td><td>43</td></tr>
+          <tr><td>2026-02-18 10:00</td><td>积分到期提醒</td><td>680</td><td>72.3%</td><td>29.6%</td><td>0</td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <!-- ========= 合规管理 ========= -->
+    <div class="page" id="page-compliance">
+      <div class="page-header"><div class="page-title">合规规则配置</div><button class="btn btn-primary">保存规则</button></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>营销频控规则</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="padding:10px;background:var(--gray-50);border-radius:8px;"><div style="font-size:13px;font-weight:600;margin-bottom:4px;">同客户投保邀约</div><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:12px;color:var(--gray-500);">30天内 ≤</span><input type="number" value="3" style="width:50px;border:1px solid var(--gray-200);border-radius:6px;padding:4px 8px;font-size:13px;text-align:center;"><span style="font-size:12px;color:var(--gray-500);">次</span></div></div>
+            <div style="padding:10px;background:var(--gray-50);border-radius:8px;"><div style="font-size:13px;font-weight:600;margin-bottom:4px;">65岁以上客户</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#065F46;background:#ECFDF5;padding:6px 8px;border-radius:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>自动过滤投资型保险推荐</div></div>
+            <div style="padding:10px;background:var(--gray-50);border-radius:8px;"><div style="font-size:13px;font-weight:600;margin-bottom:4px;">理赔期间</div><div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#065F46;background:#ECFDF5;padding:6px 8px;border-radius:6px;"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>暂停所有营销推送</div></div>
+          </div>
+        </div>
+        <div class="card" style="padding:20px;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6m0-6 6 6"/></svg>违规词库 <span class="badge badge-danger" style="margin-left:4px;">待更新</span></div>
+          <div style="background:#FEF2F2;border-radius:10px;padding:12px;margin-bottom:12px;">
+            <div style="font-size:12px;color:#991B1B;font-weight:600;margin-bottom:6px;">已拦截违规词（共47条）</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span style="background:#FCA5A5;color:#7F1D1D;font-size:11px;padding:2px 8px;border-radius:4px;">保证赔付</span>
+              <span style="background:#FCA5A5;color:#7F1D1D;font-size:11px;padding:2px 8px;border-radius:4px;">100%赔付</span>
+              <span style="background:#FCA5A5;color:#7F1D1D;font-size:11px;padding:2px 8px;border-radius:4px;">绝对安全</span>
+              <span style="background:#FCA5A5;color:#7F1D1D;font-size:11px;padding:2px 8px;border-radius:4px;">零风险</span>
+              <span style="background:#FCA5A5;color:#7F1D1D;font-size:11px;padding:2px 8px;border-radius:4px;">无条件赔</span>
+            </div>
+          </div>
+          <button class="btn btn-outline" style="width:100%;">管理违规词库</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-data-gov">
+      <div class="page-header"><div class="page-title">数据治理 / PIPL</div><button class="btn btn-primary">下载合规报告</button></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;">
+        <div class="card" style="padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--teal);">48,293</div><div style="font-size:12px;color:var(--gray-500);margin-top:4px;">已授权用户数</div></div>
+        <div class="card" style="padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--purple);">23</div><div style="font-size:12px;color:var(--gray-500);margin-top:4px;">本月删除请求</div></div>
+        <div class="card" style="padding:16px;text-align:center;"><div style="font-size:28px;font-weight:800;color:var(--success);">100%</div><div style="font-size:12px;color:var(--gray-500);margin-top:4px;">24h内响应率</div></div>
+      </div>
+      <div class="card" style="padding:20px;">
+        <div style="font-size:14px;font-weight:700;margin-bottom:14px;">PIPL 授权管理规则</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--gray-700);">
+          <div style="padding:10px;background:var(--gray-50);border-radius:8px;">✅ 健康数据仅用于生成守护报告，不作第三方共享</div>
+          <div style="padding:10px;background:var(--gray-50);border-radius:8px;">✅ 用户有权随时申请删除健康信息（24h内响应）</div>
+          <div style="padding:10px;background:var(--gray-50);border-radius:8px;">✅ 数据加密存储，传输使用 TLS 1.3</div>
+          <div style="padding:10px;background:#FEF3C7;border-radius:8px;">⚠️ 数据保留期限：用户注销后需在90天内销毁</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========= 系统管理 ========= -->
+    <div class="page" id="page-ops-accounts">
+      <div class="page-header"><div class="page-title">运营账号管理</div><button class="btn btn-primary">+ 新建账号</button></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table"><thead><tr><th>姓名</th><th>账号</th><th>角色</th><th>最后登录</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>
+          <tr><td>超级管理员</td><td>admin@shh.com</td><td><span class="badge badge-purple">超级管理员</span></td><td>刚刚</td><td><span class="badge badge-success">正常</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+          <tr><td>李审核</td><td>li.review@shh.com</td><td><span class="badge badge-teal">内容审核员</span></td><td>1小时前</td><td><span class="badge badge-success">正常</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+          <tr><td>王数据</td><td>wang.data@shh.com</td><td><span class="badge badge-gold">数据分析员</span></td><td>昨天</td><td><span class="badge badge-success">正常</span></td><td><a style="color:var(--purple);cursor:pointer;font-size:13px;">编辑</a></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+    <div class="page" id="page-audit-log">
+      <div class="page-header"><div class="page-title">操作日志</div><button class="btn btn-outline">导出日志</button></div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table"><thead><tr><th>操作时间</th><th>操作人</th><th>角色</th><th>操作内容</th><th>IP地址</th><th>结果</th></tr></thead>
+        <tbody>
+          <tr><td>2026-02-19 10:42</td><td>超级管理员</td><td><span class="badge badge-purple">超管</span></td><td>修改积分规则：转介绍 200→800分</td><td>192.168.1.x</td><td><span class="badge badge-success">成功</span></td></tr>
+          <tr><td>2026-02-19 10:15</td><td>李审核</td><td><span class="badge badge-teal">审核员</span></td><td>驳回策略：「平安健康险推荐」- 违规词</td><td>192.168.1.x</td><td><span class="badge badge-success">成功</span></td></tr>
+          <tr><td>2026-02-19 09:30</td><td>超级管理员</td><td><span class="badge badge-purple">超管</span></td><td>新建运营账号：wang.data@shh.com</td><td>192.168.1.x</td><td><span class="badge badge-success">成功</span></td></tr>
+          <tr><td>2026-02-18 17:20</td><td>王数据</td><td><span class="badge badge-gold">分析员</span></td><td>导出平台数据报告（2月）</td><td>192.168.1.x</td><td><span class="badge badge-success">成功</span></td></tr>
+        </tbody></table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Rejection Reason Modal -->
+<div id="reject-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:16px;padding:28px;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="font-size:17px;font-weight:700;color:#0F172A;margin-bottom:4px;">驳回策略</div>
+    <div id="reject-strategy-name" style="font-size:13px;color:#64748B;margin-bottom:20px;"></div>
+    <div style="font-size:13px;font-weight:600;color:#374151;margin-bottom:8px;">驳回原因 <span style="color:#EF4444;">*</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+      <button class="reject-reason-chip" onclick="selectReason(this,'违规词汇：含夸大性宣传内容')">违规词汇</button>
+      <button class="reject-reason-chip" onclick="selectReason(this,'目标人群设置不合规')">人群不合规</button>
+      <button class="reject-reason-chip" onclick="selectReason(this,'频控超限：触达频次过高')">频控超限</button>
+      <button class="reject-reason-chip" onclick="selectReason(this,'内容描述不清晰，需修改后重新提交')">内容不清晰</button>
+    </div>
+    <textarea id="reject-reason-input" placeholder="请详细说明驳回原因（必填，提交公司将收到此反馈）..." style="width:100%;height:100px;border:1.5px solid #E2E8F0;border-radius:10px;padding:10px 12px;font-size:13px;font-family:'Noto Sans SC',sans-serif;outline:none;resize:vertical;color:#334155;box-sizing:border-box;"></textarea>
+    <div style="font-size:11px;color:#94A3B8;margin-top:6px;margin-bottom:20px;">驳回记录将保存在审核日志中，提交公司管理员可查看原因</div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeRejectModal()" style="padding:9px 20px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#374151;font-family:inherit;">取消</button>
+      <button onclick="confirmReject()" style="padding:9px 20px;background:#EF4444;border:none;border-radius:8px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;">确认驳回</button>
+    </div>
+  </div>
+</div>
+<style>
+.reject-reason-chip { padding:5px 12px;border:1.5px solid #E2E8F0;border-radius:20px;font-size:12px;cursor:pointer;background:#fff;color:#374151;font-family:'Noto Sans SC',sans-serif;transition:all 0.15s; }
+.reject-reason-chip:hover { border-color:#6366F1;color:#6366F1; }
+.reject-reason-chip.selected { background:#EEF2FF;border-color:#6366F1;color:#4338CA;font-weight:600; }
+</style>
+
+<script>
+function showPage(name, clickedEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + name);
+  if (page) page.classList.add('active');
+  if (clickedEl && clickedEl.classList) clickedEl.classList.add('active');
+  const titles = {
+    dashboard: '跨公司大盘',
+    tenants: '租户管理',
+    agents: '独立业务员',
+    'strategy-review': '营销策略审核',
+    tags: '标签库管理',
+    settings: '平台设置',
+    users: '全平台用户',
+    roles: '角色权限矩阵',
+    knowledge: '知识科普文章',
+    'quiz-bank': '答题题库',
+    'points-config': '积分规则配置',
+    redemption: '兑换商品管理',
+    'push-templates': '推送模板',
+    'push-history': '推送历史记录',
+    compliance: '合规规则配置',
+    'data-gov': '数据治理 / PIPL',
+    'ops-accounts': '运营账号管理',
+    'audit-log': '操作日志',
+    'level-config': '等级体系配置',
+    'points-dashboard': '积分大盘',
+    'anomaly-monitor': '积分异常监控',
+    activities: '活动管理'
+  };
+  document.getElementById('page-title').textContent = titles[name] || name;
+}
+let currentRejectRow = null;
+let currentRejectName = '';
+function showRejectModal(name, btn) {
+  currentRejectRow = btn.closest('tr');
+  currentRejectName = name;
+  document.getElementById('reject-strategy-name').textContent = '策略：' + name;
+  document.getElementById('reject-reason-input').value = '';
+  document.querySelectorAll('.reject-reason-chip').forEach(c => c.classList.remove('selected'));
+  const modal = document.getElementById('reject-modal');
+  modal.style.display = 'flex';
+}
+function closeRejectModal() {
+  document.getElementById('reject-modal').style.display = 'none';
+  currentRejectRow = null;
+}
+function selectReason(chip, text) {
+  document.querySelectorAll('.reject-reason-chip').forEach(c => c.classList.remove('selected'));
+  chip.classList.add('selected');
+  document.getElementById('reject-reason-input').value = text;
+}
+function confirmReject() {
+  const reason = document.getElementById('reject-reason-input').value.trim();
+  if (!reason) { document.getElementById('reject-reason-input').style.borderColor='#EF4444'; return; }
+  if (currentRejectRow) {
+    const cells = currentRejectRow.cells;
+    cells[cells.length-1].innerHTML = '<span style="color:#EF4444;font-size:12px;font-weight:600;">已驳回</span>';
+    currentRejectRow.style.background = '#FFF5F5';
+    currentRejectRow.style.opacity = '0.7';
+  }
+  closeRejectModal();
+}
+function approveStrategy(btn, name) {
+  const row = btn.closest('tr');
+  row.cells[row.cells.length-1].innerHTML = '<span style="color:#10B981;font-size:12px;font-weight:600;">已通过</span>';
+  row.style.background = '#F0FDF4';
+  row.style.opacity = '0.7';
+}
+</script>
+</body>
+</html>

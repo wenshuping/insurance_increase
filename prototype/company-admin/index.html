@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>保险公司管理员端 — 守护+</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sidebar-bg: #0F2544;
+    --sidebar-hover: rgba(255,255,255,0.06);
+    --sidebar-active: rgba(37,99,235,0.3);
+    --primary: #2563EB;
+    --primary-light: #EFF6FF;
+    --success: #10B981;
+    --success-light: #D1FAE5;
+    --warning: #F59E0B;
+    --warning-light: #FEF3C7;
+    --danger: #EF4444;
+    --danger-light: #FEE2E2;
+    --gray-50: #F8FAFC;
+    --gray-100: #F1F5F9;
+    --gray-200: #E2E8F0;
+    --gray-300: #CBD5E1;
+    --gray-500: #64748B;
+    --gray-700: #334155;
+    --gray-900: #0F172A;
+    --body-bg: #F4F6FA;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans SC', sans-serif; background: var(--body-bg); min-height: 100vh; display: flex; color: var(--gray-900); }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    background: var(--sidebar-bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .logo-brand { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+  .logo-brand span { color: #F5A623; }
+  .logo-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; }
+  .nav-section-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 1px; padding: 8px 10px 4px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: rgba(255,255,255,0.6);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--sidebar-hover); color: #fff; }
+  .nav-item.active { background: var(--sidebar-active); color: #fff; font-weight: 600; }
+  .nav-item .nav-icon { width: 22px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--danger); color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+  .sidebar-user {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .user-role { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+
+  /* Main */
+  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    height: 60px;
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topbar-title { font-size: 17px; font-weight: 700; color: var(--gray-900); }
+  .topbar-right { display: flex; align-items: center; gap: 14px; }
+  .topbar-icon { width: 36px; height: 36px; border-radius: 50%; background: var(--gray-100); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; }
+  .topbar-badge { position: absolute; top: -2px; right: -2px; background: var(--danger); width: 16px; height: 16px; border-radius: 50%; font-size: 9px; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* Page sections */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* KPI Cards */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .kpi-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border-left: 4px solid;
+    transition: box-shadow 0.2s;
+  }
+  .kpi-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+  .kpi-label { font-size: 12px; color: var(--gray-500); font-weight: 500; margin-bottom: 8px; }
+  .kpi-value { font-size: 28px; font-weight: 800; color: var(--gray-900); line-height: 1; margin-bottom: 6px; }
+  .kpi-sub { font-size: 12px; color: var(--gray-500); display: flex; align-items: center; gap: 4px; }
+  .kpi-up { color: var(--success); font-weight: 600; }
+  .kpi-down { color: var(--danger); font-weight: 600; }
+
+  /* Section headers */
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .section-title { font-size: 16px; font-weight: 700; color: var(--gray-900); }
+  .section-action { font-size: 13px; color: var(--primary); cursor: pointer; font-weight: 500; }
+
+  /* Tables */
+  .card { background: #fff; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); overflow: hidden; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-size: 15px; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 11px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--gray-500); background: var(--gray-50); border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: var(--gray-700); border-bottom: 1px solid var(--gray-100); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--gray-50); }
+
+  /* Badges */
+  .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge-success { background: var(--success-light); color: #065F46; }
+  .badge-warning { background: var(--warning-light); color: #92400E; }
+  .badge-danger { background: var(--danger-light); color: #991B1B; }
+  .badge-primary { background: var(--primary-light); color: #1E40AF; }
+  .badge-gray { background: var(--gray-100); color: var(--gray-700); }
+  .badge-trial { background: #EDE9FE; color: #5B21B6; }
+
+  /* Progress bar */
+  .progress { background: var(--gray-100); border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; background: var(--primary); }
+
+  /* Avatar initials */
+  .avatar-sm { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+
+  /* Grid layouts */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* Action buttons */
+  .btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: #1D4ED8; }
+  .btn-ghost { background: var(--gray-100); color: var(--gray-700); }
+  .btn-ghost:hover { background: var(--gray-200); }
+  .btn-danger { background: var(--danger-light); color: var(--danger); }
+  .action-btns { display: flex; gap: 6px; }
+
+  /* SVG Charts */
+  .chart-container { padding: 20px; }
+
+  /* Alert Cards */
+  .alert-card { border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+  .alert-warning { background: var(--warning-light); border: 1px solid #FDE68A; }
+  .alert-info { background: var(--primary-light); border: 1px solid #BFDBFE; }
+  .alert-text { font-size: 13px; color: var(--gray-700); flex: 1; }
+  .alert-btn { font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 8px; cursor: pointer; border: none; font-family: inherit; }
+
+  /* Org Tree */
+  .tree-node { padding: 8px 0; }
+  .tree-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
+  .tree-item:hover { background: var(--gray-50); }
+  .tree-toggle { width: 20px; height: 20px; border-radius: 4px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; cursor: pointer; }
+  .tree-label { flex: 1; }
+  .tree-name { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+  .tree-sub { font-size: 12px; color: var(--gray-500); margin-top: 1px; }
+  .tree-meta { display: flex; gap: 8px; align-items: center; }
+  .tree-children { margin-left: 30px; border-left: 2px solid var(--gray-200); padding-left: 12px; }
+
+  /* Rank table */
+  .rank-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; }
+  .rank-1 { background: #FEF3C7; color: #D97706; }
+  .rank-2 { background: #F1F5F9; color: #64748B; }
+  .rank-3 { background: #FEF3C7; color: #92400E; }
+  .rank-other { background: var(--gray-100); color: var(--gray-500); }
+
+  /* Search/filter bar */
+  .filter-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+  .search-input { flex: 1; max-width: 280px; padding: 9px 14px; border: 1.5px solid var(--gray-200); border-radius: 10px; font-size: 13px; font-family: inherit; outline: none; color: var(--gray-900); }
+  .search-input:focus { border-color: var(--primary); }
+  .select-input { padding: 9px 14px; border: 1.5px solid var(--gray-200); border-radius: 10px; font-size: 13px; font-family: inherit; outline: none; color: var(--gray-700); background: #fff; cursor: pointer; }
+
+  /* Tabs */
+  .page-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--gray-200); margin-bottom: 20px; }
+  .page-tab { padding: 10px 20px; font-size: 14px; font-weight: 500; color: var(--gray-500); border-bottom: 2px solid transparent; margin-bottom: -2px; cursor: pointer; transition: all 0.15s; }
+  .page-tab.active { color: var(--primary); border-color: var(--primary); font-weight: 700; }
+
+  /* Inline alert */
+  .inline-alert { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #92400E; display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-brand">守护<span>+</span> 管理</div>
+    <div class="logo-sub">太平洋保险 · 华南区</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">核心数据</div>
+    <div class="nav-item active" onclick="showPage('overview', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21v-6m7 6V3m7 18V9"/></svg></span> 总览大盘
+    </div>
+    <div class="nav-item" onclick="showPage('org', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 12h4m-4-4h4m0 13v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg></span> 组织架构
+    </div>
+    <div class="nav-section-label" style="margin-top:8px;">人员管理</div>
+    <div class="nav-item" onclick="showPage('employees', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></span> 员工管理
+    </div>
+    <div class="nav-item" onclick="showPage('analytics', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></span> 团队分析
+    </div>
+    <div class="nav-section-label" style="margin-top:8px;">营销运营</div>
+    <div class="nav-item" onclick="showPage('strategies', this)">
+      <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span> 营销策略
+      <span class="nav-badge">2</span>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">陈</div>
+    <div>
+      <div class="user-name">陈志远</div>
+      <div class="user-role">公司管理员</div>
+    </div>
+  </div>
+</aside>
+
+<!-- Main Content -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">总览大盘</div>
+    <div class="topbar-right">
+      <!-- Global Search -->
+      <div style="display:flex;align-items:center;gap:6px;background:#F1F5F9;border-radius:8px;padding:6px 12px;cursor:text;" onclick="this.querySelector('input').focus()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#64748B" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="搜索员工、团队..." style="border:none;background:transparent;font-size:13px;outline:none;color:var(--gray-700);width:140px;font-family:inherit;" />
+      </div>
+      <div style="font-size:13px;color:var(--gray-500);">2026-02-19 周四</div>
+      <div class="topbar-icon">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#64748B" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+        <div class="topbar-badge">3</div>
+      </div>
+      <div class="user-avatar" style="width:36px;height:36px;font-size:14px;">陈</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW PAGE -->
+    <div class="page active" id="page-overview">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="inline-alert" style="margin-bottom:0;flex:1;margin-right:16px;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#92400E" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>
+          有 3名业务员本月暂无成交，5张保单将于30天内到期，建议及时跟进
+        </div>
+        <!-- Date Range Picker -->
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="setDateRange('today',this)">今日</button>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="setDateRange('week',this)">本周</button>
+          <button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="setDateRange('month',this)">本月</button>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="setDateRange('quarter',this)">本季</button>
+        </div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-color:var(--primary);">
+          <div class="kpi-label">在职业务员</div>
+          <div class="kpi-value">128</div>
+          <div class="kpi-sub"><span class="kpi-up">↑ +5</span> 较上月</div>
+        </div>
+        <div class="kpi-card" style="border-color:var(--success);">
+          <div class="kpi-label">本月新增客户</div>
+          <div class="kpi-value">342</div>
+          <div class="kpi-sub"><span class="kpi-up">↑ +28%</span> 环比增长</div>
+        </div>
+        <div class="kpi-card" style="border-color:var(--warning);">
+          <div class="kpi-label">本月保费（元）</div>
+          <div class="kpi-value">¥128.5万</div>
+          <div class="kpi-sub"><span class="kpi-up">↑ 84%</span> 目标完成率</div>
+        </div>
+        <div class="kpi-card" style="border-color:#8B5CF6;">
+          <div class="kpi-label">本月佣金（元）</div>
+          <div class="kpi-value">¥19.3万</div>
+          <div class="kpi-sub"><span class="kpi-up">↑ +8%</span> 较上月</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Trend Chart -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">近30天保费趋势</div>
+            <div style="font-size:12px;color:var(--gray-500);">2026年2月</div>
+          </div>
+          <div class="chart-container" style="padding:20px 20px 10px;">
+            <svg viewBox="0 0 400 140" width="100%">
+              <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#2563EB" stop-opacity="0.2"/>
+                  <stop offset="100%" stop-color="#2563EB" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Grid lines -->
+              <line x1="0" y1="30" x2="400" y2="30" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="0" y1="60" x2="400" y2="60" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="0" y1="90" x2="400" y2="90" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="0" y1="120" x2="400" y2="120" stroke="#F1F5F9" stroke-width="1"/>
+              <!-- Area -->
+              <path d="M10,110 C30,100 50,95 70,85 S110,70 130,75 S170,55 190,50 S230,40 250,35 S290,25 310,20 S350,15 380,10 L380,120 L10,120 Z" fill="url(#areaGrad)"/>
+              <!-- Line -->
+              <path d="M10,110 C30,100 50,95 70,85 S110,70 130,75 S170,55 190,50 S230,40 250,35 S290,25 310,20 S350,15 380,10" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- Current point -->
+              <circle cx="380" cy="10" r="5" fill="#2563EB"/>
+              <!-- Y labels -->
+              <text x="2" y="33" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">150万</text>
+              <text x="2" y="63" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">100万</text>
+              <text x="2" y="93" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">50万</text>
+              <!-- X labels -->
+              <text x="10" y="135" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">2/1</text>
+              <text x="180" y="135" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">2/10</text>
+              <text x="365" y="135" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">2/19</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Team Performance Table -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">团队绩效概览</div>
+            <span class="section-action" onclick="showPage('analytics', document.querySelector('.nav-item:nth-child(5))'))">查看详情</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>团队</th>
+                <th>业务员</th>
+                <th>本月保费</th>
+                <th>目标完成</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div style="font-weight:600;">张伟团队</div><div style="font-size:11px;color:var(--gray-500);">北京营业部</div></td>
+                <td>12人</td>
+                <td style="font-weight:700;">¥42.3万</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress" style="flex:1;"><div class="progress-fill" style="width:96%;background:var(--success);"></div></div>
+                    <span style="font-size:12px;font-weight:700;color:var(--success);">96%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:600;">李梅团队</div><div style="font-size:11px;color:var(--gray-500);">上海营业部</div></td>
+                <td>8人</td>
+                <td style="font-weight:700;">¥31.8万</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress" style="flex:1;"><div class="progress-fill" style="width:84%;"></div></div>
+                    <span style="font-size:12px;font-weight:700;color:var(--primary);">84%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:600;">王强团队</div><div style="font-size:11px;color:var(--gray-500);">广州营业部</div></td>
+                <td>10人</td>
+                <td style="font-weight:700;">¥28.6万</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress" style="flex:1;"><div class="progress-fill" style="width:72%;background:var(--warning);"></div></div>
+                    <span style="font-size:12px;font-weight:700;color:var(--warning);">72%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td><div style="font-weight:600;">赵丽团队</div><div style="font-size:11px;color:var(--gray-500);">深圳营业部</div></td>
+                <td>6人</td>
+                <td style="font-weight:700;">¥25.8万</td>
+                <td>
+                  <div style="display:flex;align-items:center;gap:6px;">
+                    <div class="progress" style="flex:1;"><div class="progress-fill" style="width:58%;background:var(--danger);"></div></div>
+                    <span style="font-size:12px;font-weight:700;color:var(--danger);">58%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORG PAGE -->
+    <div class="page" id="page-org">
+      <div class="section-header">
+        <div class="section-title">组织架构</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" id="batch-btn" style="display:none;" onclick="showBatchOps()">批量操作 <span id="batch-count" style="background:var(--primary);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;margin-left:4px;">0</span></button>
+          <button class="btn btn-primary">+ 新建团队</button>
+        </div>
+      </div>
+      <!-- Batch operations toolbar (hidden by default) -->
+      <div id="batch-toolbar" style="display:none;background:var(--primary-light);border:1.5px solid #BFDBFE;border-radius:10px;padding:10px 16px;margin-bottom:16px;display:none;align-items:center;gap:12px;">
+        <span style="font-size:13px;font-weight:600;color:var(--primary);">已选 <span id="batch-num">0</span> 项</span>
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;">调整归属团队</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;">批量发消息</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;">批量导出</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;color:var(--danger);" onclick="clearBatch()">取消选择</button>
+      </div>
+      <div class="card" style="padding:20px;">
+        <!-- Root -->
+        <div class="tree-node">
+          <div class="tree-item" style="background:var(--primary-light);border-radius:10px;margin-bottom:8px;">
+            <div class="tree-toggle" style="background:var(--primary);color:#fff;">▾</div>
+            <div class="avatar-sm" style="background:var(--primary);font-size:14px;">司</div>
+            <div class="tree-label">
+              <div class="tree-name">太平洋保险 · 华南区</div>
+              <div class="tree-sub">4个团队 · 36名业务员 · 128人力</div>
+            </div>
+            <div class="tree-meta">
+              <span class="badge badge-primary">总公司</span>
+              <span style="font-size:13px;font-weight:700;">本月 ¥128.5万</span>
+            </div>
+          </div>
+          <div class="tree-children">
+            <!-- Team 1 -->
+            <div class="tree-node">
+              <div class="tree-item">
+                <div class="tree-toggle">▾</div>
+                <div class="avatar-sm" style="background:#1D4ED8;">张</div>
+                <div class="tree-label">
+                  <div class="tree-name">张伟团队</div>
+                  <div class="tree-sub">团队长：张伟 · 北京营业部</div>
+                </div>
+                <div class="tree-meta">
+                  <span class="badge badge-success">活跃</span>
+                  <span style="font-size:13px;color:var(--gray-700);">12人 · ¥42.3万</span>
+                </div>
+              </div>
+              <div class="tree-children" style="display:flex;flex-wrap:wrap;gap:8px;padding:8px 0;">
+                <div style="background:var(--gray-50);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
+                  <div class="avatar-sm" style="background:#6366F1;width:28px;height:28px;font-size:12px;">刘</div>
+                  <div><div style="font-size:13px;font-weight:600;">刘小明</div><div style="font-size:11px;color:var(--gray-500);">专业版 · ¥8.4万</div></div>
+                </div>
+                <div style="background:var(--gray-50);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
+                  <div class="avatar-sm" style="background:#0891B2;width:28px;height:28px;font-size:12px;">王</div>
+                  <div><div style="font-size:13px;font-weight:600;">王文丽</div><div style="font-size:11px;color:var(--gray-500);">专业版 · ¥7.9万</div></div>
+                </div>
+                <div style="background:var(--gray-50);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px;">
+                  <div class="avatar-sm" style="background:#059669;width:28px;height:28px;font-size:12px;">陈</div>
+                  <div><div style="font-size:13px;font-weight:600;">陈明华</div><div style="font-size:11px;color:var(--gray-500);">基础版 · ¥5.2万</div></div>
+                </div>
+                <div style="background:var(--gray-50);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--gray-500);display:flex;align-items:center;">+9人</div>
+              </div>
+            </div>
+            <!-- Team 2 -->
+            <div class="tree-node" style="margin-top:4px;">
+              <div class="tree-item">
+                <div class="tree-toggle">▸</div>
+                <div class="avatar-sm" style="background:#059669;">李</div>
+                <div class="tree-label">
+                  <div class="tree-name">李梅团队</div>
+                  <div class="tree-sub">团队长：李梅 · 上海营业部</div>
+                </div>
+                <div class="tree-meta">
+                  <span class="badge badge-success">活跃</span>
+                  <span style="font-size:13px;color:var(--gray-700);">8人 · ¥31.8万</span>
+                </div>
+              </div>
+            </div>
+            <div class="tree-node" style="margin-top:4px;">
+              <div class="tree-item">
+                <div class="tree-toggle">▸</div>
+                <div class="avatar-sm" style="background:#D97706;">王</div>
+                <div class="tree-label">
+                  <div class="tree-name">王强团队</div>
+                  <div class="tree-sub">团队长：王强 · 广州营业部</div>
+                </div>
+                <div class="tree-meta">
+                  <span class="badge badge-warning">待提升</span>
+                  <span style="font-size:13px;color:var(--gray-700);">10人 · ¥28.6万</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES PAGE -->
+    <div class="page" id="page-employees">
+      <div class="filter-bar">
+        <input class="search-input" type="text" placeholder="搜索员工姓名、工号...">
+        <select class="select-input"><option>全部团队</option><option>张伟团队</option><option>李梅团队</option><option>王强团队</option></select>
+        <select class="select-input"><option>全部状态</option><option>活跃</option><option>试用期</option><option>离职</option></select>
+        <button class="btn btn-ghost">筛选</button>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-ghost">📥 批量导入</button>
+          <button class="btn btn-primary">+ 添加员工</button>
+        </div>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox"></th>
+              <th>姓名 / 工号</th>
+              <th>团队</th>
+              <th>岗位</th>
+              <th>状态</th>
+              <th>本月保费</th>
+              <th>客户数</th>
+              <th>订阅套餐</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-sm" style="background:#1D4ED8;">张</div>
+                  <div><div style="font-weight:600;font-size:13px;">张伟</div><div style="font-size:11px;color:var(--gray-500);">TL-20220315</div></div>
+                </div>
+              </td>
+              <td>张伟团队（自营）</td>
+              <td><span class="badge badge-primary">团队长</span></td>
+              <td><span class="badge badge-success">活跃</span></td>
+              <td style="font-weight:700;">¥42,300</td>
+              <td>286</td>
+              <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;">旗舰版</span></td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">详情</button><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">消息</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-sm" style="background:#6366F1;">刘</div>
+                  <div><div style="font-weight:600;font-size:13px;">刘小明</div><div style="font-size:11px;color:var(--gray-500);">AG-20231105</div></div>
+                </div>
+              </td>
+              <td>张伟团队</td>
+              <td><span class="badge badge-gray">业务员</span></td>
+              <td><span class="badge badge-success">活跃</span></td>
+              <td style="font-weight:700;">¥8,400</td>
+              <td>42</td>
+              <td><span class="badge badge-primary">专业版</span></td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">详情</button><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">消息</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-sm" style="background:#F59E0B;color:#fff;">周</div>
+                  <div><div style="font-weight:600;font-size:13px;">周晓燕</div><div style="font-size:11px;color:var(--gray-500);">AG-20240210</div></div>
+                </div>
+              </td>
+              <td>李梅团队</td>
+              <td><span class="badge badge-gray">业务员</span></td>
+              <td><span class="badge badge-trial">试用期</span></td>
+              <td style="font-weight:700;">¥2,100</td>
+              <td>8</td>
+              <td><span class="badge badge-gray">基础版</span></td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">详情</button><button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">禁用</button></div></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox"></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="avatar-sm" style="background:#9CA3AF;">孙</div>
+                  <div><div style="font-weight:600;font-size:13px;">孙志强</div><div style="font-size:11px;color:var(--gray-500);">AG-20210820</div></div>
+                </div>
+              </td>
+              <td>王强团队</td>
+              <td><span class="badge badge-gray">业务员</span></td>
+              <td><span class="badge badge-gray">已离职</span></td>
+              <td style="font-weight:700;color:var(--gray-400);">—</td>
+              <td style="color:var(--gray-400);">156</td>
+              <td><span class="badge badge-gray">已冻结</span></td>
+              <td><div class="action-btns"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">详情</button></div></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="padding:14px 16px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:13px;color:var(--gray-500);">共 128 条记录</div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-ghost" style="padding:5px 12px;">上一页</button>
+            <button class="btn btn-primary" style="padding:5px 12px;">1</button>
+            <button class="btn btn-ghost" style="padding:5px 12px;">2</button>
+            <button class="btn btn-ghost" style="padding:5px 12px;">3</button>
+            <button class="btn btn-ghost" style="padding:5px 12px;">下一页</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS PAGE -->
+    <div class="page" id="page-analytics">
+      <div class="section-header">
+        <div class="section-title">团队分析</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost">本月</button>
+          <button class="btn btn-primary">本季度</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Bar Chart -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">团队保费对比</div></div>
+          <div class="chart-container">
+            <svg viewBox="0 0 360 200" width="100%">
+              <!-- Grid -->
+              <line x1="60" y1="10" x2="60" y2="170" stroke="#E2E8F0" stroke-width="1"/>
+              <line x1="60" y1="170" x2="350" y2="170" stroke="#E2E8F0" stroke-width="1"/>
+              <line x1="60" y1="130" x2="350" y2="130" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="60" y1="90" x2="350" y2="90" stroke="#F1F5F9" stroke-width="1"/>
+              <line x1="60" y1="50" x2="350" y2="50" stroke="#F1F5F9" stroke-width="1"/>
+              <!-- Bars -->
+              <rect x="75" y="42" width="40" height="128" rx="6" fill="#2563EB"/>
+              <rect x="155" y="72" width="40" height="98" rx="6" fill="#2563EB" opacity="0.7"/>
+              <rect x="235" y="83" width="40" height="87" rx="6" fill="#2563EB" opacity="0.5"/>
+              <rect x="295" y="101" width="40" height="69" rx="6" fill="#2563EB" opacity="0.3"/>
+              <!-- Labels -->
+              <text x="95" y="188" text-anchor="middle" font-size="10" fill="#64748B" font-family="Noto Sans SC">张伟团队</text>
+              <text x="175" y="188" text-anchor="middle" font-size="10" fill="#64748B" font-family="Noto Sans SC">李梅团队</text>
+              <text x="255" y="188" text-anchor="middle" font-size="10" fill="#64748B" font-family="Noto Sans SC">王强团队</text>
+              <text x="315" y="188" text-anchor="middle" font-size="10" fill="#64748B" font-family="Noto Sans SC">赵丽团队</text>
+              <!-- Value labels -->
+              <text x="95" y="37" text-anchor="middle" font-size="10" fill="#1E40AF" font-weight="700" font-family="Noto Sans SC">¥42.3万</text>
+              <text x="175" y="67" text-anchor="middle" font-size="10" fill="#1E40AF" font-weight="700" font-family="Noto Sans SC">¥31.8万</text>
+              <text x="255" y="78" text-anchor="middle" font-size="10" fill="#1E40AF" font-weight="700" font-family="Noto Sans SC">¥28.6万</text>
+              <text x="315" y="96" text-anchor="middle" font-size="10" fill="#1E40AF" font-weight="700" font-family="Noto Sans SC">¥25.8万</text>
+              <!-- Y labels -->
+              <text x="50" y="174" text-anchor="end" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">0</text>
+              <text x="50" y="134" text-anchor="end" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">15万</text>
+              <text x="50" y="94" text-anchor="end" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">30万</text>
+              <text x="50" y="54" text-anchor="end" font-size="9" fill="#94A3B8" font-family="Noto Sans SC">45万</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Ranking -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">业务员排行榜（本月）</div></div>
+          <table>
+            <thead><tr><th>排名</th><th>业务员</th><th>团队</th><th>本月保费</th><th>环比</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div class="rank-num rank-1" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">1</div></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="background:#1D4ED8;width:28px;height:28px;font-size:12px;">王</div><div style="font-weight:600;font-size:13px;">王文丽</div></div></td>
+                <td style="font-size:12px;color:var(--gray-500);">张伟团队</td>
+                <td style="font-weight:700;">¥9.8万</td>
+                <td style="color:var(--success);font-size:12px;font-weight:600;">↑ +23%</td>
+              </tr>
+              <tr>
+                <td><div class="rank-num rank-2" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#94A3B8,#64748B);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">2</div></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="background:#6366F1;width:28px;height:28px;font-size:12px;">刘</div><div style="font-weight:600;font-size:13px;">刘小明</div></div></td>
+                <td style="font-size:12px;color:var(--gray-500);">张伟团队</td>
+                <td style="font-weight:700;">¥8.4万</td>
+                <td style="color:var(--success);font-size:12px;font-weight:600;">↑ +15%</td>
+              </tr>
+              <tr>
+                <td><div class="rank-num rank-3" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">3</div></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="background:#059669;width:28px;height:28px;font-size:12px;">林</div><div style="font-weight:600;font-size:13px;">林建国</div></div></td>
+                <td style="font-size:12px;color:var(--gray-500);">李梅团队</td>
+                <td style="font-weight:700;">¥7.6万</td>
+                <td style="color:var(--danger);font-size:12px;font-weight:600;">↓ -5%</td>
+              </tr>
+              <tr>
+                <td><div class="rank-num rank-other" style="font-size:13px;">4</div></td>
+                <td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar-sm" style="background:#D97706;width:28px;height:28px;font-size:12px;">陈</div><div style="font-weight:600;font-size:13px;">陈小华</div></div></td>
+                <td style="font-size:12px;color:var(--gray-500);">王强团队</td>
+                <td style="font-weight:700;">¥6.9万</td>
+                <td style="color:var(--success);font-size:12px;font-weight:600;">↑ +8%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- STRATEGIES PAGE -->
+    <div class="page" id="page-strategies">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <div class="inline-alert" style="margin-bottom:0;flex:1;margin-right:16px;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#92400E" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3M12 9v4m0 4h.01"/></svg>
+          有 2 个营销策略待您审核确认
+        </div>
+        <button class="btn btn-primary" onclick="alert('新建策略功能：填写策略名称、触发条件、目标人群、推送内容，提交后由平台审核')">+ 新建策略</button>
+      </div>
+      <div class="section-header">
+        <div class="section-title">营销策略</div>
+        <div style="font-size:13px;color:var(--gray-500);">您可查看触达情况并新建策略，新策略需平台审核后生效</div>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>策略名称</th><th>状态</th><th>触发类型</th><th>本月触达</th><th>转化率</th><th>覆盖业务员</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">生日暖心关怀</td>
+              <td><span class="badge badge-success">运行中</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">时间触发 · 生日前7天</td>
+              <td>48人</td>
+              <td style="color:var(--success);font-weight:700;">12.5%</td>
+              <td>全部 128人</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">保障缺口定向转化</td>
+              <td><span class="badge badge-success">运行中</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">标签触发 · 医疗缺口+高意向</td>
+              <td>23人</td>
+              <td style="color:var(--success);font-weight:700;">28.3%</td>
+              <td>全部 128人</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">续保紧急触达</td>
+              <td><span class="badge badge-success">运行中</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">标签触发 · 续保紧急</td>
+              <td>15人</td>
+              <td style="color:var(--warning);font-weight:700;">9.8%</td>
+              <td>全部 128人</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">沉睡客户唤醒</td>
+              <td><span class="badge" style="background:#FEF3C7;color:#92400E;">待确认</span></td>
+              <td style="font-size:12px;color:var(--gray-500);">标签持续触发 · DORMANT 15天</td>
+              <td>—</td>
+              <td>—</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script>
+function showPage(name, clickedEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (clickedEl) clickedEl.classList.add('active');
+  const titles = {
+    overview: '总览大盘',
+    org: '组织架构',
+    employees: '员工管理',
+    analytics: '团队分析',
+    strategies: '营销策略'
+  };
+  document.getElementById('page-title').textContent = titles[name] || name;
+}
+function setDateRange(range, btn) {
+  document.querySelectorAll('#page-overview .btn').forEach(b => {
+    b.classList.remove('btn-primary'); b.classList.add('btn-ghost');
+  });
+  btn.classList.remove('btn-ghost'); btn.classList.add('btn-primary');
+  const labels = {today:'今日数据',week:'本周数据',month:'本月数据',quarter:'本季数据'};
+  document.getElementById('page-title').textContent = '总览大盘 · ' + (labels[range] || '');
+}
+function showBatchOps() {
+  const toolbar = document.getElementById('batch-toolbar');
+  toolbar.style.display = toolbar.style.display === 'none' ? 'flex' : 'none';
+}
+function clearBatch() {
+  document.querySelectorAll('.org-checkbox').forEach(cb => cb.checked = false);
+  document.getElementById('batch-toolbar').style.display = 'none';
+  document.getElementById('batch-btn').style.display = 'none';
+}
+</script>
+</body>
+</html>
