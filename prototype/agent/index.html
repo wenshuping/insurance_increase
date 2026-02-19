@@ -423,70 +423,55 @@
       </div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
-    <!-- 昨日战报迷你统计图 -->
-    <div onclick="openDailyReport()" style="margin:10px 16px 0;background:#fff;border-radius:16px;padding:14px 16px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.06);border:1px solid #E5E7EB;position:relative;overflow:hidden;">
-      <div style="position:absolute;right:-16px;top:-16px;width:70px;height:70px;border-radius:50%;background:#EBF2FF;pointer-events:none;"></div>
-      <!-- Header row -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div>
-          <div style="font-size:13px;font-weight:700;color:#111827;">昨日战报</div>
-          <div style="font-size:11px;color:#6B7280;margin-top:1px;">2026-02-18（周三）</div>
+    <!-- 昨日战报 —— 4格指标卡（点击进详情） -->
+    <div style="margin:10px 16px 0;cursor:pointer;" onclick="openDailyReport()">
+      <!-- 标题行 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 2px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:3px;height:14px;border-radius:2px;background:#1A56DB;"></div>
+          <span style="font-size:13px;font-weight:700;color:#111827;">昨日战报</span>
+          <span style="font-size:11px;color:#9CA3AF;">2026-02-18（周三）</span>
         </div>
-        <div style="display:flex;align-items:center;gap:3px;font-size:12px;color:#1A56DB;font-weight:600;">
+        <div style="display:flex;align-items:center;gap:2px;font-size:11px;color:#1A56DB;font-weight:600;">
           查看详情
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
         </div>
       </div>
-      <!-- 4-metric row -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
-        <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#1A56DB;line-height:1.1;">12</div>
-          <div style="font-size:10px;color:#6B7280;margin-top:3px;">链接打开</div>
-          <div style="font-size:10px;color:#10B981;font-weight:700;">↑15%</div>
+      <!-- 2×2 指标卡 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">链接打开次数</div>
+          <div style="font-size:30px;font-weight:900;color:#1A56DB;line-height:1.1;">12</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 15%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周</span>
+          </div>
         </div>
-        <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#0D9488;line-height:1.1;">3</div>
-          <div style="font-size:10px;color:#6B7280;margin-top:3px;">测评完成</div>
-          <div style="font-size:10px;color:#10B981;font-weight:700;">↑50%</div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">测评完成人数</div>
+          <div style="font-size:30px;font-weight:900;color:#0D9488;line-height:1.1;">3</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 50%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周</span>
+          </div>
         </div>
-        <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#EF4444;line-height:1.1;">3</div>
-          <div style="font-size:10px;color:#6B7280;margin-top:3px;">新增线索</div>
-          <div style="font-size:10px;color:#EF4444;font-weight:700;">↓25%</div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">新增线索</div>
+          <div style="font-size:30px;font-weight:900;color:#EF4444;line-height:1.1;">3</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#EF4444;font-size:11px;font-weight:700;">↓ 25%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周</span>
+          </div>
         </div>
-        <div style="text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#7C3AED;line-height:1.1;">7</div>
-          <div style="font-size:10px;color:#6B7280;margin-top:3px;">计划书阅读</div>
-          <div style="font-size:10px;color:#10B981;font-weight:700;">↑40%</div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">计划书阅读</div>
+          <div style="font-size:30px;font-weight:900;color:#7C3AED;line-height:1.1;">7</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 40%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周</span>
+          </div>
         </div>
       </div>
-      <!-- 7-day mini bar chart -->
-      <svg viewBox="0 0 310 48" width="100%" style="display:block;">
-        <defs>
-          <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#1A56DB" stop-opacity="0.9"/>
-            <stop offset="100%" stop-color="#1A56DB" stop-opacity="0.3"/>
-          </linearGradient>
-        </defs>
-        <!-- bars: Mon Tue Wed(yesterday=highlight) Thu Fri Sat Sun -->
-        <rect x="10" y="20" width="32" height="24" rx="4" fill="#DBEAFE"/>
-        <rect x="54" y="14" width="32" height="30" rx="4" fill="#DBEAFE"/>
-        <rect x="98" y="8"  width="32" height="36" rx="4" fill="url(#barGrad)"/>
-        <rect x="142" y="28" width="32" height="16" rx="4" fill="#DBEAFE" opacity="0.5"/>
-        <rect x="186" y="22" width="32" height="22" rx="4" fill="#DBEAFE" opacity="0.5"/>
-        <rect x="230" y="32" width="32" height="12" rx="4" fill="#DBEAFE" opacity="0.5"/>
-        <rect x="274" y="18" width="32" height="26" rx="4" fill="#DBEAFE" opacity="0.5"/>
-        <!-- labels -->
-        <text x="26" y="47" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">周一</text>
-        <text x="70" y="47" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">周二</text>
-        <text x="114" y="47" text-anchor="middle" font-size="9" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">昨日</text>
-        <text x="158" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周四</text>
-        <text x="202" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周五</text>
-        <text x="246" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周六</text>
-        <text x="290" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周日</text>
-        <!-- yesterday value label -->
-        <text x="114" y="6" text-anchor="middle" font-size="10" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">12</text>
-      </svg>
     </div>
     <!-- Quick access row: 今日任务 + 活动邀请 -->
     <div style="display:flex;gap:10px;margin:10px 16px 0;">
