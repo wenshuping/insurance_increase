@@ -43,6 +43,7 @@ skills:
   - postmortem-writing          # 项目复盘
   - c4-architecture             # 辅助跨团队沟通
   - planning-with-files         # 文件驱动项目规划
+  - obsidian-bases              # Obsidian 知识库管理
 ```
 
 ### 🎨 UI 设计师
