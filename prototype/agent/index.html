@@ -423,65 +423,80 @@
       </div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
     </div>
-    <!-- Today's Focus -->
-    <div style="margin:10px 16px 0;display:flex;gap:8px;">
-      <div onclick="openNewAgentTasks()" style="flex:1;background:linear-gradient(135deg,#FFF7ED,#FEF3C7);border:1.5px solid #FDE68A;border-radius:14px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:10px;">
-        <div style="width:38px;height:38px;border-radius:10px;background:#F5A623;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+    <!-- 昨日战报迷你统计图 -->
+    <div onclick="openDailyReport()" style="margin:10px 16px 0;background:#fff;border-radius:16px;padding:14px 16px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.06);border:1px solid #E5E7EB;position:relative;overflow:hidden;">
+      <div style="position:absolute;right:-16px;top:-16px;width:70px;height:70px;border-radius:50%;background:#EBF2FF;pointer-events:none;"></div>
+      <!-- Header row -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#111827;">昨日战报</div>
+          <div style="font-size:11px;color:#6B7280;margin-top:1px;">2026-02-18（周三）</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:3px;font-size:12px;color:#1A56DB;font-weight:600;">
+          查看详情
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
+      </div>
+      <!-- 4-metric row -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;">
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#1A56DB;line-height:1.1;">12</div>
+          <div style="font-size:10px;color:#6B7280;margin-top:3px;">链接打开</div>
+          <div style="font-size:10px;color:#10B981;font-weight:700;">↑15%</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#0D9488;line-height:1.1;">3</div>
+          <div style="font-size:10px;color:#6B7280;margin-top:3px;">测评完成</div>
+          <div style="font-size:10px;color:#10B981;font-weight:700;">↑50%</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#EF4444;line-height:1.1;">3</div>
+          <div style="font-size:10px;color:#6B7280;margin-top:3px;">新增线索</div>
+          <div style="font-size:10px;color:#EF4444;font-weight:700;">↓25%</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#7C3AED;line-height:1.1;">7</div>
+          <div style="font-size:10px;color:#6B7280;margin-top:3px;">计划书阅读</div>
+          <div style="font-size:10px;color:#10B981;font-weight:700;">↑40%</div>
+        </div>
+      </div>
+      <!-- 7-day mini bar chart -->
+      <svg viewBox="0 0 310 48" width="100%" style="display:block;">
+        <defs>
+          <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1A56DB" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#1A56DB" stop-opacity="0.3"/>
+          </linearGradient>
+        </defs>
+        <!-- bars: Mon Tue Wed(yesterday=highlight) Thu Fri Sat Sun -->
+        <rect x="10" y="20" width="32" height="24" rx="4" fill="#DBEAFE"/>
+        <rect x="54" y="14" width="32" height="30" rx="4" fill="#DBEAFE"/>
+        <rect x="98" y="8"  width="32" height="36" rx="4" fill="url(#barGrad)"/>
+        <rect x="142" y="28" width="32" height="16" rx="4" fill="#DBEAFE" opacity="0.5"/>
+        <rect x="186" y="22" width="32" height="22" rx="4" fill="#DBEAFE" opacity="0.5"/>
+        <rect x="230" y="32" width="32" height="12" rx="4" fill="#DBEAFE" opacity="0.5"/>
+        <rect x="274" y="18" width="32" height="26" rx="4" fill="#DBEAFE" opacity="0.5"/>
+        <!-- labels -->
+        <text x="26" y="47" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">周一</text>
+        <text x="70" y="47" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">周二</text>
+        <text x="114" y="47" text-anchor="middle" font-size="9" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">昨日</text>
+        <text x="158" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周四</text>
+        <text x="202" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周五</text>
+        <text x="246" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周六</text>
+        <text x="290" y="47" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周日</text>
+        <!-- yesterday value label -->
+        <text x="114" y="6" text-anchor="middle" font-size="10" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">12</text>
+      </svg>
+    </div>
+    <!-- Quick access row: 今日任务 + 活动邀请 -->
+    <div style="display:flex;gap:10px;margin:10px 16px 0;">
+      <div onclick="openNewAgentTasks()" style="flex:1;background:linear-gradient(135deg,#F59E0B,#D97706);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         </div>
         <div>
-          <div style="font-size:13px;font-weight:700;color:#92400E;">今日任务</div>
-          <div style="font-size:11px;color:#D97706;margin-top:1px;">完成 2/5 · 今天加油</div>
-        </div>
-      </div>
-      <div onclick="openDailyReport()" style="flex:1;background:linear-gradient(135deg,#EBF2FF,#DBEAFE);border:1.5px solid #BFDBFE;border-radius:14px;padding:14px;cursor:pointer;display:flex;align-items:center;gap:10px;">
-        <div style="width:38px;height:38px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:#1E40AF;">昨日战报</div>
-          <div style="font-size:11px;color:#3B82F6;margin-top:1px;">3条新线索 ↑15%</div>
-        </div>
-      </div>
-    </div>
-    <div style="padding:12px 16px 4px;background:#fff;border-bottom:1px solid var(--gray-100);">
-      <div style="font-size:12px;font-weight:700;color:var(--gray-500);letter-spacing:0.5px;margin-bottom:8px;">TODAY'S FOCUS</div>
-      <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;">
-        <div style="flex-shrink:0;background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 12px;min-width:130px;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <span style="width:6px;height:6px;border-radius:50%;background:#EF4444;display:inline-block;"></span>
-            <span style="font-size:11px;font-weight:700;color:#DC2626;">紧急</span>
-          </div>
-          <div style="font-size:12px;font-weight:600;color:var(--gray-900);">李华 续保到期</div>
-          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">明日到期，立即联系</div>
-        </div>
-        <div style="flex-shrink:0;background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:10px 12px;min-width:130px;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <span style="width:6px;height:6px;border-radius:50%;background:#FF6B35;display:inline-block;"></span>
-            <span style="font-size:11px;font-weight:700;color:#EA580C;">今日</span>
-          </div>
-          <div style="font-size:12px;font-weight:600;color:var(--gray-900);">王芳 高意向</div>
-          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">发送定制计划书</div>
-        </div>
-        <div style="flex-shrink:0;background:#F0FDFA;border:1px solid #99F6E4;border-radius:10px;padding:10px 12px;min-width:130px;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            <span style="width:6px;height:6px;border-radius:50%;background:#0D9488;display:inline-block;"></span>
-            <span style="font-size:11px;font-weight:700;color:#0D9488;">提醒</span>
-          </div>
-          <div style="font-size:12px;font-weight:600;color:var(--gray-900);">张明 生日</div>
-          <div style="font-size:11px;color:var(--gray-500);margin-top:2px;">3天后，准备祝福语</div>
-        </div>
-      </div>
-    </div>
-    <!-- §2.1 + §2.3: Quick access row -->
-    <div style="display:flex;gap:10px;margin:10px 16px 0;">
-      <div class="rank-entry-card" style="flex:1;" onclick="openActRanking()">
-        <div class="rank-entry-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
-        </div>
-        <div>
-          <div style="font-size:13px;font-weight:700;color:#fff;">客户活跃榜</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.75);margin-top:2px;">5冷却客户待唤醒</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;">今日任务</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px;">完成 2/5 · 今天加油</div>
         </div>
       </div>
       <div onclick="openActivityInvite()" style="flex:1;background:linear-gradient(135deg,#0D9488,#059669);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;">
@@ -818,90 +833,304 @@
     </div>
   </div>
 
-  <!-- Performance Screen -->
+  <!-- 战报 Screen (formerly 业绩) -->
   <div class="screen" id="screen-perf">
-    <div class="perf-header">
-      <div class="perf-month">2026年2月 本月业绩</div>
-      <div class="perf-total"><span class="perf-unit">¥</span>84,200</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
-        <span style="font-size:12px;color:rgba(255,255,255,0.7);">目标 ¥100,000 · 完成率 84%</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.5);">差 ¥15,800</span>
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1E3A5F,#1A56DB);padding:16px 16px 20px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:17px;font-weight:800;color:#fff;">战报</div>
+        <!-- 日/月/年 Selector -->
+        <div style="display:flex;background:rgba(255,255,255,0.15);border-radius:10px;padding:2px;">
+          <div id="pr-tab-day"   onclick="switchPeriod('day')"   style="padding:5px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;background:rgba(255,255,255,0.25);">日</div>
+          <div id="pr-tab-month" onclick="switchPeriod('month')" style="padding:5px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:rgba(255,255,255,0.65);">月</div>
+          <div id="pr-tab-year"  onclick="switchPeriod('year')"  style="padding:5px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;color:rgba(255,255,255,0.65);">年</div>
+        </div>
       </div>
-      <div style="background:rgba(255,255,255,0.2);border-radius:6px;height:6px;margin-top:8px;overflow:hidden;">
-        <div style="width:84%;height:100%;background:#fff;border-radius:6px;"></div>
+      <!-- Date navigator -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:16px;">
+        <div onclick="navPeriod(-1)" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m15 18-6-6 6-6"/></svg>
+        </div>
+        <div id="pr-date-label" style="font-size:14px;font-weight:700;color:#fff;min-width:140px;text-align:center;">2026-02-18（周三）</div>
+        <div onclick="navPeriod(1)" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+        </div>
       </div>
     </div>
-    <div class="perf-grid">
-      <div class="perf-card">
-        <div class="perf-card-label">成交保单</div>
-        <div class="perf-card-value">7</div>
-        <div class="perf-card-sub">↑ 较上月 +2</div>
-      </div>
-      <div class="perf-card">
-        <div class="perf-card-label">新增客户</div>
-        <div class="perf-card-value">18</div>
-        <div class="perf-card-sub">↑ 较上月 +5</div>
-      </div>
-      <div class="perf-card">
-        <div class="perf-card-label">续保率</div>
-        <div class="perf-card-value">91%</div>
-        <div class="perf-card-sub">↑ 较上月 +3%</div>
-      </div>
-      <div class="perf-card">
-        <div class="perf-card-label">预计佣金</div>
-        <div class="perf-card-value">¥12,630</div>
-        <div class="perf-card-sub" style="color:var(--gray-500);">结算日 3月5日</div>
-      </div>
-    </div>
-    <div class="rank-card">
-      <div class="rank-num">#3</div>
-      <div class="rank-info">
-        <div class="rank-label">团队排名</div>
-        <div class="rank-team">张伟团队（共12人）</div>
-        <div style="font-size:12px;color:var(--gray-500);margin-top:4px;">与第2名相差 ¥3,200</div>
-      </div>
-      <svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="none" stroke="#FEE68A" stroke-width="4"/><circle cx="20" cy="20" r="18" fill="none" stroke="var(--orange)" stroke-width="4" stroke-dasharray="90 113" stroke-linecap="round" transform="rotate(-90 20 20)"/><text x="20" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="var(--orange)">79%</text></svg>
-    </div>
-    <!-- Mini target progress cards -->
-    <div style="margin:0 16px 16px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-      <div style="background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow-sm);">
-        <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;">成交保单目标</div>
-        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px;">
-          <span style="font-size:18px;font-weight:700;color:var(--gray-900);">7</span>
-          <span style="font-size:11px;color:var(--gray-500);">/ 10单</span>
+
+    <div style="flex:1;overflow-y:auto;" id="pr-scroll">
+    <div id="pr-scroll-inner">
+
+    <!-- === 日 VIEW === -->
+    <div id="pr-view-day">
+      <!-- 4 metrics -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;">
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">链接打开次数</div>
+          <div style="font-size:30px;font-weight:900;color:#1A56DB;line-height:1;">12</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 15%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周同日</span>
+          </div>
         </div>
-        <div style="background:var(--gray-100);border-radius:4px;height:5px;overflow:hidden;">
-          <div style="width:70%;height:100%;background:var(--primary);border-radius:4px;"></div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">测评完成人数</div>
+          <div style="font-size:30px;font-weight:900;color:#0D9488;line-height:1;">3</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 50%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周同日</span>
+          </div>
         </div>
-        <div style="font-size:11px;color:var(--primary);margin-top:4px;font-weight:600;">70% · 差3单</div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">新增线索</div>
+          <div style="font-size:30px;font-weight:900;color:#EF4444;line-height:1;">3</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#EF4444;font-size:11px;font-weight:700;">↓ 25%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周同日</span>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">计划书阅读</div>
+          <div style="font-size:30px;font-weight:900;color:#7C3AED;line-height:1;">7</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 40%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 上周同日</span>
+          </div>
+        </div>
       </div>
-      <div style="background:#fff;border-radius:12px;padding:12px;box-shadow:var(--shadow-sm);">
-        <div style="font-size:11px;color:var(--gray-500);margin-bottom:6px;">新增客户目标</div>
-        <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:6px;">
-          <span style="font-size:18px;font-weight:700;color:var(--gray-900);">18</span>
-          <span style="font-size:11px;color:var(--gray-500);">/ 20人</span>
-        </div>
-        <div style="background:var(--gray-100);border-radius:4px;height:5px;overflow:hidden;">
-          <div style="width:90%;height:100%;background:var(--teal);border-radius:4px;"></div>
-        </div>
-        <div style="font-size:11px;color:var(--teal);margin-top:4px;font-weight:600;">90% · 差2人</div>
-      </div>
-    </div>
-    <div class="section-padding">
-      <div class="section-title">本月保费趋势</div>
-      <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:var(--shadow-sm);">
-        <svg viewBox="0 0 300 100" width="100%">
-          <defs><linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1A56DB" stop-opacity="0.3"/><stop offset="100%" stop-color="#1A56DB" stop-opacity="0"/></linearGradient></defs>
-          <path d="M10,80 L30,70 L60,60 L90,65 L120,45 L150,50 L180,35 L210,30 L240,25 L270,20 L290,15" fill="none" stroke="#1A56DB" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M10,80 L30,70 L60,60 L90,65 L120,45 L150,50 L180,35 L210,30 L240,25 L270,20 L290,15 L290,95 L10,95 Z" fill="url(#lineGrad)"/>
-          <line x1="10" y1="95" x2="290" y2="95" stroke="#E5E7EB" stroke-width="1"/>
-          <text x="10" y="105" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">2/1</text>
-          <text x="140" y="105" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">2/10</text>
-          <text x="275" y="105" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">2/19</text>
+      <!-- 7-day trend chart -->
+      <div style="margin:12px 16px 0;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">近7天趋势</div>
+        <svg viewBox="0 0 310 80" width="100%">
+          <defs>
+            <linearGradient id="prDayGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1A56DB" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#1A56DB" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- bar chart: 7 days -->
+          <rect x="8"   y="38" width="34" height="30" rx="4" fill="#DBEAFE"/>
+          <rect x="52"  y="26" width="34" height="42" rx="4" fill="#DBEAFE"/>
+          <rect x="96"  y="10" width="34" height="58" rx="4" fill="#1A56DB" opacity="0.85"/>
+          <rect x="140" y="50" width="34" height="18" rx="4" fill="#DBEAFE" opacity="0.5"/>
+          <rect x="184" y="34" width="34" height="34" rx="4" fill="#DBEAFE" opacity="0.5"/>
+          <rect x="228" y="46" width="34" height="22" rx="4" fill="#DBEAFE" opacity="0.5"/>
+          <rect x="272" y="30" width="34" height="38" rx="4" fill="#DBEAFE" opacity="0.5"/>
+          <!-- x labels -->
+          <text x="25"  y="78" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">周一</text>
+          <text x="69"  y="78" text-anchor="middle" font-size="9" fill="#9CA3AF" font-family="Noto Sans SC">周二</text>
+          <text x="113" y="78" text-anchor="middle" font-size="9" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">昨日</text>
+          <text x="157" y="78" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周四</text>
+          <text x="201" y="78" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周五</text>
+          <text x="245" y="78" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周六</text>
+          <text x="289" y="78" text-anchor="middle" font-size="9" fill="#D1D5DB" font-family="Noto Sans SC">周日</text>
+          <!-- value label on highlight -->
+          <text x="113" y="8" text-anchor="middle" font-size="10" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">12</text>
         </svg>
       </div>
-    </div>
-  </div>
+      <!-- 团队排名 -->
+      <div style="margin:12px 16px 0;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-size:13px;font-weight:700;color:#111827;">团队排名</div>
+          <div style="background:#EBF2FF;border-radius:8px;padding:3px 10px;font-size:12px;font-weight:700;color:#1A56DB;">第 3 名 / 24人</div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:5px;height:56px;margin-bottom:8px;">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="flex:1;width:100%;background:#BFDBFE;border-radius:4px 4px 0 0;"></div><div style="font-size:10px;color:#9CA3AF;">刘</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="flex:0.9;width:100%;background:#93C5FD;border-radius:4px 4px 0 0;"></div><div style="font-size:10px;color:#9CA3AF;">王</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;"><div style="flex:0.75;width:100%;background:#1A56DB;border-radius:4px 4px 0 0;"></div><div style="position:absolute;top:-18px;background:#1A56DB;color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:4px;">你</div><div style="font-size:10px;color:#1A56DB;font-weight:700;">张</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="flex:0.6;width:100%;background:#DBEAFE;border-radius:4px 4px 0 0;"></div><div style="font-size:10px;color:#9CA3AF;">陈</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="flex:0.5;width:100%;background:#DBEAFE;border-radius:4px 4px 0 0;"></div><div style="font-size:10px;color:#9CA3AF;">李</div></div>
+        </div>
+        <div style="font-size:12px;color:#6B7280;background:#F9FAFB;border-radius:8px;padding:8px;">距离第2名王姐只差 <strong style="color:#1A56DB;">2条线索</strong>，今天继续加油！</div>
+      </div>
+      <!-- 今日建议行动 -->
+      <div style="margin:12px 16px 14px;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">今日建议行动</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;background:#FEF2F2;border-radius:10px;padding:10px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#EF4444;flex-shrink:0;"></div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#991B1B;">王芳 · 48小时前查看了计划书</div><div style="font-size:11px;color:#EF4444;margin-top:1px;">今天是最佳跟进窗口</div></div>
+            <div onclick="callContact('王芳')" style="background:#EF4444;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;">联系</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#FFF7ED;border-radius:10px;padding:10px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#F59E0B;flex-shrink:0;"></div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#92400E;">陈志强 · 完成了测评（43分）</div><div style="font-size:11px;color:#D97706;margin-top:1px;">保障完整度低，有明显缺口</div></div>
+            <div onclick="callContact('陈志强')" style="background:#F59E0B;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;">联系</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;background:#F0FDFA;border-radius:10px;padding:10px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#10B981;flex-shrink:0;"></div>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#065F46;">林小燕 · 新增客户（来自刘芳转发）</div><div style="font-size:11px;color:#10B981;margin-top:1px;">裂变新线索，48h内跟进</div></div>
+            <div onclick="callContact('林小燕')" style="background:#10B981;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;cursor:pointer;white-space:nowrap;">联系</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pr-view-day -->
+
+    <!-- === 月 VIEW === -->
+    <div id="pr-view-month" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;">
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">本月保费</div>
+          <div style="font-size:26px;font-weight:900;color:#1A56DB;line-height:1;">¥8.4万</div>
+          <div style="margin-top:6px;background:#E5E7EB;border-radius:4px;height:4px;overflow:hidden;"><div style="width:84%;height:100%;background:#1A56DB;border-radius:4px;"></div></div>
+          <div style="font-size:10px;color:#1A56DB;margin-top:3px;font-weight:600;">84% · 目标¥10万</div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">成交保单</div>
+          <div style="font-size:26px;font-weight:900;color:#0D9488;line-height:1;">7单</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ +2单</span>
+            <span style="font-size:10px;color:#9CA3AF;">较上月</span>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">新增客户</div>
+          <div style="font-size:26px;font-weight:900;color:#7C3AED;line-height:1;">18人</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ +5人</span>
+            <span style="font-size:10px;color:#9CA3AF;">较上月</span>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">预计佣金</div>
+          <div style="font-size:26px;font-weight:900;color:#F59E0B;line-height:1;">¥1.26万</div>
+          <div style="font-size:10px;color:#9CA3AF;margin-top:5px;">结算日 3月5日</div>
+        </div>
+      </div>
+      <!-- monthly trend chart (12 bars) -->
+      <div style="margin:12px 16px 0;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">月度保费趋势</div>
+        <svg viewBox="0 0 340 80" width="100%">
+          <defs><linearGradient id="prMonthGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1A56DB" stop-opacity="0.3"/><stop offset="100%" stop-color="#1A56DB" stop-opacity="0"/></linearGradient></defs>
+          <path d="M14,70 L42,62 L70,55 L98,60 L126,45 L154,50 L182,38 L210,32 L238,28 L266,22 L294,18 L322,14" fill="none" stroke="#1A56DB" stroke-width="2" stroke-linecap="round"/>
+          <path d="M14,70 L42,62 L70,55 L98,60 L126,45 L154,50 L182,38 L210,32 L238,28 L266,22 L294,18 L322,14 L322,75 L14,75 Z" fill="url(#prMonthGrad)"/>
+          <line x1="14" y1="75" x2="322" y2="75" stroke="#E5E7EB" stroke-width="1"/>
+          <!-- month labels -->
+          <text x="14"  y="82" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="Noto Sans SC">3月</text>
+          <text x="98"  y="82" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="Noto Sans SC">6月</text>
+          <text x="182" y="82" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="Noto Sans SC">9月</text>
+          <text x="266" y="82" text-anchor="middle" font-size="8" fill="#9CA3AF" font-family="Noto Sans SC">12月</text>
+          <text x="322" y="82" text-anchor="middle" font-size="8" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">本月</text>
+          <circle cx="322" cy="14" r="4" fill="#1A56DB"/>
+        </svg>
+      </div>
+      <!-- renewal rate -->
+      <div style="margin:12px 16px 14px;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">续保率 & 目标进度</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="position:relative;width:64px;height:64px;flex-shrink:0;">
+            <svg width="64" height="64" style="transform:rotate(-90deg)">
+              <circle cx="32" cy="32" r="26" fill="none" stroke="#E5E7EB" stroke-width="6"/>
+              <circle cx="32" cy="32" r="26" fill="none" stroke="#10B981" stroke-width="6" stroke-dasharray="149 165" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#10B981;">91%</div>
+          </div>
+          <div>
+            <div style="font-size:13px;font-weight:700;color:#065F46;">续保率 91%</div>
+            <div style="font-size:12px;color:#6B7280;margin-top:3px;">行业均值 82%，高出 9%</div>
+            <div style="font-size:12px;color:#1A56DB;margin-top:4px;font-weight:600;">本月续保 11单 / 12单</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pr-view-month -->
+
+    <!-- === 年 VIEW === -->
+    <div id="pr-view-year" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0;">
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">年度累计保费</div>
+          <div style="font-size:24px;font-weight:900;color:#1A56DB;line-height:1;">¥42万</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 28%</span>
+            <span style="font-size:10px;color:#9CA3AF;">vs 去年同期</span>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">年度新客户</div>
+          <div style="font-size:24px;font-weight:900;color:#0D9488;line-height:1;">86人</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ +22人</span>
+            <span style="font-size:10px;color:#9CA3AF;">较去年</span>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">年度保单数</div>
+          <div style="font-size:24px;font-weight:900;color:#7C3AED;line-height:1;">38单</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ +9单</span>
+            <span style="font-size:10px;color:#9CA3AF;">较去年</span>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+          <div style="font-size:11px;color:#6B7280;margin-bottom:5px;">年度佣金</div>
+          <div style="font-size:24px;font-weight:900;color:#F59E0B;line-height:1;">¥6.3万</div>
+          <div style="display:flex;align-items:center;gap:4px;margin-top:5px;">
+            <span style="color:#10B981;font-size:11px;font-weight:700;">↑ 31%</span>
+            <span style="font-size:10px;color:#9CA3AF;">较去年</span>
+          </div>
+        </div>
+      </div>
+      <!-- annual bar chart by month -->
+      <div style="margin:12px 16px 0;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">全年保费（按月）</div>
+        <svg viewBox="0 0 340 80" width="100%">
+          <!-- 12 monthly bars for 2025 -->
+          <rect x="4"   y="60" width="22" height="15" rx="3" fill="#DBEAFE"/>
+          <rect x="30"  y="52" width="22" height="23" rx="3" fill="#DBEAFE"/>
+          <rect x="56"  y="44" width="22" height="31" rx="3" fill="#DBEAFE"/>
+          <rect x="82"  y="56" width="22" height="19" rx="3" fill="#DBEAFE"/>
+          <rect x="108" y="40" width="22" height="35" rx="3" fill="#DBEAFE"/>
+          <rect x="134" y="48" width="22" height="27" rx="3" fill="#DBEAFE"/>
+          <rect x="160" y="34" width="22" height="41" rx="3" fill="#DBEAFE"/>
+          <rect x="186" y="28" width="22" height="47" rx="3" fill="#DBEAFE"/>
+          <rect x="212" y="20" width="22" height="55" rx="3" fill="#DBEAFE"/>
+          <rect x="238" y="14" width="22" height="61" rx="3" fill="#DBEAFE"/>
+          <rect x="264" y="10" width="22" height="65" rx="3" fill="#DBEAFE"/>
+          <rect x="290" y="6"  width="22" height="69" rx="3" fill="#1A56DB" opacity="0.85"/>
+          <!-- year-to-date growth line -->
+          <text x="301" y="4" text-anchor="middle" font-size="8" fill="#1A56DB" font-weight="700" font-family="Noto Sans SC">本月</text>
+          <!-- x-axis -->
+          <line x1="4" y1="76" x2="316" y2="76" stroke="#E5E7EB" stroke-width="1"/>
+          <text x="15"  y="84" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="Noto Sans SC">1月</text>
+          <text x="93"  y="84" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="Noto Sans SC">4月</text>
+          <text x="171" y="84" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="Noto Sans SC">7月</text>
+          <text x="249" y="84" text-anchor="middle" font-size="7" fill="#9CA3AF" font-family="Noto Sans SC">10月</text>
+        </svg>
+      </div>
+      <!-- top 3 products -->
+      <div style="margin:12px 16px 14px;background:#fff;border-radius:14px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">年度销售 TOP 险种</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;font-weight:600;color:#374151;">重疾险</span>
+              <span style="font-size:12px;color:#1A56DB;font-weight:700;">¥18.2万 · 14单</span>
+            </div>
+            <div style="background:#E5E7EB;border-radius:4px;height:5px;overflow:hidden;"><div style="width:73%;height:100%;background:#1A56DB;border-radius:4px;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;font-weight:600;color:#374151;">百万医疗险</span>
+              <span style="font-size:12px;color:#0D9488;font-weight:700;">¥12.4万 · 16单</span>
+            </div>
+            <div style="background:#E5E7EB;border-radius:4px;height:5px;overflow:hidden;"><div style="width:50%;height:100%;background:#0D9488;border-radius:4px;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;font-weight:600;color:#374151;">定期寿险</span>
+              <span style="font-size:12px;color:#7C3AED;font-weight:700;">¥8.6万 · 8单</span>
+            </div>
+            <div style="background:#E5E7EB;border-radius:4px;height:5px;overflow:hidden;"><div style="width:34%;height:100%;background:#7C3AED;border-radius:4px;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /pr-view-year -->
+
+    </div><!-- /pr-scroll-inner -->
+    </div><!-- /pr-scroll -->
+
+  </div><!-- /screen-perf -->
 
   <!-- Settings Screen -->
   <div class="screen" id="screen-settings">
@@ -1254,7 +1483,7 @@
       <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3.128a4 4 0 0 1 0 7.744M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg></span><span class="tab-label">客户</span>
     </div>
     <div class="tab-item" id="tab-perf" onclick="switchTab('perf')">
-      <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21v-6m7 6V3m7 18V9"/></svg></span><span class="tab-label">业绩</span>
+      <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21v-6m7 6V3m7 18V9"/></svg></span><span class="tab-label">战报</span>
     </div>
     <div class="tab-item" id="tab-settings" onclick="switchTab('settings')">
       <span class="tab-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="tab-label">我的</span>
@@ -2215,6 +2444,43 @@ function callContact(name) {
   alert('拨打 ' + name + ' 的电话。（原型演示）');
 }
 
+/* ===== 战报 日/月/年 切换 ===== */
+var prPeriod = 'day';
+var prOffset = { day: 0, month: 0, year: 0 };
+
+var prDayLabels = ['2026-02-18（周三）','2026-02-17（周二）','2026-02-16（周一）','2026-02-15（周日）'];
+var prMonthLabels = ['2026年2月','2026年1月','2025年12月','2025年11月'];
+var prYearLabels = ['2025年度','2024年度','2023年度'];
+
+function switchPeriod(p) {
+  prPeriod = p;
+  prOffset[p] = 0;
+  ['day','month','year'].forEach(function(k){
+    var tab = document.getElementById('pr-tab-' + k);
+    if (k === p) {
+      tab.style.background = 'rgba(255,255,255,0.25)';
+      tab.style.color = '#fff';
+    } else {
+      tab.style.background = 'transparent';
+      tab.style.color = 'rgba(255,255,255,0.65)';
+    }
+    document.getElementById('pr-view-' + k).style.display = (k === p) ? 'block' : 'none';
+  });
+  updatePrDateLabel();
+}
+
+function navPeriod(dir) {
+  prOffset[prPeriod] += dir;
+  if (prOffset[prPeriod] < 0) prOffset[prPeriod] = 0;
+  updatePrDateLabel();
+}
+
+function updatePrDateLabel() {
+  var labels = prPeriod === 'day' ? prDayLabels : prPeriod === 'month' ? prMonthLabels : prYearLabels;
+  var idx = Math.min(prOffset[prPeriod], labels.length - 1);
+  var el = document.getElementById('pr-date-label');
+  if (el) el.textContent = labels[idx];
+}
 </script>
 
 </body>
